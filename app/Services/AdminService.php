@@ -43,7 +43,7 @@ class AdminService
     }
 
     //update admin
-    public function updateAdmin(Admin $adminId, array $data): Admin
+    public function updateAdmin(int $adminId, array $data): Admin
     {
         $admin = Admin::find($adminId);
 

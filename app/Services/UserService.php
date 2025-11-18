@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Services\User;
+namespace App\Services;
 
 use App\Models\User;
 use App\Services\MessageService;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 
 
@@ -18,6 +19,19 @@ class UserService
     //create user
     public function createUser(array $data): array
     {
+        // Re-validate uniqueness to prevent race conditions
+        if (User::where('email', $data['email'])->exists()) {
+            throw new \Exception('Email is already registered');
+        }
+
+        if (User::where('phone', $data['phone'])->exists()) {
+            throw new \Exception('Phone number is already registered');
+        }
+
+        if (User::where('username', $data['username'])->exists()) {
+            throw new \Exception('Username is already taken');
+        }
+
         $user = User::create([
             'username' => $data['username'],
             'fname' => $data['fname'],
@@ -45,7 +59,7 @@ class UserService
     }
 
     //update user
-    public function updateUser(User $userId, array $data): User
+    public function updateUser(int $userId, array $data): User
     {
         $user = User::find($userId);
 
@@ -135,6 +149,32 @@ class UserService
     public function sendRegistrationOtp(string $phone, string $email): array
     {
         //send otp via sms
+        $result = $this->messageService->sendVerificationOtp($phone);
 
+        Log::info("Registration OTP Send Result: {$result}");
+
+        if (isset($result['status']) && $result['status'] === 'success') {
+            return [
+                'success' => true,
+                'message' => 'OTP sent successfully.',
+            ];
+        }
+
+        return [
+            'success' => false,
+            'message' => 'Failed to send OTP. ' . ($result['message'] ?? 'Please try again.'),
+        ];
+    }
+
+    //verify otp
+    public function verifyOtp(string $phone, string $otp): array
+    {
+        return $this->messageService->verifyOtp($phone, $otp);
+    }
+
+    //generate reset password token
+    public function generateResetToken(): string
+    {
+        return Str::random(128);
     }
 }
