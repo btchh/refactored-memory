@@ -19,18 +19,8 @@ class AdminSeeder extends Seeder
             'lname' => 'User',
             'email' => 'admin@example.com',
             'phone' => '+1234567890',
-            'address' => '123 Admin Street',
+            'address' => 'Bagong Pook Rosario Batangas',
             'password' => 'password123'
-        ]);
-
-        Admin::create([
-            'admin_name' => 'superadmin',
-            'fname' => 'Super',
-            'lname' => 'Admin',
-            'email' => 'superadmin@example.com',
-            'phone' => '+0987654321',
-            'address' => '456 Super Street',
-            'password' => 'superpass123'
         ]);
     }
 }

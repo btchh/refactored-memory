@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use App\Services\AuthService;
 use App\Services\UserService;
+use App\Services\GeocodeService;
 use App\Http\Requests\User\Login;
 use App\Http\Requests\User\Register;
 use App\Http\Requests\User\SendRegistrationOtp;
@@ -22,6 +23,7 @@ class UserController extends Controller
     public function __construct(
         private UserService $userService,
         private AuthService $authService,
+        private GeocodeService $geocodeService,
     ) {}
 
     /**
@@ -91,18 +93,59 @@ class UserController extends Controller
     /**
      * Send registration OTP
      */
-    public function sendRegistrationOtp(SendRegistrationOtp $request)
+    public function sendRegistrationOtp(Request $request)
     {
+        // Manual validation for JSON response
+        $validator = \Validator::make($request->all(), [
+            'phone' => ['required', 'string', 'regex:/^(09|\+639)\d{9}$/', 'unique:users,phone'],
+            'email' => ['required', 'email', 'unique:users,email'],
+        ], [
+            'phone.required' => 'Phone number is required',
+            'phone.regex' => 'Phone number must be a valid Philippine mobile number',
+            'phone.unique' => 'Phone number is already registered',
+            'email.required' => 'Email is required',
+            'email.email' => 'Email must be a valid email address',
+            'email.unique' => 'Email is already registered',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => $validator->errors()->first()
+            ], 422);
+        }
+
         try {
             $result = $this->userService->sendRegistrationOtp($request->phone, $request->email);
 
-            if ($result['success']) {
-                return redirect()->back()->with('success', $result['message']);
-            }
-
-            return redirect()->back()->with('error', $result['message']);
+            return response()->json($result, $result['success'] ? 200 : 400);
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 400);
+        }
+    }
+
+    /**
+     * Verify OTP before registration
+     */
+    public function verifyRegistrationOtp(Request $request)
+    {
+        $request->validate([
+            'phone' => 'required',
+            'otp' => 'required|digits:6'
+        ]);
+
+        try {
+            $result = $this->userService->verifyOtp($request->phone, $request->otp);
+            
+            return response()->json($result, $result['success'] ? 200 : 400);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 400);
         }
     }
 
@@ -112,18 +155,13 @@ class UserController extends Controller
     public function register(Register $request)
     {
         try {
-            // Verify OTP first
-            $otpResult = $this->userService->verifyOtp($request->phone, $request->otp);
-
-            if (!$otpResult['success']) {
-                return redirect()->back()->withInput()->with('error', 'Invalid or expired OTP');
-            }
-
-            // Create user
+            // OTP was already verified in step 2, so we can skip verification here
+            // Just create the user directly
             $result = $this->userService->createUser($request->validated());
 
-            return redirect()->route('user.login')->with('success', 'Registration successful. Please login with your credentials.');
+            return redirect()->route('user.login')->with('success', 'Registration successful! Please login with your credentials.');
         } catch (\Exception $e) {
+            \Log::error('Registration failed: ' . $e->getMessage());
             return redirect()->back()->withInput()->with('error', $e->getMessage());
         }
     }
@@ -260,6 +298,125 @@ class UserController extends Controller
         } catch (\Exception $e) {
             return redirect()->back()->with('error', $e->getMessage());
         }
+    }
+
+    /**
+     * Show admin location tracking page
+     */
+    public function showTrackAdmin()
+    {
+        return view('user.track-admin');
+    }
+
+    /**
+     * Get admin location data with ETA
+     */
+    public function getAdminLocation(Request $request)
+    {
+        $user = Auth::guard('web')->user();
+        
+        // Geocode user's address if needed
+        if ($user && (!$user->latitude || !$user->longitude) && $user->address) {
+            $userCoords = $this->geocodeService->geocodeAddress($user->address);
+            if ($userCoords) {
+                $user->update([
+                    'latitude' => $userCoords['latitude'],
+                    'longitude' => $userCoords['longitude']
+                ]);
+            }
+        }
+        
+        // Get all admins with addresses
+        $admins = \App\Models\Admin::select('id', 'fname', 'lname', 'phone', 'address', 'latitude', 'longitude', 'location_updated_at')
+            ->whereNotNull('address')
+            ->get()
+            ->map(function ($admin) use ($user) {
+                // If coordinates don't exist, geocode the address
+                if (empty($admin->latitude) || empty($admin->longitude)) {
+                    $coordinates = $this->geocodeService->geocodeAddress($admin->address);
+                    
+                    if ($coordinates) {
+                        // Update admin with geocoded coordinates
+                        $admin->update([
+                            'latitude' => $coordinates['latitude'],
+                            'longitude' => $coordinates['longitude'],
+                            'location_updated_at' => now()
+                        ]);
+                        
+                        $admin->latitude = $coordinates['latitude'];
+                        $admin->longitude = $coordinates['longitude'];
+                    } else {
+                        return null; // Skip admins with invalid addresses
+                    }
+                }
+
+                $adminData = [
+                    'id' => $admin->id,
+                    'name' => $admin->fname . ' ' . $admin->lname,
+                    'phone' => $admin->phone,
+                    'address' => $admin->address,
+                    'latitude' => (float) $admin->latitude,
+                    'longitude' => (float) $admin->longitude,
+                    'updated_at' => $admin->location_updated_at ? $admin->location_updated_at->diffForHumans() : 'Never'
+                ];
+
+                // Calculate distance and ETA if user has coordinates
+                if ($user && $user->latitude && $user->longitude) {
+                    $straightDistance = $this->calculateDistance(
+                        $user->latitude,
+                        $user->longitude,
+                        $admin->latitude,
+                        $admin->longitude
+                    );
+                    
+                    // Apply road factor (roads are typically 1.3-1.5x longer than straight line)
+                    $roadFactor = 1.4;
+                    $actualDistance = $straightDistance * $roadFactor;
+                    
+                    // Assuming 30 km/h average speed in city traffic
+                    $averageSpeed = 30; // km/h
+                    $travelTimeMinutes = ($actualDistance / $averageSpeed) * 60;
+                    
+                    $adminData['distance_km'] = round($actualDistance, 2);
+                    $adminData['eta_minutes'] = round($travelTimeMinutes, 1);
+                    $adminData['eta'] = now()->addMinutes($travelTimeMinutes)->format('h:i A');
+                }
+
+                return $adminData;
+            })
+            ->filter(); // Remove null entries
+
+        return response()->json([
+            'success' => true,
+            'admins' => $admins->values(),
+            'user_location' => $user && $user->latitude ? [
+                'latitude' => (float) $user->latitude,
+                'longitude' => (float) $user->longitude
+            ] : null
+        ]);
+    }
+
+    /**
+     * Calculate distance between two points using Haversine formula
+     */
+    private function calculateDistance($lat1, $lon1, $lat2, $lon2)
+    {
+        $earthRadius = 6371; // km
+        
+        $latFrom = deg2rad($lat1);
+        $lonFrom = deg2rad($lon1);
+        $latTo = deg2rad($lat2);
+        $lonTo = deg2rad($lon2);
+        
+        $latDelta = $latTo - $latFrom;
+        $lonDelta = $lonTo - $lonFrom;
+        
+        $a = sin($latDelta / 2) * sin($latDelta / 2) +
+             cos($latFrom) * cos($latTo) *
+             sin($lonDelta / 2) * sin($lonDelta / 2);
+        $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+        
+        return round($earthRadius * $c, 2);
     }
 
     /**

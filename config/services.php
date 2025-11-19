@@ -38,4 +38,8 @@ return [
     'iprog_sms' => [
         'api_token' => env('IPROG_SMS_API_TOKEN'),
     ],
+
+    'geoapify' => [
+        'api_key' => env('GEOAPIFY_API_KEY'),
+    ],
 ];

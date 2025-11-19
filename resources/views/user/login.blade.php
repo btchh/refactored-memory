@@ -26,6 +26,12 @@
                     </x-modules.alert>
                 @endif
 
+                @if (session('error'))
+                    <x-modules.alert type="error" dismissible>
+                        {{ session('error') }}
+                    </x-modules.alert>
+                @endif
+
                 <!-- Login Form -->
                 <form action="{{ route('user.login') }}" method="POST" class="space-y-5">
                     @csrf

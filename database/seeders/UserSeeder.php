@@ -21,7 +21,7 @@ class UserSeeder extends Seeder
             [
                 'fname' => 'John',
                 'lname' => 'Doe',
-                'address' => '123 Main St, City',
+                'address' => 'Lipa City',
                 'phone' => '1234567890',
                 'password' => 'password123',
             ]
@@ -35,7 +35,7 @@ class UserSeeder extends Seeder
             [
                 'fname' => 'Jane',
                 'lname' => 'Smith',
-                'address' => '456 Oak Ave, Town',
+                'address' => 'Padre Garcia Batangas',
                 'phone' => '0987654321',
                 'password' => 'password123',
             ]
@@ -49,7 +49,7 @@ class UserSeeder extends Seeder
             [
                 'fname' => 'Bob',
                 'lname' => 'Johnson',
-                'address' => '789 Pine Rd, Village',
+                'address' => 'Antipolo Rizal',
                 'phone' => '5551234567',
                 'password' => 'password123',
             ]

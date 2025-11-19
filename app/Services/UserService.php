@@ -151,12 +151,12 @@ class UserService
         //send otp via sms
         $result = $this->messageService->sendVerificationOtp($phone);
 
-        Log::info("Registration OTP Send Result: {$result}");
+        Log::info("Registration OTP Send Result: " . json_encode($result));
 
         if (isset($result['status']) && $result['status'] === 'success') {
             return [
                 'success' => true,
-                'message' => 'OTP sent successfully.',
+                'message' => $result['message'] ?? 'OTP sent successfully to your phone.',
             ];
         }
 
@@ -169,7 +169,22 @@ class UserService
     //verify otp
     public function verifyOtp(string $phone, string $otp): array
     {
-        return $this->messageService->verifyOtp($phone, $otp);
+        $result = $this->messageService->verifyOtp($phone, $otp);
+        
+        Log::info("OTP Verification Result: " . json_encode($result));
+        
+        // Normalize response format
+        if (isset($result['status']) && $result['status'] === 'success') {
+            return [
+                'success' => true,
+                'message' => $result['message'] ?? 'OTP verified successfully.',
+            ];
+        }
+        
+        return [
+            'success' => false,
+            'message' => $result['message'] ?? 'Invalid or expired OTP code.',
+        ];
     }
 
     //generate reset password token

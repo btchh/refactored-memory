@@ -21,11 +21,18 @@ class Admin extends Authenticatable
         'phone',
         'email',
         'password',
+        'latitude',
+        'longitude',
+        'location_updated_at',
     ];
 
     protected $hidden = [
         'password',
         'remember_token'
+    ];
+
+    protected $casts = [
+        'location_updated_at' => 'datetime',
     ];
 
     public function setPasswordAttribute($value)

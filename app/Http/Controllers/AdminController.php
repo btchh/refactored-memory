@@ -245,6 +245,70 @@ class AdminController extends Controller
     }
 
     /**
+     * Send OTP for admin creation
+     */
+    public function sendAdminOtp(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email|unique:admins,email',
+            'phone' => 'required|unique:admins,phone'
+        ]);
+
+        try {
+            // Generate OTP
+            $otp = rand(100000, 999999);
+            
+            // Store OTP in cache for 10 minutes
+            \Cache::put('admin_otp_' . $request->phone, $otp, 600);
+            
+            // Send OTP via SMS (using your SMS service)
+            $smsService = app(\App\Services\SmsService::class);
+            $smsService->sendOtp($request->phone, $otp);
+            
+            // TODO: Also send via email if needed
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'OTP sent successfully'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 400);
+        }
+    }
+
+    /**
+     * Verify OTP for admin creation
+     */
+    public function verifyAdminOtp(Request $request)
+    {
+        $request->validate([
+            'phone' => 'required',
+            'otp' => 'required|digits:6'
+        ]);
+
+        $cachedOtp = \Cache::get('admin_otp_' . $request->phone);
+
+        if (!$cachedOtp || $cachedOtp != $request->otp) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid or expired OTP'
+            ], 400);
+        }
+
+        // Mark as verified
+        \Cache::put('admin_otp_verified_' . $request->phone, true, 600);
+        \Cache::forget('admin_otp_' . $request->phone);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'OTP verified successfully'
+        ]);
+    }
+
+    /**
      * Create new admin
      */
     public function createAdmin(CreateAdmin $request)
@@ -255,13 +319,198 @@ class AdminController extends Controller
             return redirect()->route('admin.login')->with('error', 'Unauthorized');
         }
 
+        // Check if OTP was verified
+        $verified = \Cache::get('admin_otp_verified_' . $request->phone);
+        if (!$verified) {
+            return redirect()->back()->withInput()->with('error', 'Please verify OTP first');
+        }
+
         try {
             $this->adminService->createAdmin($request->validated());
+            
+            // Clear verification cache
+            \Cache::forget('admin_otp_verified_' . $request->phone);
 
             return redirect()->route('admin.create-admin')->with('success', 'Admin created successfully');
         } catch (\Exception $e) {
             return redirect()->back()->withInput()->with('error', $e->getMessage());
         }
+    }
+
+    /**
+     * Show route to user page
+     */
+    public function showRouteToUser()
+    {
+        return view('admin.route-to-user');
+    }
+
+    /**
+     * Get route from admin to user with ETA
+     */
+    public function getRouteToUser($userId)
+    {
+        $admin = Auth::guard('admin')->user();
+        $user = \App\Models\User::find($userId);
+
+        if (!$admin || !$user) {
+            return response()->json(['success' => false, 'message' => 'Admin or User not found'], 404);
+        }
+
+        // Geocode addresses if coordinates don't exist
+        $geocodeService = app(\App\Services\GeocodeService::class);
+        
+        if (empty($admin->latitude) || empty($admin->longitude)) {
+            $adminCoords = $geocodeService->geocodeAddress($admin->address);
+            if ($adminCoords) {
+                $admin->update([
+                    'latitude' => $adminCoords['latitude'],
+                    'longitude' => $adminCoords['longitude'],
+                    'location_updated_at' => now()
+                ]);
+            } else {
+                return response()->json(['success' => false, 'message' => 'Could not geocode admin address'], 400);
+            }
+        }
+
+        if (empty($user->latitude) || empty($user->longitude)) {
+            $userCoords = $geocodeService->geocodeAddress($user->address);
+            if ($userCoords) {
+                $user->update([
+                    'latitude' => $userCoords['latitude'],
+                    'longitude' => $userCoords['longitude']
+                ]);
+            } else {
+                return response()->json(['success' => false, 'message' => 'Could not geocode user address'], 400);
+            }
+        }
+
+        // Get route from Geoapify
+        $routeData = $this->getRouteFromGeoapify(
+            $admin->latitude,
+            $admin->longitude,
+            $user->latitude,
+            $user->longitude
+        );
+
+        if (!$routeData) {
+            return response()->json(['success' => false, 'message' => 'Could not calculate route'], 400);
+        }
+
+        return response()->json([
+            'success' => true,
+            'admin' => [
+                'name' => $admin->fname . ' ' . $admin->lname,
+                'latitude' => (float) $admin->latitude,
+                'longitude' => (float) $admin->longitude,
+                'address' => $admin->address
+            ],
+            'user' => [
+                'name' => $user->fname . ' ' . $user->lname,
+                'latitude' => (float) $user->latitude,
+                'longitude' => (float) $user->longitude,
+                'address' => $user->address
+            ],
+            'route' => $routeData
+        ]);
+    }
+
+    /**
+     * Get route using simple distance calculation (fallback)
+     */
+    private function getRouteFromGeoapify($fromLat, $fromLon, $toLat, $toLon)
+    {
+        try {
+            $apiKey = config('services.geoapify.api_key');
+            
+            // Try Geoapify routing first
+            $response = \Illuminate\Support\Facades\Http::withOptions([
+                'verify' => false,
+            ])->timeout(10)->get('https://api.geoapify.com/v1/routing', [
+                'waypoints' => "{$fromLat},{$fromLon}|{$toLat},{$toLon}",
+                'mode' => 'drive',
+                'apiKey' => $apiKey
+            ]);
+
+            if ($response->successful()) {
+                $data = $response->json();
+                
+                if (!empty($data['features'][0])) {
+                    $feature = $data['features'][0];
+                    $properties = $feature['properties'];
+                    
+                    return [
+                        'distance' => $properties['distance'], // in meters
+                        'time' => $properties['time'], // in seconds
+                        'geometry' => $feature['geometry'],
+                        'distance_km' => round($properties['distance'] / 1000, 2),
+                        'time_minutes' => round($properties['time'] / 60, 1),
+                        'eta' => now()->addSeconds($properties['time'])->format('h:i A'),
+                        'method' => 'routing'
+                    ];
+                }
+            }
+
+            // Fallback to straight-line distance calculation
+            \Log::warning('Routing API failed, using distance calculation fallback');
+            return $this->calculateStraightLineRoute($fromLat, $fromLon, $toLat, $toLon);
+            
+        } catch (\Exception $e) {
+            \Log::error('Routing exception: ' . $e->getMessage());
+            // Fallback to straight-line distance
+            return $this->calculateStraightLineRoute($fromLat, $fromLon, $toLat, $toLon);
+        }
+    }
+
+    /**
+     * Calculate straight-line distance and estimated time
+     */
+    private function calculateStraightLineRoute($fromLat, $fromLon, $toLat, $toLon)
+    {
+        // Haversine formula for distance
+        $earthRadius = 6371000; // meters
+        
+        $latFrom = deg2rad($fromLat);
+        $lonFrom = deg2rad($fromLon);
+        $latTo = deg2rad($toLat);
+        $lonTo = deg2rad($toLon);
+        
+        $latDelta = $latTo - $latFrom;
+        $lonDelta = $lonTo - $lonFrom;
+        
+        $a = sin($latDelta / 2) * sin($latDelta / 2) +
+             cos($latFrom) * cos($latTo) *
+             sin($lonDelta / 2) * sin($lonDelta / 2);
+        $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+        
+        $distance = $earthRadius * $c; // in meters
+        
+        // Apply road factor (roads are typically 1.3-1.5x longer than straight line)
+        $roadFactor = 1.4;
+        $actualDistance = $distance * $roadFactor;
+        
+        // Estimate time assuming average speed of 30 km/h in city traffic
+        $averageSpeed = 30; // km/h (realistic city driving with traffic)
+        $time = ($actualDistance / 1000) / $averageSpeed * 3600; // in seconds
+        
+        // Create simple straight line geometry
+        $geometry = [
+            'type' => 'LineString',
+            'coordinates' => [
+                [$fromLon, $fromLat],
+                [$toLon, $toLat]
+            ]
+        ];
+        
+        return [
+            'distance' => $actualDistance,
+            'time' => $time,
+            'geometry' => $geometry,
+            'distance_km' => round($actualDistance / 1000, 2),
+            'time_minutes' => round($time / 60, 1),
+            'eta' => now()->addSeconds($time)->format('h:i A'),
+            'method' => 'estimated'
+        ];
     }
 
     /**

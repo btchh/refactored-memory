@@ -22,7 +22,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
     });
 
     // Protected routes
-    Route::middleware('auth:admin')->group(function () {
+    Route::middleware(['auth:admin', 'prevent.back'])->group(function () {
         Route::post('logout', [AdminController::class, 'logout'])->name('logout');
         Route::get('dashboard', [AdminController::class, 'showDashboard'])->name('dashboard');
         Route::get('profile', [AdminController::class, 'showProfile'])->name('profile');
@@ -31,6 +31,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('change-password', [AdminController::class, 'changePassword']);
         Route::get('create-admin', [AdminController::class, 'showCreateAdmin'])->name('create-admin');
         Route::post('create-admin', [AdminController::class, 'createAdmin']);
+        Route::post('send-admin-otp', [AdminController::class, 'sendAdminOtp'])->name('send-admin-otp');
+        Route::post('verify-admin-otp', [AdminController::class, 'verifyAdminOtp'])->name('verify-admin-otp');
+        Route::get('route-to-user', [AdminController::class, 'showRouteToUser'])->name('route-to-user');
+        Route::get('get-route/{userId}', [AdminController::class, 'getRouteToUser'])->name('get-route');
     });
 });
 
@@ -42,6 +46,7 @@ Route::prefix('user')->name('user.')->group(function () {
         Route::post('login', [UserController::class, 'login']);
         Route::get('register', [UserController::class, 'showRegister'])->name('register');
         Route::post('send-registration-otp', [UserController::class, 'sendRegistrationOtp'])->name('send-registration-otp');
+        Route::post('verify-otp', [UserController::class, 'verifyRegistrationOtp'])->name('verify-otp');
         Route::post('register', [UserController::class, 'register']);
         Route::get('forgot-password', [UserController::class, 'showForgotPassword'])->name('forgot-password');
         Route::post('send-password-reset-otp', [UserController::class, 'sendPasswordResetOtp'])->name('send-password-reset-otp');
@@ -51,15 +56,33 @@ Route::prefix('user')->name('user.')->group(function () {
     });
 
     // Protected routes
-    Route::middleware('auth:web')->group(function () {
+    Route::middleware(['auth:web', 'prevent.back'])->group(function () {
         Route::post('logout', [UserController::class, 'logout'])->name('logout');
         Route::get('dashboard', [UserController::class, 'showDashboard'])->name('dashboard');
         Route::get('profile', [UserController::class, 'showProfile'])->name('profile');
         Route::post('update-profile', [UserController::class, 'updateProfile'])->name('update-profile');
         Route::get('change-password', [UserController::class, 'showChangePassword'])->name('change-password');
         Route::post('change-password', [UserController::class, 'changePassword']);
+        Route::get('track-admin', [UserController::class, 'showTrackAdmin'])->name('track-admin');
+        Route::get('admin-location', [UserController::class, 'getAdminLocation'])->name('admin-location');
     });
 });
 
 // Alias for users.dashboard used in AdminController
 Route::get('/users/dashboard', [UserController::class, 'showDashboard'])->name('users.dashboard')->middleware('auth:web');
+
+// API routes
+Route::get('/api/users', function() {
+    $users = \App\Models\User::select('id', 'username', 'fname', 'lname', 'phone', 'address')
+        ->get()
+        ->map(function($user) {
+            return [
+                'id' => $user->id,
+                'name' => $user->fname . ' ' . $user->lname,
+                'phone' => $user->phone,
+                'address' => $user->address
+            ];
+        });
+    
+    return response()->json(['success' => true, 'users' => $users]);
+})->middleware('auth:admin');

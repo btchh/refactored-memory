@@ -11,7 +11,19 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        $middleware->alias([
+            'prevent.back' => \App\Http\Middleware\PreventBackHistory::class,
+        ]);
+        
+        // Configure authentication redirects for different guards
+        $middleware->redirectGuestsTo(function ($request) {
+            // Check if the request is for admin routes
+            if ($request->is('admin/*')) {
+                return route('admin.login');
+            }
+            // Default to user login
+            return route('user.login');
+        });
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
