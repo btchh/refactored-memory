@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Step Navigation Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .step-content {
+            padding: 20px;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .hidden {
+            display: none;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            cursor: pointer;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        .btn-primary {
+            background: #3b82f6;
+            color: white;
+        }
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+        }
+        .progress {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px 0;
+        }
+        .progress-step {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-center;
+            font-weight: bold;
+        }
+        .progress-step.active {
+            background: #3b82f6;
+            color: white;
+        }
+        .progress-step.inactive {
+            background: #d1d5db;
+            color: #6b7280;
+        }
+        #log {
+            background: #f3f4f6;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 20px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .log-entry {
+            margin: 5px 0;
+            font-family: monospace;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Multi-Step Form Navigation Test</h1>
+    <p>This page tests the step navigation logic without backend dependencies.</p>
+
+    <!-- Progress Indicators -->
+    <div class="progress">
+        <div id="step1-indicator" class="progress-step active">1</div>
+        <div id="step2-indicator" class="progress-step inactive">2</div>
+        <div id="step3-indicator" class="progress-step inactive">3</div>
+    </div>
+
+    <!-- Step 1 -->
+    <div id="step1" class="step-content">
+        <h2>Step 1: Contact Information</h2>
+        <p>This is step 1 content</p>
+        <button class="btn-primary" onclick="goToStep(2)">Next to Step 2</button>
+    </div>
+
+    <!-- Step 2 -->
+    <div id="step2" class="step-content hidden">
+        <h2>Step 2: OTP Verification</h2>
+        <p>This is step 2 content</p>
+        <button class="btn-secondary" onclick="goToStep(1)">Back to Step 1</button>
+        <button class="btn-primary" onclick="goToStep(3)">Next to Step 3</button>
+    </div>
+
+    <!-- Step 3 -->
+    <div id="step3" class="step-content hidden">
+        <h2>Step 3: User Details</h2>
+        <p>This is step 3 content</p>
+        <button class="btn-secondary" onclick="goToStep(2)">Back to Step 2</button>
+        <button class="btn-primary" onclick="alert('Form submitted!')">Submit</button>
+    </div>
+
+    <!-- Debug Log -->
+    <div id="log">
+        <strong>Navigation Log:</strong>
+        <div id="log-entries"></div>
+    </div>
+
+    <script type="module">
+        // Simulate the MultiStepForm class
+        class TestMultiStepForm {
+            constructor() {
+                this.currentStep = 1;
+                this.totalSteps = 3;
+                this.log('Initialized at step 1');
+            }
+
+            goToStep(step) {
+                this.log(`goToStep(${step}) called from step ${this.currentStep}`);
+                
+                // Hide all steps
+                document.querySelectorAll('.step-content').forEach(el => {
+                    el.classList.add('hidden');
+                    this.log(`  - Hiding ${el.id}`);
+                });
+                
+                // Show target step
+                const targetStep = document.getElementById(`step${step}`);
+                if (targetStep) {
+                    targetStep.classList.remove('hidden');
+                    this.log(`  - Showing step${step}`);
+                } else {
+                    this.log(`  - ERROR: step${step} not found!`);
+                }
+                
+                // Update progress indicators
+                this.updateProgressIndicators(step);
+                
+                this.currentStep = step;
+                this.log(`  - Current step is now: ${this.currentStep}`);
+            }
+
+            updateProgressIndicators(currentStep) {
+                for (let i = 1; i <= this.totalSteps; i++) {
+                    const indicator = document.getElementById(`step${i}-indicator`);
+                    if (!indicator) continue;
+                    
+                    if (i === currentStep) {
+                        indicator.className = 'progress-step active';
+                    } else {
+                        indicator.className = 'progress-step inactive';
+                    }
+                }
+            }
+
+            log(message) {
+                const logEntries = document.getElementById('log-entries');
+                const entry = document.createElement('div');
+                entry.className = 'log-entry';
+                const timestamp = new Date().toLocaleTimeString();
+                entry.textContent = `[${timestamp}] ${message}`;
+                logEntries.appendChild(entry);
+                
+                // Auto-scroll to bottom
+                const logContainer = document.getElementById('log');
+                logContainer.scrollTop = logContainer.scrollHeight;
+            }
+        }
+
+        // Initialize
+        const form = new TestMultiStepForm();
+        
+        // Expose globally
+        window.goToStep = (step) => form.goToStep(step);
+        
+        console.log('Test form initialized');
+        form.log('Ready for testing!');
+    </script>
+
+    <div style="margin-top: 40px; padding: 20px; background: #f0f0f0; border-radius: 4px;">
+        <h3>Test Instructions:</h3>
+        <ol>
+            <li>Click "Next to Step 2" - should show step 2</li>
+            <li>Click "Back to Step 1" - should show step 1</li>
+            <li>Click "Next to Step 2" again - should show step 2</li>
+            <li>Click "Next to Step 3" - should show step 3</li>
+            <li>Click "Back to Step 2" - should show step 2</li>
+            <li>Watch the log to see what's happening</li>
+        </ol>
+        <p><strong>Expected:</strong> Navigation should work smoothly without returning to step 1 unexpectedly.</p>
+    </div>
+</body>
+</html>

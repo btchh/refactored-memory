@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use App\Services\AuthService;
 use App\Services\AdminService;
+use App\Services\LocationService;
 use App\Http\Requests\Admin\Login;
 use App\Http\Requests\Admin\SendPasswordReset;
 use App\Http\Requests\Admin\PasswordReset;
@@ -18,9 +19,12 @@ use App\Http\Requests\Admin\CreateAdmin;
 
 class AdminController extends Controller
 {
+    use \App\Traits\Responses;
+
     public function __construct(
         private AdminService $adminService,
         private AuthService $authService,
+        private LocationService $locationService,
     ) {}
 
     /**
@@ -35,7 +39,7 @@ class AdminController extends Controller
 
         // Redirect if logged in as user
         if (Auth::guard('web')->check()) {
-            return redirect()->route('users.dashboard');
+            return redirect()->route('user.dashboard');
         }
 
         return view('admin.login');
@@ -46,21 +50,15 @@ class AdminController extends Controller
      */
     public function login(Login $request)
     {
-        \Log::info('Login attempt', ['admin_name' => $request->admin_name]);
-        
         $remember = $request->boolean('remember', false);
         $loginField = $request->admin_name;
 
         $result = $this->authService->loginAdmin($loginField, $request->password, $remember);
 
-        \Log::info('Login result', ['success' => $result['success'], 'message' => $result['message']]);
-
         if ($result['success']) {
-            \Log::info('Redirecting to dashboard');
             return redirect()->route('admin.dashboard')->with('success', $result['message']);
         }
 
-        \Log::info('Login failed, redirecting back');
         return redirect()->back()->withInput()->with('error', $result['message']);
     }
 
@@ -159,7 +157,7 @@ class AdminController extends Controller
         }
 
         $this->adminService->updateAdmin($admin->id, [
-            'password' => Hash::make($request->password)
+            'password' => $request->password
         ]);
 
         DB::table('password_reset_tokens')
@@ -249,10 +247,18 @@ class AdminController extends Controller
      */
     public function sendAdminOtp(Request $request)
     {
-        $request->validate([
+        $validator = \Validator::make($request->all(), [
             'email' => 'required|email|unique:admins,email',
             'phone' => 'required|unique:admins,phone'
         ]);
+
+        if ($validator->fails()) {
+            return $this->errorResponse(
+                'Validation failed',
+                $validator->errors()->toArray(),
+                422
+            );
+        }
 
         try {
             // Generate OTP
@@ -267,15 +273,10 @@ class AdminController extends Controller
             
             // TODO: Also send via email if needed
             
-            return response()->json([
-                'success' => true,
-                'message' => 'OTP sent successfully'
-            ]);
+            return $this->successResponse('OTP sent successfully');
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage()
-            ], 400);
+            \Log::error('Failed to send admin OTP: ' . $e->getMessage());
+            return $this->errorResponse('Failed to send OTP', [], 500);
         }
     }
 
@@ -284,28 +285,30 @@ class AdminController extends Controller
      */
     public function verifyAdminOtp(Request $request)
     {
-        $request->validate([
+        $validator = \Validator::make($request->all(), [
             'phone' => 'required',
             'otp' => 'required|digits:6'
         ]);
 
+        if ($validator->fails()) {
+            return $this->errorResponse(
+                'Validation failed',
+                $validator->errors()->toArray(),
+                422
+            );
+        }
+
         $cachedOtp = \Cache::get('admin_otp_' . $request->phone);
 
         if (!$cachedOtp || $cachedOtp != $request->otp) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Invalid or expired OTP'
-            ], 400);
+            return $this->errorResponse('Invalid or expired OTP', [], 400);
         }
 
         // Mark as verified
         \Cache::put('admin_otp_verified_' . $request->phone, true, 600);
         \Cache::forget('admin_otp_' . $request->phone);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'OTP verified successfully'
-        ]);
+        return $this->successResponse('OTP verified successfully');
     }
 
     /**
@@ -316,12 +319,24 @@ class AdminController extends Controller
         $currentAdmin = Auth::guard('admin')->user();
 
         if (!$currentAdmin) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unauthorized'
+                ], 401);
+            }
             return redirect()->route('admin.login')->with('error', 'Unauthorized');
         }
 
         // Check if OTP was verified
         $verified = \Cache::get('admin_otp_verified_' . $request->phone);
         if (!$verified) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Please verify OTP first'
+                ], 400);
+            }
             return redirect()->back()->withInput()->with('error', 'Please verify OTP first');
         }
 
@@ -331,8 +346,22 @@ class AdminController extends Controller
             // Clear verification cache
             \Cache::forget('admin_otp_verified_' . $request->phone);
 
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Admin created successfully',
+                    'redirect' => route('admin.create-admin')
+                ]);
+            }
+
             return redirect()->route('admin.create-admin')->with('success', 'Admin created successfully');
         } catch (\Exception $e) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $e->getMessage()
+                ], 400);
+            }
             return redirect()->back()->withInput()->with('error', $e->getMessage());
         }
     }
@@ -354,65 +383,148 @@ class AdminController extends Controller
         $user = \App\Models\User::find($userId);
 
         if (!$admin || !$user) {
-            return response()->json(['success' => false, 'message' => 'Admin or User not found'], 404);
+            return $this->errorResponse('Admin or User not found', [], 404);
         }
 
-        // Geocode addresses if coordinates don't exist
+        // Geocode addresses if coordinates don't exist (only when actively requesting route)
         $geocodeService = app(\App\Services\GeocodeService::class);
         
         if (empty($admin->latitude) || empty($admin->longitude)) {
+            if (!$admin->address) {
+                \Log::warning('Route calculation failed: Admin address not set', ['admin_id' => $admin->id]);
+                return $this->errorResponse('Admin address is not set. Please update your profile with a valid address.', [], 400);
+            }
+            
+            \Log::info('Geocoding admin address for route calculation', ['admin_id' => $admin->id, 'address' => $admin->address]);
             $adminCoords = $geocodeService->geocodeAddress($admin->address);
-            if ($adminCoords) {
-                $admin->update([
-                    'latitude' => $adminCoords['latitude'],
-                    'longitude' => $adminCoords['longitude'],
-                    'location_updated_at' => now()
-                ]);
+            
+            if ($adminCoords && isset($adminCoords['latitude']) && isset($adminCoords['longitude'])) {
+                // Validate coordinates before updating
+                if (is_numeric($adminCoords['latitude']) && is_numeric($adminCoords['longitude'])) {
+                    $admin->update([
+                        'latitude' => $adminCoords['latitude'],
+                        'longitude' => $adminCoords['longitude'],
+                        'location_updated_at' => now()
+                    ]);
+                    \Log::info('Admin location geocoded successfully', ['admin_id' => $admin->id]);
+                } else {
+                    \Log::warning('Geocoding returned invalid coordinates', [
+                        'admin_id' => $admin->id,
+                        'coordinates' => $adminCoords,
+                        'reason' => 'non_numeric'
+                    ]);
+                    return $this->errorResponse('Unable to determine admin location. The geocoding service returned invalid coordinates.', [], 400);
+                }
             } else {
-                return response()->json(['success' => false, 'message' => 'Could not geocode admin address'], 400);
+                // Geocoding failed - log and return graceful error
+                \Log::warning('Geocoding failed for admin address', [
+                    'admin_id' => $admin->id,
+                    'address' => $admin->address,
+                    'reason' => 'geocoding_returned_null'
+                ]);
+                return $this->errorResponse('Unable to geocode admin address. Please verify the address is correct and try again.', [], 400);
             }
         }
 
         if (empty($user->latitude) || empty($user->longitude)) {
+            if (!$user->address) {
+                \Log::warning('Route calculation failed: User address not set', ['user_id' => $user->id]);
+                return $this->errorResponse('User address is not set. The user needs to update their profile with a valid address.', [], 400);
+            }
+            
+            \Log::info('Geocoding user address for route calculation', ['user_id' => $user->id, 'address' => $user->address]);
             $userCoords = $geocodeService->geocodeAddress($user->address);
-            if ($userCoords) {
-                $user->update([
-                    'latitude' => $userCoords['latitude'],
-                    'longitude' => $userCoords['longitude']
-                ]);
+            
+            if ($userCoords && isset($userCoords['latitude']) && isset($userCoords['longitude'])) {
+                // Validate coordinates before updating
+                if (is_numeric($userCoords['latitude']) && is_numeric($userCoords['longitude'])) {
+                    $user->update([
+                        'latitude' => $userCoords['latitude'],
+                        'longitude' => $userCoords['longitude']
+                    ]);
+                    \Log::info('User location geocoded successfully', ['user_id' => $user->id]);
+                } else {
+                    \Log::warning('Geocoding returned invalid coordinates', [
+                        'user_id' => $user->id,
+                        'coordinates' => $userCoords,
+                        'reason' => 'non_numeric'
+                    ]);
+                    return $this->errorResponse('Unable to determine user location. The geocoding service returned invalid coordinates.', [], 400);
+                }
             } else {
-                return response()->json(['success' => false, 'message' => 'Could not geocode user address'], 400);
+                // Geocoding failed - log and return graceful error
+                \Log::warning('Geocoding failed for user address', [
+                    'user_id' => $user->id,
+                    'address' => $user->address,
+                    'reason' => 'geocoding_returned_null'
+                ]);
+                return $this->errorResponse('Unable to geocode user address. Please verify the address is correct and try again.', [], 400);
             }
         }
 
-        // Get route from Geoapify
-        $routeData = $this->getRouteFromGeoapify(
-            $admin->latitude,
-            $admin->longitude,
-            $user->latitude,
-            $user->longitude
-        );
-
-        if (!$routeData) {
-            return response()->json(['success' => false, 'message' => 'Could not calculate route'], 400);
+        // Verify both coordinates exist and are valid before attempting route calculation
+        if (empty($admin->latitude) || empty($admin->longitude) || empty($user->latitude) || empty($user->longitude) ||
+            !is_numeric($admin->latitude) || !is_numeric($admin->longitude) || 
+            !is_numeric($user->latitude) || !is_numeric($user->longitude)) {
+            \Log::error('Route calculation failed: Invalid coordinates after geocoding', [
+                'admin_id' => $admin->id,
+                'user_id' => $user->id,
+                'admin_coords' => ['lat' => $admin->latitude, 'lon' => $admin->longitude],
+                'user_coords' => ['lat' => $user->latitude, 'lon' => $user->longitude]
+            ]);
+            return $this->errorResponse('Cannot calculate route: Location coordinates are missing or invalid after geocoding attempt.', [], 400);
         }
 
-        return response()->json([
-            'success' => true,
-            'admin' => [
-                'name' => $admin->fname . ' ' . $admin->lname,
-                'latitude' => (float) $admin->latitude,
-                'longitude' => (float) $admin->longitude,
-                'address' => $admin->address
-            ],
-            'user' => [
-                'name' => $user->fname . ' ' . $user->lname,
-                'latitude' => (float) $user->latitude,
-                'longitude' => (float) $user->longitude,
-                'address' => $user->address
-            ],
-            'route' => $routeData
-        ]);
+        // Get route from Geoapify
+        try {
+            $routeData = $this->getRouteFromGeoapify(
+                (float) $admin->latitude,
+                (float) $admin->longitude,
+                (float) $user->latitude,
+                (float) $user->longitude
+            );
+
+            if (!$routeData) {
+                \Log::error('Route calculation returned no data', [
+                    'admin_id' => $admin->id,
+                    'user_id' => $user->id
+                ]);
+                return $this->errorResponse('Could not calculate route. Both routing API and fallback calculation failed.', [], 400);
+            }
+
+            return $this->successResponse('Route calculated successfully', [
+                'admin' => [
+                    'name' => $admin->fname . ' ' . $admin->lname,
+                    'latitude' => (float) $admin->latitude,
+                    'longitude' => (float) $admin->longitude,
+                    'address' => $admin->address
+                ],
+                'user' => [
+                    'name' => $user->fname . ' ' . $user->lname,
+                    'latitude' => (float) $user->latitude,
+                    'longitude' => (float) $user->longitude,
+                    'address' => $user->address
+                ],
+                'route' => $routeData
+            ]);
+        } catch (\InvalidArgumentException $e) {
+            \Log::error('Route calculation failed: Invalid coordinates', [
+                'admin_id' => $admin->id,
+                'user_id' => $user->id,
+                'error' => $e->getMessage(),
+                'reason' => 'invalid_argument'
+            ]);
+            return $this->errorResponse('Cannot calculate route: The coordinates provided are invalid. ' . $e->getMessage(), [], 400);
+        } catch (\Exception $e) {
+            \Log::error('Route calculation failed: Unexpected error', [
+                'admin_id' => $admin->id,
+                'user_id' => $user->id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'reason' => 'exception'
+            ]);
+            return $this->errorResponse('An unexpected error occurred while calculating the route. Please try again.', [], 500);
+        }
     }
 
     /**
@@ -439,78 +551,126 @@ class AdminController extends Controller
                     $feature = $data['features'][0];
                     $properties = $feature['properties'];
                     
+                    // Calculate ETA using application's configured timezone
+                    $currentTime = now();
+                    $etaTime = $currentTime->copy()->addSeconds($properties['time']);
+                    
                     return [
                         'distance' => $properties['distance'], // in meters
                         'time' => $properties['time'], // in seconds
                         'geometry' => $feature['geometry'],
                         'distance_km' => round($properties['distance'] / 1000, 2),
                         'time_minutes' => round($properties['time'] / 60, 1),
-                        'eta' => now()->addSeconds($properties['time'])->format('h:i A'),
+                        'eta' => $etaTime->format('h:i A'),
+                        'current_time' => $currentTime->format('h:i A'),
                         'method' => 'routing'
                     ];
                 }
             }
 
-            // Fallback to straight-line distance calculation
-            \Log::warning('Routing API failed, using distance calculation fallback');
-            return $this->calculateStraightLineRoute($fromLat, $fromLon, $toLat, $toLon);
+            // Fallback to LocationService for straight-line distance calculation
+            \Log::warning('Routing API failed, using distance calculation fallback', [
+                'reason' => 'no_features_in_response'
+            ]);
+            return $this->locationService->calculateRoute($fromLat, $fromLon, $toLat, $toLon);
             
+        } catch (\Illuminate\Http\Client\ConnectionException $e) {
+            \Log::error('Routing API connection failed, using fallback', [
+                'error' => $e->getMessage(),
+                'reason' => 'network_error'
+            ]);
+            return $this->locationService->calculateRoute($fromLat, $fromLon, $toLat, $toLon);
+        } catch (\Illuminate\Http\Client\RequestException $e) {
+            \Log::error('Routing API request failed, using fallback', [
+                'error' => $e->getMessage(),
+                'status' => $e->response ? $e->response->status() : 'unknown',
+                'reason' => 'api_error'
+            ]);
+            return $this->locationService->calculateRoute($fromLat, $fromLon, $toLat, $toLon);
         } catch (\Exception $e) {
-            \Log::error('Routing exception: ' . $e->getMessage());
-            // Fallback to straight-line distance
-            return $this->calculateStraightLineRoute($fromLat, $fromLon, $toLat, $toLon);
+            \Log::error('Routing exception, using fallback', [
+                'error' => $e->getMessage(),
+                'reason' => 'exception'
+            ]);
+            return $this->locationService->calculateRoute($fromLat, $fromLon, $toLat, $toLon);
         }
     }
 
+
+
     /**
-     * Calculate straight-line distance and estimated time
+     * Show geocoding test page (debug only)
      */
-    private function calculateStraightLineRoute($fromLat, $fromLon, $toLat, $toLon)
+    public function testGeocode()
     {
-        // Haversine formula for distance
-        $earthRadius = 6371000; // meters
+        if (!config('app.debug')) {
+            abort(404);
+        }
         
-        $latFrom = deg2rad($fromLat);
-        $lonFrom = deg2rad($fromLon);
-        $latTo = deg2rad($toLat);
-        $lonTo = deg2rad($toLon);
+        return view('admin.test-geocode');
+    }
+
+    /**
+     * Perform geocoding test (debug only)
+     */
+    public function performTestGeocode(\Illuminate\Http\Request $request)
+    {
+        if (!config('app.debug')) {
+            abort(404);
+        }
         
-        $latDelta = $latTo - $latFrom;
-        $lonDelta = $lonTo - $lonFrom;
+        $address = $request->input('address');
+        $fresh = $request->boolean('fresh', false);
         
-        $a = sin($latDelta / 2) * sin($latDelta / 2) +
-             cos($latFrom) * cos($latTo) *
-             sin($lonDelta / 2) * sin($lonDelta / 2);
-        $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+        if (empty($address)) {
+            return $this->errorResponse('Address is required', [], 400);
+        }
         
-        $distance = $earthRadius * $c; // in meters
+        $geocodeService = app(\App\Services\GeocodeService::class);
         
-        // Apply road factor (roads are typically 1.3-1.5x longer than straight line)
-        $roadFactor = 1.4;
-        $actualDistance = $distance * $roadFactor;
+        // Clear cache if fresh is requested
+        if ($fresh) {
+            $geocodeService->clearCache($address);
+        }
         
-        // Estimate time assuming average speed of 30 km/h in city traffic
-        $averageSpeed = 30; // km/h (realistic city driving with traffic)
-        $time = ($actualDistance / 1000) / $averageSpeed * 3600; // in seconds
+        $result = $fresh 
+            ? $geocodeService->geocodeAddressFresh($address)
+            : $geocodeService->geocodeAddress($address);
         
-        // Create simple straight line geometry
-        $geometry = [
-            'type' => 'LineString',
-            'coordinates' => [
-                [$fromLon, $fromLat],
-                [$toLon, $toLat]
-            ]
-        ];
+        if ($result) {
+            return $this->successResponse('Geocoding successful', [
+                'result' => $result,
+                'cached' => !$fresh
+            ]);
+        }
         
-        return [
-            'distance' => $actualDistance,
-            'time' => $time,
-            'geometry' => $geometry,
-            'distance_km' => round($actualDistance / 1000, 2),
-            'time_minutes' => round($time / 60, 1),
-            'eta' => now()->addSeconds($time)->format('h:i A'),
-            'method' => 'estimated'
-        ];
+        return $this->errorResponse('Geocoding failed. Check logs for details.', [], 400);
+    }
+
+    /**
+     * Get list of users for API
+     */
+    public function getUsersList(Request $request)
+    {
+        try {
+            $users = \App\Models\User::select('id', 'username', 'fname', 'lname', 'phone', 'address')
+                ->get()
+                ->map(function($user) {
+                    return [
+                        'id' => $user->id,
+                        'name' => $user->fname . ' ' . $user->lname,
+                        'phone' => $user->phone,
+                        'address' => $user->address
+                    ];
+                });
+            
+            return $this->successResponse('Users retrieved successfully', [
+                'users' => $users
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Failed to retrieve users: ' . $e->getMessage());
+            return $this->errorResponse('Failed to retrieve users', [], 500);
+        }
     }
 
     /**

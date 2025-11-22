@@ -23,6 +23,7 @@ class User extends Authenticatable
         'password',
         'latitude',
         'longitude',
+        'location_updated_at',
     ];
 
     protected $hidden = [
@@ -32,6 +33,7 @@ class User extends Authenticatable
 
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'location_updated_at' => 'datetime',
         'password' => 'hashed',
     ];
 

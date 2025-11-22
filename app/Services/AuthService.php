@@ -15,9 +15,9 @@ class AuthService
         string $password,
         bool $remember = false
     ): array {
-        $feildType = filter_var($loginField, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
+        $fieldType = filter_var($loginField, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
 
-        if (Auth::guard('web')->attempt([$feildType => $loginField, 'password' => $password], $remember)) {
+        if (Auth::guard('web')->attempt([$fieldType => $loginField, 'password' => $password], $remember)) {
             $user = Auth::guard('web')->user();
             return [
                 'success' => true,
@@ -38,9 +38,9 @@ class AuthService
         string $password,
         bool $remember = false
     ): array {
-        $feildType = filter_var($loginField, FILTER_VALIDATE_EMAIL) ? 'email' : 'admin_name';
+        $fieldType = filter_var($loginField, FILTER_VALIDATE_EMAIL) ? 'email' : 'admin_name';
 
-        if (Auth::guard('admin')->attempt([$feildType => $loginField, 'password' => $password], $remember)) {
+        if (Auth::guard('admin')->attempt([$fieldType => $loginField, 'password' => $password], $remember)) {
             $admin = Auth::guard('admin')->user();
             return [
                 'success' => true,

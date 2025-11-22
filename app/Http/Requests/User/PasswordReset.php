@@ -22,7 +22,6 @@ class PasswordReset extends FormRequest
     public function rules(): array
     {
         return [
-            'token' => 'required|string',
             'phone' => ['required', 'string', 'regex:/^(09|\+639)\d{9}$/'],
             'password' => 'required|string|min:8|confirmed',
         ];
@@ -36,7 +35,6 @@ class PasswordReset extends FormRequest
     public function messages(): array
     {
         return [
-            'token.required' => 'Reset token is required',
             'phone.required' => 'Phone number is required',
             'phone.regex' => 'Phone number must be a valid Philippine mobile number',
             'password.required' => 'Password is required',

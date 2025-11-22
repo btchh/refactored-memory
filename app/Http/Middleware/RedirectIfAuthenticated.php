@@ -26,7 +26,7 @@ class RedirectIfAuthenticated
                 }
 
                 // Redirect authenticated web users to user dashboard
-                return redirect()->route('dashboard');
+                return redirect()->route('user.dashboard');
             }
         }
 

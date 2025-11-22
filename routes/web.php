@@ -22,13 +22,13 @@ Route::prefix('admin')->name('admin.')->group(function () {
     });
 
     // Protected routes
-    Route::middleware(['auth:admin', 'prevent.back'])->group(function () {
+    Route::middleware(['isAdmin', 'prevent.back'])->group(function () {
         Route::post('logout', [AdminController::class, 'logout'])->name('logout');
         Route::get('dashboard', [AdminController::class, 'showDashboard'])->name('dashboard');
         Route::get('profile', [AdminController::class, 'showProfile'])->name('profile');
         Route::post('update-profile', [AdminController::class, 'updateProfile'])->name('update-profile');
         Route::get('change-password', [AdminController::class, 'showChangePassword'])->name('change-password');
-        Route::post('change-password', [AdminController::class, 'changePassword']);
+        Route::post('change-password', [AdminController::class, 'changePassword'])->name('update-password');
         Route::get('create-admin', [AdminController::class, 'showCreateAdmin'])->name('create-admin');
         Route::post('create-admin', [AdminController::class, 'createAdmin']);
         Route::post('send-admin-otp', [AdminController::class, 'sendAdminOtp'])->name('send-admin-otp');
@@ -56,7 +56,7 @@ Route::prefix('user')->name('user.')->group(function () {
     });
 
     // Protected routes
-    Route::middleware(['auth:web', 'prevent.back'])->group(function () {
+    Route::middleware(['isUser', 'prevent.back'])->group(function () {
         Route::post('logout', [UserController::class, 'logout'])->name('logout');
         Route::get('dashboard', [UserController::class, 'showDashboard'])->name('dashboard');
         Route::get('profile', [UserController::class, 'showProfile'])->name('profile');
@@ -68,21 +68,7 @@ Route::prefix('user')->name('user.')->group(function () {
     });
 });
 
-// Alias for users.dashboard used in AdminController
-Route::get('/users/dashboard', [UserController::class, 'showDashboard'])->name('users.dashboard')->middleware('auth:web');
+// Removed - using user.dashboard route instead
 
 // API routes
-Route::get('/api/users', function() {
-    $users = \App\Models\User::select('id', 'username', 'fname', 'lname', 'phone', 'address')
-        ->get()
-        ->map(function($user) {
-            return [
-                'id' => $user->id,
-                'name' => $user->fname . ' ' . $user->lname,
-                'phone' => $user->phone,
-                'address' => $user->address
-            ];
-        });
-    
-    return response()->json(['success' => true, 'users' => $users]);
-})->middleware('auth:admin');
+Route::get('/api/users', [AdminController::class, 'getUsersList'])->middleware('isAdmin');

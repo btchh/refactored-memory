@@ -4,42 +4,92 @@ namespace App\Services;
 
 use App\Models\Admin;
 use App\Services\MessageService;
+use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 
 class AdminService
 {
     public function __construct(
-        private MessageService $messageService
+        private MessageService $messageService,
+        private GeocodeService $geocodeService
     ) {}
 
     //create admin
     public function createAdmin(array $data): array
     {
-        $admin = Admin::create([
-            'admin_name' => $data['admin_name'],
-            'fname' => $data['fname'],
-            'lname' => $data['lname'],
-            'address' => $data['address'],
-            'phone' => $data['phone'],
-            'email' => $data['email'],
-            'password' => $data['password'],
-        ]);
-
-        //send welcome message
         try {
-            Log::info("Sending welcome message to admin: {$admin->phone}");
-            $this->messageService->sendWelcomeMessage($admin->phone, [
-                'contact_number' => 'Place_Holder'
-            ]);
-        } catch (\Exception $e) {
-            Log::error("Failed to send welcome message to admin: {$admin->phone}. Error: " . $e->getMessage());
-        }
+            // Wrap admin creation in database transaction to prevent race conditions
+            $result = DB::transaction(function () use ($data) {
+                // Re-validate uniqueness constraints inside transaction
+                // This ensures atomicity and prevents concurrent registrations
+                if (Admin::where('email', $data['email'])->exists()) {
+                    throw new \Exception('Email is already registered');
+                }
 
-        return [
-            'admin' => $admin,
-            'message' => 'Admin created successfully.'
-        ];
+                if (Admin::where('phone', $data['phone'])->exists()) {
+                    throw new \Exception('Phone number is already registered');
+                }
+
+                // Geocode address if provided
+                if (!empty($data['address'])) {
+                    $coords = $this->geocodeService->geocodeAddressFresh($data['address']);
+                    if ($coords) {
+                        $data['latitude'] = $coords['latitude'];
+                        $data['longitude'] = $coords['longitude'];
+                        $data['location_updated_at'] = now();
+                    }
+                }
+
+                $admin = Admin::create([
+                    'admin_name' => $data['admin_name'],
+                    'fname' => $data['fname'],
+                    'lname' => $data['lname'],
+                    'address' => $data['address'],
+                    'phone' => $data['phone'],
+                    'email' => $data['email'],
+                    'password' => $data['password'],
+                    'latitude' => $data['latitude'] ?? null,
+                    'longitude' => $data['longitude'] ?? null,
+                    'location_updated_at' => $data['location_updated_at'] ?? null,
+                ]);
+
+                return $admin;
+            });
+
+            //send welcome message (outside transaction to avoid blocking)
+            try {
+                Log::info("Sending welcome message to admin: {$result->phone}");
+                $this->messageService->sendWelcomeMessage($result->phone, [
+                    'contact_number' => 'Place_Holder'
+                ]);
+            } catch (\Exception $e) {
+                Log::error("Failed to send welcome message to admin: {$result->phone}. Error: " . $e->getMessage());
+            }
+
+            return [
+                'admin' => $result,
+                'message' => 'Admin created successfully.'
+            ];
+        } catch (QueryException $e) {
+            // Handle database constraint violations
+            if ($e->getCode() === '23000') {
+                // Integrity constraint violation
+                $errorMessage = $e->getMessage();
+
+                if (str_contains($errorMessage, 'admins_email_unique')) {
+                    throw new \Exception('Email is already registered');
+                } elseif (str_contains($errorMessage, 'admins_phone_unique')) {
+                    throw new \Exception('Phone number is already registered');
+                }
+
+                throw new \Exception('Admin creation failed due to duplicate data');
+            }
+
+            // Re-throw other database exceptions
+            throw $e;
+        }
     }
 
     //update admin
@@ -51,6 +101,20 @@ class AdminService
             throw new \Exception("Admin not found.");
         }
 
+        // If address changed, geocode it
+        if (isset($data['address']) && $data['address'] !== $admin->address) {
+            $coords = $this->geocodeService->geocodeAddressFresh($data['address']);
+            if ($coords) {
+                $data['latitude'] = $coords['latitude'];
+                $data['longitude'] = $coords['longitude'];
+                $data['location_updated_at'] = now();
+            } else {
+                $data['latitude'] = null;
+                $data['longitude'] = null;
+                $data['location_updated_at'] = null;
+            }
+        }
+
         $admin->update($data);
         return $admin->fresh();
     }
@@ -59,6 +123,10 @@ class AdminService
     public function changePass(int $adminId, string $currentPassword, string $newPassword): bool
     {
         $admin = Admin::find($adminId);
+
+        if (!$admin) {
+            throw new \Exception("Admin not found with ID: {$adminId}");
+        }
 
         //verify
         if (!Hash::check($currentPassword, $admin->password)) {
@@ -71,7 +139,7 @@ class AdminService
 
         //update
         $admin->update([
-            'password' => Hash::make($newPassword)
+            'password' => $newPassword
         ]);
 
         return true;

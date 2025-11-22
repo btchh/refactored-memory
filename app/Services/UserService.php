@@ -4,6 +4,8 @@ namespace App\Services;
 
 use App\Models\User;
 use App\Services\MessageService;
+use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -13,49 +15,88 @@ use Illuminate\Support\Str;
 class UserService
 {
     public function __construct(
-        private MessageService $messageService
+        private MessageService $messageService,
+        private GeocodeService $geocodeService
     ) {}
 
     //create user
     public function createUser(array $data): array
     {
-        // Re-validate uniqueness to prevent race conditions
-        if (User::where('email', $data['email'])->exists()) {
-            throw new \Exception('Email is already registered');
-        }
-
-        if (User::where('phone', $data['phone'])->exists()) {
-            throw new \Exception('Phone number is already registered');
-        }
-
-        if (User::where('username', $data['username'])->exists()) {
-            throw new \Exception('Username is already taken');
-        }
-
-        $user = User::create([
-            'username' => $data['username'],
-            'fname' => $data['fname'],
-            'lname' => $data['lname'],
-            'address' => $data['address'],
-            'phone' => $data['phone'],
-            'email' => $data['email'],
-            'password' => $data['password'],
-        ]);
-
-        //send welcome message
         try {
-            Log::info("User create with phone: {$user->phone}");
-            $this->messageService->sendWelcomeMessage($user->phone, [
-                'contact_number' => 'Place_Holder'
-            ]);
-        } catch (\Exception $e) {
-            Log::error("Failed to send welcome message to user: {$user->phone}. Error: " . $e->getMessage());
-        }
+            // Wrap user creation in database transaction to prevent race conditions
+            $result = DB::transaction(function () use ($data) {
+                // Re-validate uniqueness constraints inside transaction
+                // This ensures atomicity and prevents concurrent registrations
+                if (User::where('email', $data['email'])->exists()) {
+                    throw new \Exception('Email is already registered');
+                }
 
-        return [
-            'user' => $user,
-            'message' => 'User registered successfully.'
-        ];
+                if (User::where('phone', $data['phone'])->exists()) {
+                    throw new \Exception('Phone number is already registered');
+                }
+
+                if (User::where('username', $data['username'])->exists()) {
+                    throw new \Exception('Username is already taken');
+                }
+
+                // Geocode address if provided
+                if (!empty($data['address'])) {
+                    $coords = $this->geocodeService->geocodeAddressFresh($data['address']);
+                    if ($coords) {
+                        $data['latitude'] = $coords['latitude'];
+                        $data['longitude'] = $coords['longitude'];
+                    }
+                }
+
+                $user = User::create([
+                    'username' => $data['username'],
+                    'fname' => $data['fname'],
+                    'lname' => $data['lname'],
+                    'address' => $data['address'],
+                    'phone' => $data['phone'],
+                    'email' => $data['email'],
+                    'password' => $data['password'],
+                    'latitude' => $data['latitude'] ?? null,
+                    'longitude' => $data['longitude'] ?? null,
+                ]);
+
+                return $user;
+            });
+
+            //send welcome message (outside transaction to avoid blocking)
+            try {
+                Log::info("User created with phone: {$result->phone}");
+                $this->messageService->sendWelcomeMessage($result->phone, [
+                    'contact_number' => 'Place_Holder'
+                ]);
+            } catch (\Exception $e) {
+                Log::error("Failed to send welcome message to user: {$result->phone}. Error: " . $e->getMessage());
+            }
+
+            return [
+                'user' => $result,
+                'message' => 'User registered successfully.'
+            ];
+        } catch (QueryException $e) {
+            // Handle database constraint violations
+            if ($e->getCode() === '23000') {
+                // Integrity constraint violation
+                $errorMessage = $e->getMessage();
+                
+                if (str_contains($errorMessage, 'users_email_unique')) {
+                    throw new \Exception('Email is already registered');
+                } elseif (str_contains($errorMessage, 'users_phone_unique')) {
+                    throw new \Exception('Phone number is already registered');
+                } elseif (str_contains($errorMessage, 'users_username_unique')) {
+                    throw new \Exception('Username is already taken');
+                }
+                
+                throw new \Exception('Registration failed due to duplicate data');
+            }
+            
+            // Re-throw other database exceptions
+            throw $e;
+        }
     }
 
     //update user
@@ -65,6 +106,18 @@ class UserService
 
         if (!$user) {
             throw new \Exception("User not found.");
+        }
+
+        // If address changed, geocode it
+        if (isset($data['address']) && $data['address'] !== $user->address) {
+            $coords = $this->geocodeService->geocodeAddressFresh($data['address']);
+            if ($coords) {
+                $data['latitude'] = $coords['latitude'];
+                $data['longitude'] = $coords['longitude'];
+            } else {
+                $data['latitude'] = null;
+                $data['longitude'] = null;
+            }
         }
 
         $user->update($data);

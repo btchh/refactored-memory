@@ -2,6 +2,11 @@
     <x-slot:title>Create Admin</x-slot:title>
 
     <x-nav type="admin" />
+    
+    <!-- Data attributes for JavaScript -->
+    <div data-send-otp-url="{{ route('admin.send-admin-otp') }}"
+         data-verify-otp-url="{{ route('admin.verify-admin-otp') }}"
+         style="display: none;"></div>
 
     <div class="min-h-screen bg-gray-100">
         <div class="container mx-auto px-4 py-8">
@@ -56,7 +61,7 @@
 
                             <div id="contact-error" class="hidden text-red-600 text-sm"></div>
 
-                            <x-modules.button type="button" onclick="sendOTP()" variant="primary" fullWidth>
+                            <x-modules.button type="button" id="send-otp-btn" onclick="sendOTP()" variant="primary" fullWidth>
                                 Send OTP
                             </x-modules.button>
                         </form>
@@ -83,7 +88,7 @@
                                 <x-modules.button type="button" onclick="goToStep(1)" variant="secondary" class="flex-1">
                                     Back
                                 </x-modules.button>
-                                <x-modules.button type="button" onclick="verifyOTP()" variant="primary" class="flex-1">
+                                <x-modules.button type="button" id="verify-otp-btn" onclick="verifyOTP()" variant="primary" class="flex-1">
                                     Verify OTP
                                 </x-modules.button>
                             </div>
@@ -131,21 +136,36 @@
                                     required 
                                 />
 
-                                <x-modules.input 
-                                    type="password" 
-                                    name="password" 
-                                    label="Password" 
-                                    placeholder="Min 8 characters"
-                                    required 
-                                />
+                                <div>
+                                    <x-modules.input 
+                                        type="password" 
+                                        id="password"
+                                        name="password" 
+                                        label="Password" 
+                                        placeholder="Min 8 characters"
+                                        required 
+                                    />
+                                    <!-- Password Strength Indicator -->
+                                    <div class="mt-2">
+                                        <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
+                                            <div id="password-strength-bar" class="h-full transition-all duration-300" style="width: 0%"></div>
+                                        </div>
+                                        <p id="password-strength-text" class="text-xs mt-1 text-gray-500"></p>
+                                    </div>
+                                </div>
 
-                                <x-modules.input 
-                                    type="password" 
-                                    name="password_confirmation" 
-                                    label="Confirm Password" 
-                                    placeholder="Confirm password"
-                                    required 
-                                />
+                                <div>
+                                    <x-modules.input 
+                                        type="password" 
+                                        id="password_confirmation"
+                                        name="password_confirmation" 
+                                        label="Confirm Password" 
+                                        placeholder="Confirm password"
+                                        required 
+                                    />
+                                    <!-- Password Match Indicator -->
+                                    <p id="password-match-text" class="text-xs mt-2"></p>
+                                </div>
                             </div>
 
                             <div class="flex gap-3 pt-4">
@@ -163,134 +183,4 @@
         </div>
     </div>
 
-    <script>
-        let currentStep = 1;
-        let verifiedEmail = '';
-        let verifiedPhone = '';
-
-        function goToStep(step) {
-            // Hide all steps
-            document.querySelectorAll('.step-content').forEach(el => el.classList.add('hidden'));
-            
-            // Show target step
-            document.getElementById('step' + step).classList.remove('hidden');
-            
-            // Update progress indicators
-            for (let i = 1; i <= 3; i++) {
-                const indicator = document.getElementById('step' + i + '-indicator');
-                const line = document.getElementById('progress-line-' + i);
-                
-                if (i < step) {
-                    indicator.className = 'w-10 h-10 mx-auto rounded-full bg-green-600 text-white flex items-center justify-center font-bold';
-                    if (line) line.className = 'flex-1 h-1 bg-green-600';
-                } else if (i === step) {
-                    indicator.className = 'w-10 h-10 mx-auto rounded-full bg-blue-600 text-white flex items-center justify-center font-bold';
-                    if (line) line.className = 'flex-1 h-1 bg-gray-300';
-                } else {
-                    indicator.className = 'w-10 h-10 mx-auto rounded-full bg-gray-300 text-gray-600 flex items-center justify-center font-bold';
-                    if (line) line.className = 'flex-1 h-1 bg-gray-300';
-                }
-            }
-            
-            currentStep = step;
-        }
-
-        function sendOTP() {
-            const email = document.getElementById('email').value;
-            const phone = document.getElementById('phone').value;
-            const errorDiv = document.getElementById('contact-error');
-            const button = event.target;
-
-            if (!email || !phone) {
-                errorDiv.textContent = 'Please fill in all fields';
-                errorDiv.classList.remove('hidden');
-                return;
-            }
-
-            // Disable button to prevent double clicks
-            button.disabled = true;
-            button.textContent = 'Sending...';
-            errorDiv.classList.add('hidden');
-
-            console.log('Sending OTP to:', { email, phone });
-
-            fetch('{{ route('admin.send-admin-otp') }}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify({ email, phone })
-            })
-            .then(response => {
-                console.log('Response status:', response.status);
-                return response.json().then(data => ({ status: response.status, data }));
-            })
-            .then(({ status, data }) => {
-                console.log('Response status:', status);
-                console.log('Response data:', data);
-                console.log('Data.success:', data.success);
-                
-                button.disabled = false;
-                button.textContent = 'Send OTP';
-                
-                // Check if successful (status 200 or data.success is true)
-                if (data.success === true || (status === 200 && data.success !== false)) {
-                    console.log('OTP sent successfully, moving to step 2');
-                    verifiedEmail = email;
-                    verifiedPhone = phone;
-                    goToStep(2);
-                } else {
-                    console.log('OTP send failed:', data.message);
-                    errorDiv.textContent = data.message || 'Failed to send OTP';
-                    errorDiv.classList.remove('hidden');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                button.disabled = false;
-                button.textContent = 'Send OTP';
-                errorDiv.textContent = 'An error occurred: ' + error.message;
-                errorDiv.classList.remove('hidden');
-            });
-        }
-
-        function verifyOTP() {
-            const otp = document.getElementById('otp').value;
-            const errorDiv = document.getElementById('otp-error');
-
-            if (!otp || otp.length !== 6) {
-                errorDiv.textContent = 'Please enter a valid 6-digit OTP';
-                errorDiv.classList.remove('hidden');
-                return;
-            }
-
-            errorDiv.classList.add('hidden');
-
-            fetch('{{ route('admin.verify-admin-otp') }}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
-                body: JSON.stringify({ phone: verifiedPhone, otp })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    document.getElementById('verified_email').value = verifiedEmail;
-                    document.getElementById('verified_phone').value = verifiedPhone;
-                    goToStep(3);
-                } else {
-                    errorDiv.textContent = data.message || 'Invalid OTP';
-                    errorDiv.classList.remove('hidden');
-                }
-            })
-            .catch(error => {
-                errorDiv.textContent = 'An error occurred. Please try again.';
-                errorDiv.classList.remove('hidden');
-            });
-        }
-    </script>
 </x-layout>

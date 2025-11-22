@@ -21,15 +21,6 @@ class Transaction extends Model
         'status',
     ];
 
-    protected static function boot()
-    {
-        parent::boot();
-
-        static::saving(function ($transaction) {
-            $transaction->calculateTotalPrice();
-        });
-    }
-
     public function calculateTotalPrice()
     {
         $productTotal = $this->products()

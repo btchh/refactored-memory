@@ -2,6 +2,22 @@
 
 namespace App\Traits;
 
+/**
+ * Standardized API Response Trait
+ * 
+ * This trait provides consistent response structures for all API endpoints.
+ * All controllers should use these methods for API responses to ensure consistency.
+ * 
+ * Response Structure:
+ * - Success: { success: true, message: string, data: object }
+ * - Error: { success: false, message: string, errors: object }
+ * 
+ * Usage Guidelines:
+ * - API endpoints: Use successResponse() or errorResponse()
+ * - Web routes: Use redirect()->back()->with('error', ...) or redirect()->route(...)->with('success', ...)
+ * 
+ * @see Requirements 5.1, 5.2, 5.3, 8.1
+ */
 trait Responses
 {
     /**

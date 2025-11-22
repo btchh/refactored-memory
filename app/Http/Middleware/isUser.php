@@ -16,23 +16,10 @@ class IsUser
      */
     public function handle(Request $request, Closure $next): Response
     {
-        // Check if user is authenticated with the 'web' guard
-        if (!Auth::guard('web')->check()) {
-            // Return JSON response for API/AJAX requests or user routes
-            if ($request->expectsJson() || $request->is('user/*') || $request->is('dashboard*')) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Unauthenticated. Please login as a user to access this resource.',
-                ], 401);
-            }
-
-            return redirect()->route('user.login')->with('error', 'Please login as a user to access this page.');
-        }
-
-        // Prevent admin from accessing user routes
+        // First, check if an admin is trying to access user routes (cross-guard check)
         if (Auth::guard('admin')->check()) {
-            // Return JSON response for API/AJAX requests or user routes
-            if ($request->expectsJson() || $request->is('user/*') || $request->is('dashboard*')) {
+            // Return JSON response for API/AJAX requests
+            if ($request->expectsJson()) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Forbidden. Admins cannot access user resources.',
@@ -40,6 +27,19 @@ class IsUser
             }
 
             return redirect()->route('admin.dashboard')->with('error', 'Admins cannot access user pages.');
+        }
+
+        // Then check if user is authenticated with the 'web' guard
+        if (!Auth::guard('web')->check()) {
+            // Return JSON response for API/AJAX requests
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unauthenticated. Please login as a user to access this resource.',
+                ], 401);
+            }
+
+            return redirect()->route('user.login')->with('error', 'Please login as a user to access this page.');
         }
 
         return $next($request);
