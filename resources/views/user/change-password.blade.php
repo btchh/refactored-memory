@@ -1,10 +1,12 @@
 <x-layout>
     <x-slot:title>Change Password</x-slot:title>
     <x-nav type="user" />
-    <div class="min-h-screen bg-gray-100">
+
+    <!-- ✅ Add top padding so content sits below nav -->
+    <div class="min-h-screen bg-gray-100 pt-[7rem] pb-12">
 
         <!-- Main Content -->
-        <main class="container mx-auto p-4">
+        <main class="container mx-auto px-4">
             <div class="max-w-2xl mx-auto my-8">
                 <x-modules.card>
                     <!-- Alert Messages -->
@@ -23,6 +25,9 @@
                             {{ session('success') }}
                         </x-modules.alert>
                     @endif
+
+                    <!-- ✅ Centered Title -->
+                    <h2 class="text-2xl font-bold text-center text-gray-700 mb-6">Change Password</h2>
 
                     <!-- Change Password Form -->
                     <form action="{{ route('user.change-password') }}" method="POST" class="space-y-5">

@@ -20,4 +20,12 @@ return [
             ['label' => 'Track Admin', 'route' => 'user.track-admin'],
         ],
     ],
+    'landing' => [
+        'title' => 'Welcome to Wash Hour',
+        'color' => 'landing',
+        'links' => [
+            ['label' => 'Login', 'route' => 'login'],
+            ['label' => 'Register', 'route' => 'register'],
+        ],
+    ],
 ];

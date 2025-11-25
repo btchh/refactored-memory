@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\User\HistoryController;
 
 Route::get('/', function () {
     return view('landingPage');
@@ -54,6 +55,11 @@ Route::prefix('user')->name('user.')->group(function () {
         Route::get('reset-password/{phone}', [UserController::class, 'showResetPassword'])->name('reset-password');
         Route::post('reset-password', [UserController::class, 'resetPassword']);
     });
+   
+    
+    // Route::middleware('auth:web')->group(function () {
+    //     Route::get('booking', [UserController::class, 'showBooking'])->name('booking');
+    // });
 
     // Protected routes
     Route::middleware(['auth:web', 'prevent.back'])->group(function () {
@@ -65,6 +71,12 @@ Route::prefix('user')->name('user.')->group(function () {
         Route::post('change-password', [UserController::class, 'changePassword']);
         Route::get('track-admin', [UserController::class, 'showTrackAdmin'])->name('track-admin');
         Route::get('admin-location', [UserController::class, 'getAdminLocation'])->name('admin-location');
+        // Route::get('dashboard', [UserController::class, 'showDashboard'])->name('dashboard');
+        // Route::get('booking', [UserController::class, 'showBooking'])->name('booking');
+        // Route::post('booking', [UserController::class, 'submitBooking'])->name('booking.submit');
+        // Route::get('status', [UserController::class, 'showStatus'])->name('status');
+        // Route::get('shop-location', [UserController::class, 'shopLocation'])->name('shop-location');
+        // Route::get('history', [UserController::class, 'history'])->name('history');
     });
 });
 

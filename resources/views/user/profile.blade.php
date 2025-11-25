@@ -1,13 +1,14 @@
 <x-layout>
     <x-slot:title>User Profile</x-slot:title>
     <x-nav type="user" />
-    <div class="min-h-screen bg-gray-100">
 
-        <!-- Main Content -->
-        <main class="container mx-auto p-4">
-            <div class="max-w-2xl mx-auto my-8">
-                <x-modules.card>
-                    <!-- Alert Messages -->
+    <!-- ✅ Add extra top padding to avoid nav overlap -->
+    <div class="min-h-screen bg-gray-100 pt-[7rem] pb-12">
+
+        <main class="container mx-auto px-4">
+            <div class="max-w-2xl mx-auto">
+                <x-modules.card class="p-6 md:p-8">
+                    <!-- Alerts -->
                     @if ($errors->any())
                         <x-modules.alert type="error" dismissible class="mb-4">
                             <ul class="list-disc list-inside">
@@ -25,7 +26,7 @@
                     @endif
 
                     <!-- Profile Form -->
-                    <form action="{{ route('user.update-profile') }}" method="POST" class="space-y-5">
+                    <form action="{{ route('user.update-profile') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
                         @csrf
 
                         <!-- Username -->

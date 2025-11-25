@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Booking;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
@@ -229,6 +230,32 @@ class UserController extends Controller
         }
     }
 
+    // public function storeBooking(Request $request)
+    //     {
+    //         $request->validate([
+    //             'date' => 'required|date',
+    //             'time' => 'required'
+    //         ]);
+
+    //         // Example save logic
+    //         \App\Models\Booking::create([
+    //             'user_id' => auth()->id(),
+    //             'date' => $request->date,
+    //             'time' => $request->time,
+    //         ]);
+
+    //         return redirect()->route('user.booking')->with('success', 'Booking submitted successfully!');
+    //     }
+
+    //     // Dashboard / Status method
+    // public function showStatus()
+    // {
+    //     $bookings = Booking::where('user_id', auth()->id())->latest()->get();
+
+    //     return view('user.dashboard', compact('bookings'));
+    // }
+
+
     /**
      * Show user dashboard
      */
@@ -253,27 +280,53 @@ class UserController extends Controller
         return view('user.change-password');
     }
 
+    /*show the booking*/
+    public function showBooking()
+    {
+        return view('user.booking'); 
+    }
+
+//     public function showStatus()
+// {
+//     $bookings = \App\Models\Booking::where('user_id', auth()->id())->latest()->get();
+//     return view('user.status', compact('bookings'));
+// }
+
+
     /**
      * Update user profile
      */
     public function updateProfile(UpdateProfile $request)
+{
+    $user = Auth::guard('web')->user();
+
+    if (!$user) {
+        return redirect()->route('user.login')->with('error', 'Unauthorized');
+    }
+
+    try {
+        // Update basic fields
+        $this->userService->updateUser(
+            $user->id,
+            $request->only(['username', 'fname', 'lname', 'email', 'phone', 'address'])
+        );
+
+        return redirect()->route('user.profile')->with('success', 'Profile updated successfully');
+    } catch (\Exception $e) {
+        return redirect()->back()->with('error', $e->getMessage());
+    }
+}
+
+
+    public function shopLocation()
     {
-        $user = Auth::guard('web')->user();
+        return view('user.shop-location');
+    }
 
-        if (!$user) {
-            return redirect()->route('user.login')->with('error', 'Unauthorized');
-        }
-
-        try {
-            $this->userService->updateUser(
-                $user->id,
-                $request->only(['username', 'fname', 'lname', 'email', 'phone', 'address'])
-            );
-
-            return redirect()->route('user.profile')->with('success', 'Profile updated successfully');
-        } catch (\Exception $e) {
-            return redirect()->back()->with('error', $e->getMessage());
-        }
+    public function history()
+    {
+        $bookings = Booking::where('user_id', auth()->id())->latest()->get();
+        return view('user.history', compact('bookings'));
     }
 
     /**

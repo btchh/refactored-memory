@@ -1,32 +1,22 @@
 <x-layout>
-    <x-slot:title>Dashboard</x-slot:title>
-    <x-nav type="user" />
-    <div class="min-h-screen bg-gray-100">
+    <x-slot name="title">Dashboard</x-slot>
 
-        <!-- Main Content -->
-        <main class="container mx-auto p-4">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 my-8">
-                <x-modules.card>
-                    <h3 class="text-lg font-bold mb-2">Welcome</h3>
-                    <p class="text-gray-600">Welcome to your dashboard, {{ Auth::user()->fname }}!</p>
-                </x-modules.card>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Welcome Card -->
+        <div class="card bg-white shadow-md rounded-xl border border-gray-200 p-6">
+            <h2 class="text-2xl font-bold text-blue-600 mb-2">Welcome, {{ Auth::user()->fname }} {{ Auth::user()->lname }}</h2>
+            <p class="text-gray-700">This is your dashboard. You can book laundry, check status, view history, and more.</p>
+        </div>
 
-                <x-modules.card>
-                    <h3 class="text-lg font-bold mb-2">Quick Links</h3>
-                    <ul class="space-y-2">
-                        <li><a href="{{ route('user.profile') }}" class="text-green-600 hover:underline">View Profile</a></li>
-                        <li><a href="{{ route('user.change-password') }}" class="text-green-600 hover:underline">Change Password</a></li>
-                    </ul>
-                </x-modules.card>
+        <!-- Sample Placeholder Cards (for future sections) -->
+        <div class="card bg-white shadow-sm rounded-xl border border-gray-200 p-6">
+            <h3 class="text-lg font-semibold text-gray-800 mb-2">Quick Booking</h3>
+            <p class="text-sm text-gray-600">Start a new laundry booking in just a few clicks.</p>
+        </div>
 
-                <x-modules.card>
-                    <h3 class="text-lg font-bold mb-2">Account Info</h3>
-                    <p class="text-sm text-gray-600">
-                        <strong>Username:</strong> {{ Auth::user()->username }}<br>
-                        <strong>Email:</strong> {{ Auth::user()->email }}
-                    </p>
-                </x-modules.card>
-            </div>
-        </main>
+        <div class="card bg-white shadow-sm rounded-xl border border-gray-200 p-6">
+            <h3 class="text-lg font-semibold text-gray-800 mb-2">Laundry Status</h3>
+            <p class="text-sm text-gray-600">Track your current laundry progress in real-time.</p>
+        </div>
     </div>
 </x-layout>
