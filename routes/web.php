@@ -1,74 +1,125 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AdminController;
-use App\Http\Controllers\UserController;
+use App\Http\Controllers\Admin\AuthController as AdminAuthController;
+use App\Http\Controllers\Admin\ProfileController as AdminProfileController;
+use App\Http\Controllers\Admin\AdminManagementController;
+use App\Http\Controllers\Admin\RouteController as AdminRouteController;
+use App\Http\Controllers\Admin\BookingController as AdminBookingController;
+use App\Http\Controllers\User\AuthController as UserAuthController;
+use App\Http\Controllers\User\ProfileController as UserProfileController;
+use App\Http\Controllers\User\TrackingController as UserTrackingController;
+use App\Http\Controllers\User\BookingController as UserBookingController;
 
 Route::get('/', function () {
     return view('landingPage');
 });
 
+// ============================================================================
 // Admin Routes
+// ============================================================================
 Route::prefix('admin')->name('admin.')->group(function () {
-    // Public routes
+    
+    // ------------------------------------------------------------------------
+    // Admin Authentication Routes (Public)
+    // ------------------------------------------------------------------------
     Route::middleware('guest:admin')->group(function () {
-        Route::get('login', [AdminController::class, 'showLogin'])->name('login');
-        Route::post('login', [AdminController::class, 'login']);
-        Route::get('forgot-password', [AdminController::class, 'showForgotPassword'])->name('forgot-password');
-        Route::post('send-password-reset', [AdminController::class, 'sendPasswordReset'])->name('send-password-reset');
-        Route::get('reset-password/{token}', [AdminController::class, 'showResetPassword'])->name('reset-password');
-        Route::post('reset-password', [AdminController::class, 'resetPassword']);
-        Route::post('verify-password-reset', [AdminController::class, 'verifyPasswordReset'])->name('verify-password-reset');
+        Route::get('login', [AdminAuthController::class, 'showLogin'])->name('login');
+        Route::post('login', [AdminAuthController::class, 'login']);
+        Route::get('forgot-password', [AdminAuthController::class, 'showForgotPassword'])->name('forgot-password');
+        Route::post('send-password-reset', [AdminAuthController::class, 'sendPasswordReset'])->name('send-password-reset');
+        Route::post('verify-password-reset', [AdminAuthController::class, 'verifyPasswordReset'])->name('verify-password-reset');
+        Route::post('reset-password', [AdminAuthController::class, 'resetPassword'])->name('reset-password');
     });
 
-    // Protected routes
+    // ------------------------------------------------------------------------
+    // Admin Protected Routes
+    // ------------------------------------------------------------------------
     Route::middleware(['isAdmin', 'prevent.back'])->group(function () {
-        Route::post('logout', [AdminController::class, 'logout'])->name('logout');
-        Route::get('dashboard', [AdminController::class, 'showDashboard'])->name('dashboard');
-        Route::get('profile', [AdminController::class, 'showProfile'])->name('profile');
-        Route::post('update-profile', [AdminController::class, 'updateProfile'])->name('update-profile');
-        Route::get('change-password', [AdminController::class, 'showChangePassword'])->name('change-password');
-        Route::post('change-password', [AdminController::class, 'changePassword'])->name('update-password');
-        Route::get('create-admin', [AdminController::class, 'showCreateAdmin'])->name('create-admin');
-        Route::post('create-admin', [AdminController::class, 'createAdmin']);
-        Route::post('send-admin-otp', [AdminController::class, 'sendAdminOtp'])->name('send-admin-otp');
-        Route::post('verify-admin-otp', [AdminController::class, 'verifyAdminOtp'])->name('verify-admin-otp');
-        Route::get('route-to-user', [AdminController::class, 'showRouteToUser'])->name('route-to-user');
-        Route::get('get-route/{userId}', [AdminController::class, 'getRouteToUser'])->name('get-route');
+        
+        // Authentication
+        Route::post('logout', [AdminAuthController::class, 'logout'])->name('logout');
+        
+        // Dashboard
+        Route::get('dashboard', [AdminProfileController::class, 'showDashboard'])->name('dashboard');
+        
+        // Profile Management
+        Route::get('profile', [AdminProfileController::class, 'showProfile'])->name('profile');
+        Route::post('update-profile', [AdminProfileController::class, 'updateProfile'])->name('update-profile');
+        Route::get('change-password', [AdminProfileController::class, 'showChangePassword'])->name('change-password');
+        Route::post('change-password', [AdminProfileController::class, 'changePassword'])->name('update-password');
+        
+        // Admin Management
+        Route::get('create-admin', [AdminManagementController::class, 'showCreateAdmin'])->name('create-admin');
+        Route::post('create-admin', [AdminManagementController::class, 'createAdmin']);
+        Route::post('send-admin-otp', [AdminManagementController::class, 'sendAdminOtp'])->name('send-admin-otp');
+        Route::post('verify-admin-otp', [AdminManagementController::class, 'verifyAdminOtp'])->name('verify-admin-otp');
+        
+        // Routing/Tracking
+        Route::get('route-to-user', [AdminRouteController::class, 'showRouteToUser'])->name('route-to-user');
+        Route::get('get-route/{userId}', [AdminRouteController::class, 'getRouteToUser'])->name('get-route');
+        
+        // Booking Management
+        Route::get('bookings', [AdminBookingController::class, 'viewAllBookings'])->name('bookings');
+        Route::get('bookings/data', [AdminBookingController::class, 'getAllBookingsData'])->name('bookings.data');
+        Route::post('bookings/{bookingId}/manage', [AdminBookingController::class, 'manageBooking'])->name('bookings.manage');
+        Route::post('bookings/{bookingId}/cancel', [AdminBookingController::class, 'cancelUserBooking'])->name('bookings.cancel');
+        Route::get('bookings/search', [AdminBookingController::class, 'searchBookings'])->name('bookings.search');
     });
 });
 
+// ============================================================================
 // User Routes
+// ============================================================================
 Route::prefix('user')->name('user.')->group(function () {
-    // Public routes
+    
+    // ------------------------------------------------------------------------
+    // User Authentication Routes (Public)
+    // ------------------------------------------------------------------------
     Route::middleware('guest:web')->group(function () {
-        Route::get('login', [UserController::class, 'showLogin'])->name('login');
-        Route::post('login', [UserController::class, 'login']);
-        Route::get('register', [UserController::class, 'showRegister'])->name('register');
-        Route::post('send-registration-otp', [UserController::class, 'sendRegistrationOtp'])->name('send-registration-otp');
-        Route::post('verify-otp', [UserController::class, 'verifyRegistrationOtp'])->name('verify-otp');
-        Route::post('register', [UserController::class, 'register']);
-        Route::get('forgot-password', [UserController::class, 'showForgotPassword'])->name('forgot-password');
-        Route::post('send-password-reset-otp', [UserController::class, 'sendPasswordResetOtp'])->name('send-password-reset-otp');
-        Route::post('verify-password-reset-otp', [UserController::class, 'verifyPasswordResetOtp'])->name('verify-password-reset-otp');
-        Route::get('reset-password/{phone}', [UserController::class, 'showResetPassword'])->name('reset-password');
-        Route::post('reset-password', [UserController::class, 'resetPassword']);
+        Route::get('login', [UserAuthController::class, 'showLogin'])->name('login');
+        Route::post('login', [UserAuthController::class, 'login']);
+        Route::get('register', [UserAuthController::class, 'showRegister'])->name('register');
+        Route::post('send-registration-otp', [UserAuthController::class, 'sendRegistrationOtp'])->name('send-registration-otp');
+        Route::post('verify-otp', [UserAuthController::class, 'verifyRegistrationOtp'])->name('verify-otp');
+        Route::post('register', [UserAuthController::class, 'register']);
+        Route::get('forgot-password', [UserAuthController::class, 'showForgotPassword'])->name('forgot-password');
+        Route::post('send-password-reset-otp', [UserAuthController::class, 'sendPasswordResetOtp'])->name('send-password-reset-otp');
+        Route::post('verify-password-reset-otp', [UserAuthController::class, 'verifyPasswordResetOtp'])->name('verify-password-reset-otp');
+        Route::post('reset-password', [UserAuthController::class, 'resetPassword'])->name('reset-password');
     });
 
-    // Protected routes
+    // ------------------------------------------------------------------------
+    // User Protected Routes
+    // ------------------------------------------------------------------------
     Route::middleware(['isUser', 'prevent.back'])->group(function () {
-        Route::post('logout', [UserController::class, 'logout'])->name('logout');
-        Route::get('dashboard', [UserController::class, 'showDashboard'])->name('dashboard');
-        Route::get('profile', [UserController::class, 'showProfile'])->name('profile');
-        Route::post('update-profile', [UserController::class, 'updateProfile'])->name('update-profile');
-        Route::get('change-password', [UserController::class, 'showChangePassword'])->name('change-password');
-        Route::post('change-password', [UserController::class, 'changePassword']);
-        Route::get('track-admin', [UserController::class, 'showTrackAdmin'])->name('track-admin');
-        Route::get('admin-location', [UserController::class, 'getAdminLocation'])->name('admin-location');
+        
+        // Authentication
+        Route::post('logout', [UserAuthController::class, 'logout'])->name('logout');
+        
+        // Dashboard
+        Route::get('dashboard', [UserProfileController::class, 'showDashboard'])->name('dashboard');
+        
+        // Profile Management
+        Route::get('profile', [UserProfileController::class, 'showProfile'])->name('profile');
+        Route::post('update-profile', [UserProfileController::class, 'updateProfile'])->name('update-profile');
+        Route::get('change-password', [UserProfileController::class, 'showChangePassword'])->name('change-password');
+        Route::post('change-password', [UserProfileController::class, 'changePassword']);
+        
+        // Tracking
+        Route::get('track-admin', [UserTrackingController::class, 'showTrackAdmin'])->name('track-admin');
+        Route::get('admin-location', [UserTrackingController::class, 'getAdminLocation'])->name('admin-location');
+        
+        // Booking Management
+        Route::get('bookings', [UserBookingController::class, 'viewBookings'])->name('bookings');
+        Route::get('bookings/data', [UserBookingController::class, 'getUserBookingsData'])->name('bookings.data');
+        Route::post('bookings/create', [UserBookingController::class, 'createBooking'])->name('bookings.create');
+        Route::post('bookings/{bookingId}/update', [UserBookingController::class, 'updateBooking'])->name('bookings.update');
+        Route::post('bookings/{bookingId}/cancel', [UserBookingController::class, 'cancelBooking'])->name('bookings.cancel');
     });
 });
 
-// Removed - using user.dashboard route instead
-
-// API routes
-Route::get('/api/users', [AdminController::class, 'getUsersList'])->middleware('isAdmin');
+// ============================================================================
+// API Routes
+// ============================================================================
+Route::get('/api/users', [AdminRouteController::class, 'getUsersList'])->middleware('isAdmin');

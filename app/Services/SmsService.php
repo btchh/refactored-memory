@@ -149,6 +149,12 @@ class SmsService
      */
     public function sendOtp(string $phoneNumber, ?string $customMessage = null): array
     {
+        Log::info('SmsService::sendOtp - Starting OTP send', [
+            'phone' => $phoneNumber,
+            'has_custom_message' => !is_null($customMessage),
+            'api_endpoint' => "{$this->baseUrl}/otp/send_otp"
+        ]);
+
         try {
             $payload = [
                 'api_token' => $this->apiToken,
@@ -159,24 +165,71 @@ class SmsService
                 $payload['message'] = $customMessage;
             }
 
-            Log::info('Sending OTP to: ' . $phoneNumber);
-            Log::info('Payload:', $payload);
+            // Log payload with masked token
+            $logPayload = $payload;
+            $logPayload['api_token'] = substr($this->apiToken, 0, 10) . '...' . substr($this->apiToken, -10);
+            Log::info('SmsService::sendOtp - Request payload', $logPayload);
 
+            Log::info('SmsService::sendOtp - Making HTTP POST request');
             $response = Http::withOptions(['verify' => false])
                 ->post("{$this->baseUrl}/otp/send_otp", $payload);
 
+            Log::info('SmsService::sendOtp - HTTP request completed', [
+                'status_code' => $response->status(),
+                'headers' => $response->headers()
+            ]);
+
             $result = $response->json();
             
-            Log::info('OTP API Response:', $result ?? ['raw' => $response->body()]);
-            Log::info('HTTP Status Code: ' . $response->status());
+            Log::info('SmsService::sendOtp - API Response', [
+                'status_code' => $response->status(),
+                'response_body' => $result ?? ['raw' => $response->body()],
+                'response_successful' => $response->successful()
+            ]);
+
+            if (!$result) {
+                Log::warning('SmsService::sendOtp - Empty response from API', [
+                    'raw_body' => $response->body(),
+                    'status_code' => $response->status()
+                ]);
+            }
 
             return $result ?? [
                 'status' => 'error',
                 'message' => 'Empty response from API',
-                'raw_response' => $response->body()
+                'raw_response' => $response->body(),
+                'status_code' => $response->status()
+            ];
+        } catch (\Illuminate\Http\Client\ConnectionException $e) {
+            Log::error('SmsService::sendOtp - Connection exception', [
+                'phone' => $phoneNumber,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'exception_type' => 'ConnectionException'
+            ]);
+            return [
+                'status' => 'error',
+                'message' => 'Failed to connect to SMS API: ' . $e->getMessage()
+            ];
+        } catch (\Illuminate\Http\Client\RequestException $e) {
+            Log::error('SmsService::sendOtp - Request exception', [
+                'phone' => $phoneNumber,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'exception_type' => 'RequestException',
+                'response_status' => $e->response ? $e->response->status() : 'unknown'
+            ]);
+            return [
+                'status' => 'error',
+                'message' => 'SMS API request failed: ' . $e->getMessage()
             ];
         } catch (\Exception $e) {
-            Log::error('OTP sending failed: ' . $e->getMessage());
+            Log::error('SmsService::sendOtp - General exception', [
+                'phone' => $phoneNumber,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'exception_type' => get_class($e)
+            ]);
             return [
                 'status' => 'error',
                 'message' => 'Failed to send OTP: ' . $e->getMessage()

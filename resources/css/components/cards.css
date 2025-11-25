@@ -1,0 +1,141 @@
+/* Card Base Styles */
+.card {
+    background-color: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+/* Card Header */
+.card-header {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #e5e7eb;
+    background-color: #f9fafb;
+}
+
+.card-header h3 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+/* Card Body */
+.card-body {
+    padding: 1.5rem;
+}
+
+/* Card Footer */
+.card-footer {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid #e5e7eb;
+    background-color: #f9fafb;
+}
+
+/* Card Variants */
+.card-bordered {
+    border: 1px solid #e5e7eb;
+    box-shadow: none;
+}
+
+.card-elevated {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.card-flat {
+    box-shadow: none;
+}
+
+/* Card with Hover Effect */
+.card-hover {
+    transition: all 0.2s;
+}
+
+.card-hover:hover {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    transform: translateY(-4px);
+}
+
+/* Card Sizes */
+.card-sm .card-body {
+    padding: 1rem;
+}
+
+.card-sm .card-header,
+.card-sm .card-footer {
+    padding: 0.75rem 1rem;
+}
+
+.card-lg .card-body {
+    padding: 2rem;
+}
+
+.card-lg .card-header,
+.card-lg .card-footer {
+    padding: 1.25rem 2rem;
+}
+
+/* Card Grid */
+.card-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+    .card-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 1024px) {
+    .card-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+/* Card with Image */
+.card-image {
+    width: 100%;
+    height: 12rem;
+    object-fit: cover;
+}
+
+/* Card Title */
+.card-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 0.5rem;
+}
+
+/* Card Text */
+.card-text {
+    color: #4b5563;
+    margin-bottom: 1rem;
+}
+
+/* Card Link */
+.card-link {
+    color: #3b82f6;
+}
+
+.card-link:hover {
+    color: #1e40af;
+    text-decoration: underline;
+}
+
+/* Responsive Cards */
+@media (max-width: 768px) {
+    .card-body {
+        padding: 1rem;
+    }
+
+    .card-header,
+    .card-footer {
+        padding: 0.75rem 1rem;
+    }
+
+    .card-grid {
+        grid-template-columns: 1fr;
+    }
+}

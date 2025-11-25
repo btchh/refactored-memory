@@ -34,11 +34,11 @@ class MapConfigurationTest extends TestCase
             ->get(route('admin.route-to-user'));
         
         $response->assertStatus(200);
-        $response->assertViewIs('admin.route-to-user');
+        $response->assertViewIs('admin.routing.route-to-user');
         
-        // Verify the page contains the API key (rendered from config)
+        // Verify the page contains the API key in data attribute
         $apiKey = config('services.geoapify.api_key');
-        $response->assertSee("const GEOAPIFY_API_KEY = '{$apiKey}'", false);
+        $response->assertSee("data-geoapify-key=\"{$apiKey}\"", false);
     }
 
     /**
@@ -52,11 +52,11 @@ class MapConfigurationTest extends TestCase
             ->get(route('user.track-admin'));
         
         $response->assertStatus(200);
-        $response->assertViewIs('user.track-admin');
+        $response->assertViewIs('user.tracking.track-admin');
         
-        // Verify the page contains the API key (rendered from config)
+        // Verify the page contains the API key in data attribute
         $apiKey = config('services.geoapify.api_key');
-        $response->assertSee("const GEOAPIFY_API_KEY = '{$apiKey}'", false);
+        $response->assertSee("data-geoapify-key=\"{$apiKey}\"", false);
     }
 
     /**
@@ -78,9 +78,9 @@ class MapConfigurationTest extends TestCase
         $userResponse = $this->actingAs($user, 'web')
             ->get(route('user.track-admin'));
         
-        // Both should contain the same API key value
+        // Both should contain the same API key value in data attribute
         $apiKey = config('services.geoapify.api_key');
-        $adminResponse->assertSee("const GEOAPIFY_API_KEY = '{$apiKey}'", false);
-        $userResponse->assertSee("const GEOAPIFY_API_KEY = '{$apiKey}'", false);
+        $adminResponse->assertSee("data-geoapify-key=\"{$apiKey}\"", false);
+        $userResponse->assertSee("data-geoapify-key=\"{$apiKey}\"", false);
     }
 }

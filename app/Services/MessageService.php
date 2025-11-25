@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use Illuminate\Support\Facades\Log;
+
 class MessageService
 {
     protected $smsService;
@@ -38,10 +40,35 @@ class MessageService
      */
     public function sendPasswordResetOtp(string $phoneNumber): array
     {
-        return $this->smsService->sendOtp(
-            $phoneNumber,
-            config('messages.otp.password_reset')
-        );
+        Log::info('MessageService::sendPasswordResetOtp - Called', [
+            'phone' => $phoneNumber,
+            'message_template' => config('messages.otp.password_reset')
+        ]);
+
+        try {
+            $result = $this->smsService->sendOtp(
+                $phoneNumber,
+                config('messages.otp.password_reset')
+            );
+
+            Log::info('MessageService::sendPasswordResetOtp - SmsService returned', [
+                'phone' => $phoneNumber,
+                'result' => $result
+            ]);
+
+            return $result;
+        } catch (\Exception $e) {
+            Log::error('MessageService::sendPasswordResetOtp - Exception caught', [
+                'phone' => $phoneNumber,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return [
+                'status' => 'error',
+                'message' => 'Failed to send password reset OTP: ' . $e->getMessage()
+            ];
+        }
     }
 
     /**

@@ -156,28 +156,48 @@ class ApiResponseConsistencyTest extends TestCase
      */
     public function test_controllers_use_responses_trait(): void
     {
-        $adminController = new \App\Http\Controllers\AdminController(
-            app(\App\Services\AdminService::class),
-            app(\App\Services\AuthService::class),
-            app(\App\Services\LocationService::class)
+        $adminAuthController = new \App\Http\Controllers\Admin\AuthController(
+            app(\App\Services\Auth\AdminAuthService::class),
+            app(\App\Services\Auth\OtpService::class),
+            app(\App\Services\Admin\AdminProfileService::class)
         );
 
-        $userController = new \App\Http\Controllers\UserController(
-            app(\App\Services\UserService::class),
-            app(\App\Services\AuthService::class),
+        $userAuthController = new \App\Http\Controllers\User\AuthController(
+            app(\App\Services\Auth\UserAuthService::class),
+            app(\App\Services\Auth\OtpService::class),
+            app(\App\Services\User\UserManagementService::class),
+            app(\App\Services\User\UserProfileService::class)
+        );
+
+        $adminRouteController = new \App\Http\Controllers\Admin\RouteController(
+            app(\App\Services\LocationService::class),
+            app(\App\Services\GeocodeService::class)
+        );
+
+        $userTrackingController = new \App\Http\Controllers\User\TrackingController(
             app(\App\Services\GeocodeService::class),
             app(\App\Services\LocationService::class)
         );
 
-        // Verify both controllers use the Responses trait
+        // Verify all controllers use the Responses trait
         $this->assertContains(
             \App\Traits\Responses::class,
-            class_uses($adminController)
+            class_uses($adminAuthController)
         );
 
         $this->assertContains(
             \App\Traits\Responses::class,
-            class_uses($userController)
+            class_uses($userAuthController)
+        );
+
+        $this->assertContains(
+            \App\Traits\Responses::class,
+            class_uses($adminRouteController)
+        );
+
+        $this->assertContains(
+            \App\Traits\Responses::class,
+            class_uses($userTrackingController)
         );
     }
 }

@@ -79,11 +79,11 @@ class ApiEndpointTest extends TestCase
         // Read the routes file
         $routesContent = file_get_contents(base_path('routes/web.php'));
         
-        // Verify it uses controller method
+        // Verify it uses controller method (updated to AdminRouteController after refactoring)
         $this->assertStringContainsString(
-            '[AdminController::class, \'getUsersList\']',
+            '[AdminRouteController::class, \'getUsersList\']',
             $routesContent,
-            'API endpoint should use AdminController::getUsersList method'
+            'API endpoint should use AdminRouteController::getUsersList method'
         );
         
         // Verify it doesn't use inline closure

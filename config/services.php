@@ -42,4 +42,9 @@ return [
     'geoapify' => [
         'api_key' => env('GEOAPIFY_API_KEY'),
     ],
+
+    'calcom' => [
+        'api_key' => env('CALCOM_API_KEY'),
+        'base_url' => env('CALCOM_BASE_URL', 'https://api.cal.com/v1'),
+    ],
 ];
