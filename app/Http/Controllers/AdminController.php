@@ -35,7 +35,7 @@ class AdminController extends Controller
 
         // Redirect if logged in as user
         if (Auth::guard('web')->check()) {
-            return redirect()->route('users.dashboard');
+            return redirect()->route('user.dashboard');
         }
 
         return view('admin.login');

@@ -57,31 +57,23 @@ Route::prefix('user')->name('user.')->group(function () {
     });
    
     
-    // Route::middleware('auth:web')->group(function () {
-    //     Route::get('booking', [UserController::class, 'showBooking'])->name('booking');
-    // });
-
     // Protected routes
     Route::middleware(['auth:web', 'prevent.back'])->group(function () {
         Route::post('logout', [UserController::class, 'logout'])->name('logout');
         Route::get('dashboard', [UserController::class, 'showDashboard'])->name('dashboard');
+        Route::get('booking', [UserController::class, 'showBooking'])->name('booking');
+        Route::post('booking', [UserController::class, 'submitBooking'])->name('booking.submit');
+        Route::get('status', [UserController::class, 'showStatus'])->name('status');
+        Route::get('shop-location', [UserController::class, 'shopLocation'])->name('shop-location');
+        Route::get('history', [UserController::class, 'history'])->name('history');
         Route::get('profile', [UserController::class, 'showProfile'])->name('profile');
         Route::post('update-profile', [UserController::class, 'updateProfile'])->name('update-profile');
         Route::get('change-password', [UserController::class, 'showChangePassword'])->name('change-password');
         Route::post('change-password', [UserController::class, 'changePassword']);
         Route::get('track-admin', [UserController::class, 'showTrackAdmin'])->name('track-admin');
         Route::get('admin-location', [UserController::class, 'getAdminLocation'])->name('admin-location');
-        // Route::get('dashboard', [UserController::class, 'showDashboard'])->name('dashboard');
-        // Route::get('booking', [UserController::class, 'showBooking'])->name('booking');
-        // Route::post('booking', [UserController::class, 'submitBooking'])->name('booking.submit');
-        // Route::get('status', [UserController::class, 'showStatus'])->name('status');
-        // Route::get('shop-location', [UserController::class, 'shopLocation'])->name('shop-location');
-        // Route::get('history', [UserController::class, 'history'])->name('history');
     });
 });
-
-// Alias for users.dashboard used in AdminController
-Route::get('/users/dashboard', [UserController::class, 'showDashboard'])->name('users.dashboard')->middleware('auth:web');
 
 // API routes
 Route::get('/api/users', function() {

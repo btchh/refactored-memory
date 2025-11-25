@@ -1,8 +1,6 @@
 <x-layout>
     <x-slot:title>Admin Dashboard</x-slot:title>
 
-    <x-nav type="admin" />
-
     <div class="container mx-auto px-4 py-8">
         <!-- Notifications -->
         <x-notifications />

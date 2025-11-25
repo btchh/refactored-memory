@@ -18,13 +18,17 @@
 </head>
 <body class="bg-gray-100">
     <!-- ✅ Top Navigation -->
-    <x-nav type="user" />
+    <x-nav />
 
     <!-- ✅ Page Layout -->
-    <div class="flex min-h-screen pt-[6rem]">
+    <div class="flex min-h-screen pt-[5.5rem]">
         <!-- Sidebar -->
-        <aside class="w-64 fixed top-[6rem] bottom-0 left-0 z-40 overflow-y-auto bg-white border-r border-gray-200">
-            @include('components.modules.sidebar')
+        <aside class="w-64 fixed top-[5.5rem] bottom-0 left-0 z-[90] overflow-y-auto bg-white border-r border-gray-200 shadow-lg">
+            @if(Auth::guard('admin')->check())
+                @include('components.modules.admin-sidebar')
+            @else
+                @include('components.modules.sidebar')
+            @endif
         </aside>
 
         <!-- Main Content -->

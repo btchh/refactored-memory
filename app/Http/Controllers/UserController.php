@@ -34,7 +34,7 @@ class UserController extends Controller
     {
         // Redirect if already logged in as user
         if (Auth::guard('web')->check()) {
-            return redirect()->route('users.dashboard');
+            return redirect()->route('user.dashboard');
         }
 
         // Redirect if logged in as admin
@@ -60,7 +60,7 @@ class UserController extends Controller
 
         if ($result['success']) {
             \Log::info('User redirecting to dashboard');
-            return redirect()->route('users.dashboard')->with('success', $result['message']);
+            return redirect()->route('user.dashboard')->with('success', $result['message']);
         }
 
         \Log::info('User login failed, redirecting back');
@@ -280,17 +280,41 @@ class UserController extends Controller
         return view('user.change-password');
     }
 
-    /*show the booking*/
+    /**
+     * Show the booking form
+     */
     public function showBooking()
     {
         return view('user.booking'); 
     }
 
-//     public function showStatus()
-// {
-//     $bookings = \App\Models\Booking::where('user_id', auth()->id())->latest()->get();
-//     return view('user.status', compact('bookings'));
-// }
+    /**
+     * Submit booking
+     */
+    public function submitBooking(Request $request)
+    {
+        $request->validate([
+            'date' => 'required|date',
+            'time' => 'required'
+        ]);
+
+        Booking::create([
+            'user_id' => auth()->id(),
+            'date' => $request->date,
+            'time' => $request->time,
+        ]);
+
+        return redirect()->route('user.booking')->with('success', 'Booking submitted successfully!');
+    }
+
+    /**
+     * Show booking status
+     */
+    public function showStatus()
+    {
+        $bookings = Booking::where('user_id', auth()->id())->latest()->get();
+        return view('user.status', compact('bookings'));
+    }
 
 
     /**

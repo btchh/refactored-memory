@@ -1,41 +1,48 @@
 <x-layout>
     <x-slot:title>Create Admin</x-slot:title>
 
-    <x-nav type="admin" />
-
-    <div class="min-h-screen bg-gray-100">
-        <div class="container mx-auto px-4 py-8">
-            <div class="max-w-2xl mx-auto">
-                <div class="mb-6">
-                    <h1 class="text-3xl font-bold text-gray-800">Create New Admin</h1>
-                    <p class="text-gray-600 mt-2">Add a new administrator to the system</p>
+    <div class="flex items-center justify-center min-h-full py-8">
+        <div class="w-full max-w-3xl px-4">
+            <!-- Header -->
+            <div class="text-center mb-8">
+                <div class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full mb-4">
+                    <span class="text-4xl">👥</span>
                 </div>
+                <h1 class="text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-2">
+                    Create New Admin
+                </h1>
+                <p class="text-gray-600">Add a new administrator to the system</p>
+            </div>
 
-                <!-- Progress Steps -->
-                <div class="mb-8">
-                    <div class="flex items-center justify-between">
-                        <div class="flex-1 text-center">
-                            <div id="step1-indicator" class="w-10 h-10 mx-auto rounded-full bg-blue-600 text-white flex items-center justify-center font-bold">1</div>
-                            <p class="text-sm mt-2 font-semibold text-blue-600">Contact Info</p>
-                        </div>
-                        <div class="flex-1 h-1 bg-gray-300" id="progress-line-1"></div>
-                        <div class="flex-1 text-center">
-                            <div id="step2-indicator" class="w-10 h-10 mx-auto rounded-full bg-gray-300 text-gray-600 flex items-center justify-center font-bold">2</div>
-                            <p class="text-sm mt-2 text-gray-500">Verify OTP</p>
-                        </div>
-                        <div class="flex-1 h-1 bg-gray-300" id="progress-line-2"></div>
-                        <div class="flex-1 text-center">
-                            <div id="step3-indicator" class="w-10 h-10 mx-auto rounded-full bg-gray-300 text-gray-600 flex items-center justify-center font-bold">3</div>
-                            <p class="text-sm mt-2 text-gray-500">Admin Details</p>
-                        </div>
+            <!-- Progress Steps -->
+            <div class="mb-8 bg-white rounded-2xl shadow-lg p-6 border-2 border-gray-100">
+                <div class="flex items-center justify-between">
+                    <div class="flex-1 text-center">
+                        <div id="step1-indicator" class="w-12 h-12 mx-auto rounded-full bg-gradient-to-br from-purple-600 to-pink-600 text-white flex items-center justify-center font-bold text-lg shadow-lg">1</div>
+                        <p class="text-sm mt-2 font-semibold text-purple-600">📧 Contact Info</p>
+                    </div>
+                    <div class="flex-1 h-2 bg-gray-300 rounded-full mx-2" id="progress-line-1"></div>
+                    <div class="flex-1 text-center">
+                        <div id="step2-indicator" class="w-12 h-12 mx-auto rounded-full bg-gray-300 text-gray-600 flex items-center justify-center font-bold text-lg">2</div>
+                        <p class="text-sm mt-2 text-gray-500">🔐 Verify OTP</p>
+                    </div>
+                    <div class="flex-1 h-2 bg-gray-300 rounded-full mx-2" id="progress-line-2"></div>
+                    <div class="flex-1 text-center">
+                        <div id="step3-indicator" class="w-12 h-12 mx-auto rounded-full bg-gray-300 text-gray-600 flex items-center justify-center font-bold text-lg">3</div>
+                        <p class="text-sm mt-2 text-gray-500">✍️ Admin Details</p>
                     </div>
                 </div>
+            </div>
 
-                <x-modules.card>
-                    <!-- Step 1: Contact Information -->
-                    <div id="step1" class="step-content">
-                        <h2 class="text-xl font-bold mb-4">Step 1: Contact Information</h2>
-                        <form id="contact-form" class="space-y-4">
+            <x-modules.card class="shadow-xl border-2 border-gray-100">
+                <!-- Step 1: Contact Information -->
+                <div id="step1" class="step-content">
+                    <div class="text-center mb-6">
+                        <span class="text-5xl mb-3 block">📧</span>
+                        <h2 class="text-2xl font-bold text-gray-800 mb-2">Contact Information</h2>
+                        <p class="text-gray-600">Enter email and phone to receive OTP</p>
+                    </div>
+                    <form id="contact-form" class="space-y-4">
                             <x-modules.input 
                                 type="email" 
                                 id="email" 
@@ -56,16 +63,19 @@
 
                             <div id="contact-error" class="hidden text-red-600 text-sm"></div>
 
-                            <x-modules.button type="button" onclick="sendOTP()" variant="primary" fullWidth>
-                                Send OTP
+                            <x-modules.button type="button" onclick="sendOTP()" variant="primary" fullWidth class="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 transition-all duration-300 hover:scale-105">
+                                📤 Send OTP
                             </x-modules.button>
                         </form>
                     </div>
 
                     <!-- Step 2: OTP Verification -->
                     <div id="step2" class="step-content hidden">
-                        <h2 class="text-xl font-bold mb-4">Step 2: Verify OTP</h2>
-                        <p class="text-gray-600 mb-4">Enter the OTP sent to your phone and email</p>
+                        <div class="text-center mb-6">
+                            <span class="text-5xl mb-3 block">🔐</span>
+                            <h2 class="text-2xl font-bold text-gray-800 mb-2">Verify OTP</h2>
+                            <p class="text-gray-600">Enter the 6-digit code sent to your phone and email</p>
+                        </div>
                         <form id="otp-form" class="space-y-4">
                             <x-modules.input 
                                 type="text" 
@@ -80,11 +90,11 @@
                             <div id="otp-error" class="hidden text-red-600 text-sm"></div>
 
                             <div class="flex gap-3">
-                                <x-modules.button type="button" onclick="goToStep(1)" variant="secondary" class="flex-1">
-                                    Back
+                                <x-modules.button type="button" onclick="goToStep(1)" variant="secondary" class="flex-1 hover:scale-105 transition-transform">
+                                    ⬅️ Back
                                 </x-modules.button>
-                                <x-modules.button type="button" onclick="verifyOTP()" variant="primary" class="flex-1">
-                                    Verify OTP
+                                <x-modules.button type="button" onclick="verifyOTP()" variant="primary" class="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 transition-all duration-300 hover:scale-105">
+                                    ✅ Verify OTP
                                 </x-modules.button>
                             </div>
                         </form>
@@ -92,7 +102,11 @@
 
                     <!-- Step 3: Admin Details -->
                     <div id="step3" class="step-content hidden">
-                        <h2 class="text-xl font-bold mb-4">Step 3: Admin Details</h2>
+                        <div class="text-center mb-6">
+                            <span class="text-5xl mb-3 block">✍️</span>
+                            <h2 class="text-2xl font-bold text-gray-800 mb-2">Admin Details</h2>
+                            <p class="text-gray-600">Complete the admin account information</p>
+                        </div>
                         <form action="{{ route('admin.create-admin') }}" method="POST" class="space-y-4">
                             @csrf
                             <input type="hidden" id="verified_email" name="email">
@@ -149,17 +163,16 @@
                             </div>
 
                             <div class="flex gap-3 pt-4">
-                                <x-modules.button type="button" onclick="goToStep(2)" variant="secondary" class="flex-1">
-                                    Back
+                                <x-modules.button type="button" onclick="goToStep(2)" variant="secondary" class="flex-1 hover:scale-105 transition-transform">
+                                    ⬅️ Back
                                 </x-modules.button>
-                                <x-modules.button type="submit" variant="success" class="flex-1">
-                                    Create Admin
+                                <x-modules.button type="submit" variant="success" class="flex-1 bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 transition-all duration-300 hover:scale-105">
+                                    ✨ Create Admin
                                 </x-modules.button>
                             </div>
                         </form>
                     </div>
                 </x-modules.card>
-            </div>
         </div>
     </div>
 
@@ -181,14 +194,14 @@
                 const line = document.getElementById('progress-line-' + i);
                 
                 if (i < step) {
-                    indicator.className = 'w-10 h-10 mx-auto rounded-full bg-green-600 text-white flex items-center justify-center font-bold';
-                    if (line) line.className = 'flex-1 h-1 bg-green-600';
+                    indicator.className = 'w-12 h-12 mx-auto rounded-full bg-gradient-to-br from-green-500 to-teal-500 text-white flex items-center justify-center font-bold text-lg shadow-lg';
+                    if (line) line.className = 'flex-1 h-2 bg-gradient-to-r from-green-500 to-teal-500 rounded-full mx-2';
                 } else if (i === step) {
-                    indicator.className = 'w-10 h-10 mx-auto rounded-full bg-blue-600 text-white flex items-center justify-center font-bold';
-                    if (line) line.className = 'flex-1 h-1 bg-gray-300';
+                    indicator.className = 'w-12 h-12 mx-auto rounded-full bg-gradient-to-br from-purple-600 to-pink-600 text-white flex items-center justify-center font-bold text-lg shadow-lg';
+                    if (line) line.className = 'flex-1 h-2 bg-gray-300 rounded-full mx-2';
                 } else {
-                    indicator.className = 'w-10 h-10 mx-auto rounded-full bg-gray-300 text-gray-600 flex items-center justify-center font-bold';
-                    if (line) line.className = 'flex-1 h-1 bg-gray-300';
+                    indicator.className = 'w-12 h-12 mx-auto rounded-full bg-gray-300 text-gray-600 flex items-center justify-center font-bold text-lg';
+                    if (line) line.className = 'flex-1 h-2 bg-gray-300 rounded-full mx-2';
                 }
             }
             
