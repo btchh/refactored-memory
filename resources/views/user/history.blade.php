@@ -58,17 +58,28 @@
 
                             <!-- Right Section -->
                             <div class="flex flex-col items-end gap-3">
-                                <span class="inline-flex items-center gap-2 px-5 py-2 bg-green-100 text-green-700 rounded-full font-semibold">
-                                    <span class="text-lg">✅</span> Delivered
-                                </span>
+                                @if($booking->status === 'Delivered')
+                                    <span class="inline-flex items-center gap-2 px-5 py-2 bg-green-100 text-green-700 rounded-full font-semibold">
+                                        <span class="text-lg">✅</span> Delivered
+                                    </span>
+                                @elseif($booking->status === 'Cancelled')
+                                    <span class="inline-flex items-center gap-2 px-5 py-2 bg-red-100 text-red-700 rounded-full font-semibold">
+                                        <span class="text-lg">❌</span> Cancelled
+                                    </span>
+                                @else
+                                    <span class="inline-flex items-center gap-2 px-5 py-2 bg-gray-100 text-gray-700 rounded-full font-semibold">
+                                        <span class="text-lg">📦</span> {{ $booking->status }}
+                                    </span>
+                                @endif
                                 <div class="text-right">
                                     <p class="text-sm text-gray-500">Total Amount</p>
-                                    <p class="text-2xl font-bold text-purple-600">₱{{ $booking->total ?? '0' }}</p>
+                                    <p class="text-2xl font-bold text-purple-600">₱{{ number_format($booking->total ?? 0, 2) }}</p>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Services -->
+                        @if(!empty($booking->services) && is_array($booking->services))
                         <div class="mt-6 pt-6 border-t border-gray-200">
                             <p class="text-sm font-semibold text-gray-600 mb-3 flex items-center gap-2">
                                 <span class="text-lg">✨</span> Services:
@@ -76,11 +87,12 @@
                             <div class="flex flex-wrap gap-2">
                                 @foreach($booking->services as $service)
                                     <span class="px-4 py-2 bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200 text-purple-700 rounded-lg font-medium text-sm">
-                                        {{ $service['name'] }} - ₱{{ $service['price'] }}
+                                        {{ $service['name'] ?? 'Service' }} - ₱{{ $service['price'] ?? 0 }}
                                     </span>
                                 @endforeach
                             </div>
                         </div>
+                        @endif
 
                         <!-- Actions -->
                         <div class="mt-6 flex flex-wrap gap-3">

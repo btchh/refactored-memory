@@ -33,10 +33,6 @@ class Admin extends Authenticatable
 
     protected $casts = [
         'location_updated_at' => 'datetime',
+        'password' => 'hashed',
     ];
-
-    public function setPasswordAttribute($value)
-    {
-        $this->attributes['password'] = Hash::make($value);
-    }
 }

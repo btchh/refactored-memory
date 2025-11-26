@@ -1,4 +1,4 @@
-<x-layout>
+<x-guest-layout>
     <x-slot:title>Forgot Password - Admin</x-slot:title>
     <div class="min-h-screen bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center p-4">
         <div class="w-full max-w-md">
@@ -52,4 +52,4 @@
             </x-modules.card>
         </div>
     </div>
-</x-layout>
+</x-guest-layout>

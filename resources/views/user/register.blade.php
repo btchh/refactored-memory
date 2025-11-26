@@ -1,4 +1,4 @@
-<x-layout>
+<x-guest-layout>
     <x-slot:title>User Registration</x-slot:title>
     <div class="min-h-screen bg-gradient-to-br from-green-600 to-green-800 flex items-center justify-center p-4">
         <div class="w-full max-w-2xl">
@@ -542,4 +542,4 @@
             });
         }
     </script>
-</x-layout>
+</x-guest-layout>

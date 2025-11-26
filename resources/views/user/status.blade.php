@@ -74,6 +74,7 @@
                         </div>
 
                         <!-- Services -->
+                        @if(!empty($booking->services) && is_array($booking->services))
                         <div class="mt-6 pt-6 border-t border-gray-200">
                             <p class="text-sm font-semibold text-gray-600 mb-3 flex items-center gap-2">
                                 <span class="text-lg">✨</span> Services:
@@ -81,11 +82,12 @@
                             <div class="flex flex-wrap gap-2">
                                 @foreach($booking->services as $service)
                                     <span class="px-4 py-2 bg-gradient-to-r from-green-50 to-teal-50 border border-green-200 text-green-700 rounded-lg font-medium text-sm">
-                                        {{ $service['name'] }}
+                                        {{ $service['name'] ?? 'Service' }}
                                     </span>
                                 @endforeach
                             </div>
                         </div>
+                        @endif
                     </div>
                 </div>
             @empty

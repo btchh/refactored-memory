@@ -261,7 +261,24 @@ class UserController extends Controller
      */
     public function showDashboard()
     {
-        return view('user.dashboard');
+        $activeOrders = Booking::where('user_id', auth()->id())
+            ->whereIn('status', ['Pending', 'In Progress'])
+            ->count();
+        
+        $completedOrders = Booking::where('user_id', auth()->id())
+            ->where('status', 'Delivered')
+            ->count();
+        
+        $totalSpent = Booking::where('user_id', auth()->id())
+            ->where('status', 'Delivered')
+            ->sum('total');
+        
+        $recentActivity = Booking::where('user_id', auth()->id())
+            ->latest()
+            ->take(5)
+            ->get();
+
+        return view('user.dashboard', compact('activeOrders', 'completedOrders', 'totalSpent', 'recentActivity'));
     }
 
     /**
@@ -294,17 +311,33 @@ class UserController extends Controller
     public function submitBooking(Request $request)
     {
         $request->validate([
-            'date' => 'required|date',
-            'time' => 'required'
+            'date' => 'required|date|after_or_equal:today',
+            'time' => 'required',
+            'services' => 'nullable|array',
+            'notes' => 'nullable|string|max:500'
         ]);
+
+        // Calculate total based on services
+        $services = $request->input('services', []);
+        $total = 0;
+        
+        if (!empty($services)) {
+            foreach ($services as $service) {
+                $total += floatval($service['price'] ?? 0);
+            }
+        }
 
         Booking::create([
             'user_id' => auth()->id(),
             'date' => $request->date,
             'time' => $request->time,
+            'services' => $services,
+            'total' => $total,
+            'notes' => $request->notes,
+            'status' => 'Pending'
         ]);
 
-        return redirect()->route('user.booking')->with('success', 'Booking submitted successfully!');
+        return redirect()->route('user.status')->with('success', 'Booking submitted successfully!');
     }
 
     /**
@@ -312,7 +345,10 @@ class UserController extends Controller
      */
     public function showStatus()
     {
-        $bookings = Booking::where('user_id', auth()->id())->latest()->get();
+        $bookings = Booking::where('user_id', auth()->id())
+            ->whereIn('status', ['Pending', 'In Progress', 'Completed'])
+            ->latest()
+            ->get();
         return view('user.status', compact('bookings'));
     }
 
@@ -349,7 +385,10 @@ class UserController extends Controller
 
     public function history()
     {
-        $bookings = Booking::where('user_id', auth()->id())->latest()->get();
+        $bookings = Booking::where('user_id', auth()->id())
+            ->whereIn('status', ['Delivered', 'Cancelled'])
+            ->latest()
+            ->get();
         return view('user.history', compact('bookings'));
     }
 

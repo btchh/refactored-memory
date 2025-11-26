@@ -20,10 +20,10 @@
     <!-- ✅ Top Navigation -->
     <x-nav />
 
-    <!-- ✅ Page Layout -->
-    <div class="flex min-h-screen pt-[5.5rem]">
+    <!-- ✅ Page Layout with Sidebar -->
+    <div class="pt-[5.5rem]">
         <!-- Sidebar -->
-        <aside class="w-64 fixed top-[5.5rem] bottom-0 left-0 z-[90] overflow-y-auto bg-white border-r border-gray-200 shadow-lg">
+        <aside class="w-64 fixed top-[5.5rem] bottom-0 left-0 z-40 overflow-y-auto bg-white border-r border-gray-200 shadow-lg">
             @if(Auth::guard('admin')->check())
                 @include('components.modules.admin-sidebar')
             @else
@@ -32,7 +32,7 @@
         </aside>
 
         <!-- Main Content -->
-        <main class="flex-1 ml-64 p-6">
+        <main class="ml-64 min-h-screen p-6">
             {{ $slot }}
         </main>
     </div>
