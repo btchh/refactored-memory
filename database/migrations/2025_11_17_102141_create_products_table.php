@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('product_name');
             $table->decimal('price', 10, 2);
+            $table->enum('item_type', ['clothes', 'comforter', 'shoes']);
             $table->timestamps();
         });
     }

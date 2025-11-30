@@ -2,21 +2,23 @@
     <x-slot:title>Change Password</x-slot:title>
 
     <div class="flex items-center justify-center min-h-full py-8">
-        <div class="w-full max-w-3xl px-4">
+        <div class="w-full max-w-2xl px-4">
             <!-- Header -->
             <div class="text-center mb-8">
-                <div class="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-br from-orange-500 to-red-500 rounded-full mb-4 shadow-lg">
-                    <span class="text-5xl">🔒</span>
+                <div class="inline-flex items-center justify-center w-20 h-20 bg-primary-50 rounded-full mb-4">
+                    <svg class="w-10 h-10 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
                 </div>
-                <h1 class="text-5xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent mb-3">
+                <h1 class="text-4xl font-bold text-gray-900 mb-2">
                     Change Password
                 </h1>
-                <p class="text-gray-600 text-lg">Keep your account secure with a strong password</p>
+                <p class="text-gray-600">Keep your account secure with a strong password</p>
             </div>
 
-            <x-modules.card class="p-8 md:p-10 shadow-2xl border-2 border-gray-100"
+            <x-modules.card class="p-6 md:p-8">
                     <!-- Alert Messages -->
-                    @if ($errors->any())
+                    @if (isset($errors) && $errors->any())
                         <x-modules.alert type="error" dismissible class="mb-4">
                             <ul class="list-disc list-inside">
                                 @foreach ($errors->all() as $error)
@@ -39,7 +41,9 @@
                         <!-- Password Strength Info -->
                         <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-lg">
                             <div class="flex items-start gap-3">
-                                <span class="text-2xl">💡</span>
+                                <svg class="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
                                 <div>
                                     <h3 class="font-semibold text-blue-900 mb-1">Password Requirements</h3>
                                     <ul class="text-sm text-blue-800 space-y-1">
@@ -52,29 +56,21 @@
                         </div>
 
                         <!-- Current Password -->
-                        <div class="space-y-2">
-                            <x-modules.input type="password" name="current_password" label="Current Password"
-                                placeholder="Enter your current password" required class="text-lg py-3" />
-                        </div>
+                        <x-modules.input type="password" name="current_password" label="Current Password"
+                            placeholder="Enter your current password" required />
 
                         <!-- New Password -->
-                        <div class="space-y-2">
-                            <x-modules.input type="password" name="new_password" label="New Password"
-                                placeholder="Enter your new password" required class="text-lg py-3" />
-                        </div>
+                        <x-modules.input type="password" name="new_password" label="New Password"
+                            placeholder="Enter your new password" required />
 
                         <!-- Confirm New Password -->
-                        <div class="space-y-2">
-                            <x-modules.input type="password" name="new_password_confirmation" label="Confirm New Password"
-                                placeholder="Confirm your new password" required class="text-lg py-3" />
-                        </div>
+                        <x-modules.input type="password" name="new_password_confirmation" label="Confirm New Password"
+                            placeholder="Confirm your new password" required />
 
                         <!-- Submit Button -->
-                        <div class="pt-4">
-                            <x-modules.button type="submit" variant="primary" fullWidth size="lg" class="bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 transition-all duration-300 hover:scale-105 text-lg py-4">
-                                🔐 Update Password
-                            </x-modules.button>
-                        </div>
+                        <x-modules.button type="submit" variant="primary" fullWidth size="md">
+                            Update Password
+                        </x-modules.button>
                     </form>
                 </x-modules.card>
         </div>

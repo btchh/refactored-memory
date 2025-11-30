@@ -13,6 +13,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             'prevent.back' => \App\Http\Middleware\PreventBackHistory::class,
+            'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
         ]);
         
         // Configure authentication redirects for different guards
@@ -23,6 +24,16 @@ return Application::configure(basePath: dirname(__DIR__))
             }
             // Default to user login
             return route('user.login');
+        });
+        
+        // Configure authenticated user redirects
+        $middleware->redirectUsersTo(function ($request) {
+            // Check if the request is for admin routes
+            if ($request->is('admin/*')) {
+                return route('admin.dashboard');
+            }
+            // Default to user dashboard
+            return route('user.dashboard');
         });
     })
     ->withExceptions(function (Exceptions $exceptions): void {

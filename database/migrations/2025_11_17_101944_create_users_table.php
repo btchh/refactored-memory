@@ -17,6 +17,8 @@ return new class extends Migration
             $table->string('fname');
             $table->string('lname');
             $table->string('address');
+            $table->decimal('latitude', 10, 8)->nullable();
+            $table->decimal('longitude', 11, 8)->nullable();
             $table->string('email')->unique();
             $table->string('phone')->unique();
             $table->string('password');

@@ -6,7 +6,6 @@ use App\Models\User;
 use App\Services\MessageService;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
 
 
 
@@ -185,11 +184,5 @@ class UserService
             'success' => false,
             'message' => $result['message'] ?? 'Invalid or expired OTP code.',
         ];
-    }
-
-    //generate reset password token
-    public function generateResetToken(): string
-    {
-        return Str::random(128);
     }
 }

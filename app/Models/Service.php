@@ -5,17 +5,24 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Notifications\Notifiable;
 
 class Service extends Model
 {
-    use HasFactory, Notifiable;
+    use HasFactory;
 
     protected $table = 'services';
 
     protected $fillable = [
         'service_name',
-        'price'
+        'price',
+        'item_type',
+        'description',
+        'is_bundle',
+        'bundle_items'
+    ];
+
+    protected $casts = [
+        'bundle_items' => 'array',
     ];
 
     public function transactions(): BelongsToMany

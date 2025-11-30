@@ -1,16 +1,16 @@
 <x-layout>
     <x-slot:title>Admin Login</x-slot:title>
-    <div class="min-h-screen bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center p-4">
+    <div class="min-h-screen bg-gray-50 flex items-center justify-center p-4">
         <div class="w-full max-w-md">
-            <x-modules.card class="shadow-xl">
+            <div class="card p-8">
                 <!-- Header -->
                 <div class="text-center mb-8">
-                    <h1 class="text-3xl font-bold text-gray-800 mb-2">Admin Portal</h1>
-                    <p class="text-gray-600">Sign in to your account</p>
+                    <h1 class="text-2xl font-bold text-gray-900 mb-2">Admin Portal</h1>
+                    <p class="text-sm text-gray-600">Sign in to your account</p>
                 </div>
 
                 <!-- Alert Messages -->
-                @if ($errors->any())
+                @if (isset($errors) && $errors->any())
                     <x-modules.alert type="error" dismissible>
                         <ul class="list-disc list-inside">
                             @foreach ($errors->all() as $error)
@@ -33,30 +33,36 @@
                 @endif
 
                 <!-- Login Form -->
-                <form action="{{ route('admin.login') }}" method="POST" class="space-y-5">
+                <form action="{{ route('admin.login') }}" method="POST" class="space-y-6">
                     @csrf
 
                     <!-- Admin Name / Email -->
-                    <x-modules.input type="text" name="admin_name" label="Admin Name or Email"
-                        placeholder="Enter your admin name or email" required />
+                    <div class="form-group">
+                        <label for="admin_name" class="form-label">Admin Name or Email</label>
+                        <input type="text" id="admin_name" name="admin_name" class="form-input" 
+                            placeholder="Enter your admin name or email" required>
+                    </div>
 
                     <!-- Password -->
-                    <x-modules.input type="password" name="password" label="Password" placeholder="Enter your password"
-                        required />
+                    <div class="form-group">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" id="password" name="password" class="form-input" 
+                            placeholder="Enter your password" required>
+                    </div>
 
                     <!-- Remember Me -->
                     <div class="flex items-center">
                         <input type="checkbox" id="remember" name="remember"
-                            class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
-                        <label for="remember" class="ml-2 block text-sm text-gray-700">
+                            class="form-checkbox">
+                        <label for="remember" class="form-check-label">
                             Remember me
                         </label>
                     </div>
 
                     <!-- Submit Button -->
-                    <x-modules.button type="submit" variant="primary" fullWidth size="md">
+                    <button type="submit" class="btn btn-primary btn-block">
                         Sign In
-                    </x-modules.button>
+                    </button>
                 </form>
 
                 <!-- Footer -->
@@ -64,12 +70,12 @@
                     <p>
                         Forgot your password?
                         <a href="{{ route('admin.forgot-password') }}"
-                            class="text-blue-600 hover:text-blue-700 font-medium">
+                            class="text-primary-600 hover:text-primary-700 font-medium hover:underline">
                             Reset it here
                         </a>
                     </p>
                 </div>
-            </x-modules.card>
+            </div>
         </div>
     </div>
 </x-layout>

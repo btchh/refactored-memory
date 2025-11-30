@@ -1,0 +1,41 @@
+{
+  "resources/css/app.css": {
+    "file": "assets/app-Cy-7mtJW.css",
+    "src": "resources/css/app.css",
+    "isEntry": true,
+    "name": "app",
+    "names": [
+      "app.css"
+    ]
+  },
+  "resources/js/app.js": {
+    "file": "assets/app-JOnneL-Q.js",
+    "name": "app",
+    "src": "resources/js/app.js",
+    "isEntry": true
+  },
+  "resources/js/pages/admin-analytics.js": {
+    "file": "assets/admin-analytics-iKsQz0bo.js",
+    "name": "admin-analytics",
+    "src": "resources/js/pages/admin-analytics.js",
+    "isEntry": true
+  },
+  "resources/js/pages/admin-booking.js": {
+    "file": "assets/admin-booking-DHGrMs_R.js",
+    "name": "admin-booking",
+    "src": "resources/js/pages/admin-booking.js",
+    "isEntry": true
+  },
+  "resources/js/pages/admin-pricing.js": {
+    "file": "assets/admin-pricing-WNvgPzsl.js",
+    "name": "admin-pricing",
+    "src": "resources/js/pages/admin-pricing.js",
+    "isEntry": true
+  },
+  "resources/js/pages/admin-users.js": {
+    "file": "assets/admin-users-DadwS7kK.js",
+    "name": "admin-users",
+    "src": "resources/js/pages/admin-users.js",
+    "isEntry": true
+  }
+}

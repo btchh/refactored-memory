@@ -15,6 +15,9 @@ return new class extends Migration
             $table->id();
             $table->string('service_name');
             $table->decimal('price', 10, 2);
+            $table->enum('item_type', ['clothes', 'comforter', 'shoes']);
+            $table->boolean('is_bundle')->default(false);
+            $table->json('bundle_items')->nullable();
             $table->timestamps();
         });
     }

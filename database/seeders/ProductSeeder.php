@@ -12,23 +12,45 @@ class ProductSeeder extends Seeder
      */
     public function run(): void
     {
-        Product::create(
-            [
-                'product_name' => 'Detergent',
-                'price' => 15.00
-            ]
-        );
-        Product::create(
-            [
-                'product_name' => 'Fabric Softener',
-                'price' => 10.00
-            ]
-        );
-        Product::create(
-            [
-                'product_name' => 'Color Safe',
-                'price' => 11.00
-            ]
-        );
+        // Clothes products
+        Product::create([
+            'product_name' => 'Detergent',
+            'price' => 15.00,
+            'item_type' => 'clothes',
+        ]);
+        Product::create([
+            'product_name' => 'Fabric Conditioner',
+            'price' => 20.00,
+            'item_type' => 'clothes',
+        ]);
+
+        // Comforter products
+        Product::create([
+            'product_name' => 'Safai',
+            'price' => 15.00,
+            'item_type' => 'comforter',
+        ]);
+        Product::create([
+            'product_name' => 'Color Protection',
+            'price' => 25.00,
+            'item_type' => 'comforter',
+        ]);
+        Product::create([
+            'product_name' => 'Packaging',
+            'price' => 20.00,
+            'item_type' => 'comforter',
+        ]);
+
+        // Shoes products
+        Product::create([
+            'product_name' => 'Polish',
+            'price' => 20.00,
+            'item_type' => 'shoes',
+        ]);
+        Product::create([
+            'product_name' => 'Deodorize',
+            'price' => 15.00,
+            'item_type' => 'shoes',
+        ]);
     }
 }

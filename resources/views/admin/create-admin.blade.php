@@ -5,40 +5,46 @@
         <div class="w-full max-w-3xl px-4">
             <!-- Header -->
             <div class="text-center mb-8">
-                <div class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full mb-4">
-                    <span class="text-4xl">👥</span>
+                <div class="inline-flex items-center justify-center w-20 h-20 bg-primary-50 rounded-full mb-4">
+                    <svg class="w-10 h-10 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                    </svg>
                 </div>
-                <h1 class="text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-2">
+                <h1 class="text-4xl font-bold text-gray-900 mb-2">
                     Create New Admin
                 </h1>
                 <p class="text-gray-600">Add a new administrator to the system</p>
             </div>
 
             <!-- Progress Steps -->
-            <div class="mb-8 bg-white rounded-2xl shadow-lg p-6 border-2 border-gray-100">
+            <div class="mb-8 bg-white rounded-lg shadow-sm p-6 border border-gray-200">
                 <div class="flex items-center justify-between">
                     <div class="flex-1 text-center">
-                        <div id="step1-indicator" class="w-12 h-12 mx-auto rounded-full bg-gradient-to-br from-purple-600 to-pink-600 text-white flex items-center justify-center font-bold text-lg shadow-lg">1</div>
-                        <p class="text-sm mt-2 font-semibold text-purple-600">📧 Contact Info</p>
+                        <div id="step1-indicator" class="w-12 h-12 mx-auto rounded-full bg-primary-600 text-white flex items-center justify-center font-bold text-lg">1</div>
+                        <p class="text-sm mt-2 font-semibold text-primary-600">Contact Info</p>
                     </div>
                     <div class="flex-1 h-2 bg-gray-300 rounded-full mx-2" id="progress-line-1"></div>
                     <div class="flex-1 text-center">
                         <div id="step2-indicator" class="w-12 h-12 mx-auto rounded-full bg-gray-300 text-gray-600 flex items-center justify-center font-bold text-lg">2</div>
-                        <p class="text-sm mt-2 text-gray-500">🔐 Verify OTP</p>
+                        <p class="text-sm mt-2 text-gray-500">Verify OTP</p>
                     </div>
                     <div class="flex-1 h-2 bg-gray-300 rounded-full mx-2" id="progress-line-2"></div>
                     <div class="flex-1 text-center">
                         <div id="step3-indicator" class="w-12 h-12 mx-auto rounded-full bg-gray-300 text-gray-600 flex items-center justify-center font-bold text-lg">3</div>
-                        <p class="text-sm mt-2 text-gray-500">✍️ Admin Details</p>
+                        <p class="text-sm mt-2 text-gray-500">Admin Details</p>
                     </div>
                 </div>
             </div>
 
-            <x-modules.card class="shadow-xl border-2 border-gray-100">
+            <x-modules.card class="p-6 md:p-8">
                 <!-- Step 1: Contact Information -->
                 <div id="step1" class="step-content">
                     <div class="text-center mb-6">
-                        <span class="text-5xl mb-3 block">📧</span>
+                        <div class="inline-flex items-center justify-center w-16 h-16 bg-primary-50 rounded-full mb-3">
+                            <svg class="w-8 h-8 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                            </svg>
+                        </div>
                         <h2 class="text-2xl font-bold text-gray-800 mb-2">Contact Information</h2>
                         <p class="text-gray-600">Enter email and phone to receive OTP</p>
                     </div>
@@ -63,8 +69,8 @@
 
                             <div id="contact-error" class="hidden text-red-600 text-sm"></div>
 
-                            <x-modules.button type="button" onclick="sendOTP()" variant="primary" fullWidth class="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 transition-all duration-300 hover:scale-105">
-                                📤 Send OTP
+                            <x-modules.button type="button" onclick="sendOTP()" variant="primary" fullWidth size="md">
+                                Send OTP
                             </x-modules.button>
                         </form>
                     </div>
@@ -72,7 +78,11 @@
                     <!-- Step 2: OTP Verification -->
                     <div id="step2" class="step-content hidden">
                         <div class="text-center mb-6">
-                            <span class="text-5xl mb-3 block">🔐</span>
+                            <div class="inline-flex items-center justify-center w-16 h-16 bg-primary-50 rounded-full mb-3">
+                                <svg class="w-8 h-8 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                </svg>
+                            </div>
                             <h2 class="text-2xl font-bold text-gray-800 mb-2">Verify OTP</h2>
                             <p class="text-gray-600">Enter the 6-digit code sent to your phone and email</p>
                         </div>
@@ -90,11 +100,11 @@
                             <div id="otp-error" class="hidden text-red-600 text-sm"></div>
 
                             <div class="flex gap-3">
-                                <x-modules.button type="button" onclick="goToStep(1)" variant="secondary" class="flex-1 hover:scale-105 transition-transform">
-                                    ⬅️ Back
+                                <x-modules.button type="button" onclick="goToStep(1)" variant="secondary" class="flex-1">
+                                    Back
                                 </x-modules.button>
-                                <x-modules.button type="button" onclick="verifyOTP()" variant="primary" class="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 transition-all duration-300 hover:scale-105">
-                                    ✅ Verify OTP
+                                <x-modules.button type="button" onclick="verifyOTP()" variant="primary" class="flex-1">
+                                    Verify OTP
                                 </x-modules.button>
                             </div>
                         </form>
@@ -103,7 +113,11 @@
                     <!-- Step 3: Admin Details -->
                     <div id="step3" class="step-content hidden">
                         <div class="text-center mb-6">
-                            <span class="text-5xl mb-3 block">✍️</span>
+                            <div class="inline-flex items-center justify-center w-16 h-16 bg-primary-50 rounded-full mb-3">
+                                <svg class="w-8 h-8 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                </svg>
+                            </div>
                             <h2 class="text-2xl font-bold text-gray-800 mb-2">Admin Details</h2>
                             <p class="text-gray-600">Complete the admin account information</p>
                         </div>
@@ -111,6 +125,17 @@
                             @csrf
                             <input type="hidden" id="verified_email" name="email">
                             <input type="hidden" id="verified_phone" name="phone">
+
+                            <!-- Alert Messages -->
+                            @if (isset($errors) && $errors->any())
+                                <x-modules.alert type="error" dismissible>
+                                    <ul class="list-disc list-inside">
+                                        @foreach ($errors->all() as $error)
+                                            <li>{{ $error }}</li>
+                                        @endforeach
+                                    </ul>
+                                </x-modules.alert>
+                            @endif
 
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <x-modules.input 
@@ -163,11 +188,11 @@
                             </div>
 
                             <div class="flex gap-3 pt-4">
-                                <x-modules.button type="button" onclick="goToStep(2)" variant="secondary" class="flex-1 hover:scale-105 transition-transform">
-                                    ⬅️ Back
+                                <x-modules.button type="button" onclick="goToStep(2)" variant="secondary" class="flex-1">
+                                    Back
                                 </x-modules.button>
-                                <x-modules.button type="submit" variant="success" class="flex-1 bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 transition-all duration-300 hover:scale-105">
-                                    ✨ Create Admin
+                                <x-modules.button type="submit" variant="primary" class="flex-1">
+                                    Create Admin
                                 </x-modules.button>
                             </div>
                         </form>
@@ -177,133 +202,11 @@
     </div>
 
     <script>
-        let currentStep = 1;
-        let verifiedEmail = '';
-        let verifiedPhone = '';
-
-        function goToStep(step) {
-            // Hide all steps
-            document.querySelectorAll('.step-content').forEach(el => el.classList.add('hidden'));
-            
-            // Show target step
-            document.getElementById('step' + step).classList.remove('hidden');
-            
-            // Update progress indicators
-            for (let i = 1; i <= 3; i++) {
-                const indicator = document.getElementById('step' + i + '-indicator');
-                const line = document.getElementById('progress-line-' + i);
-                
-                if (i < step) {
-                    indicator.className = 'w-12 h-12 mx-auto rounded-full bg-gradient-to-br from-green-500 to-teal-500 text-white flex items-center justify-center font-bold text-lg shadow-lg';
-                    if (line) line.className = 'flex-1 h-2 bg-gradient-to-r from-green-500 to-teal-500 rounded-full mx-2';
-                } else if (i === step) {
-                    indicator.className = 'w-12 h-12 mx-auto rounded-full bg-gradient-to-br from-purple-600 to-pink-600 text-white flex items-center justify-center font-bold text-lg shadow-lg';
-                    if (line) line.className = 'flex-1 h-2 bg-gray-300 rounded-full mx-2';
-                } else {
-                    indicator.className = 'w-12 h-12 mx-auto rounded-full bg-gray-300 text-gray-600 flex items-center justify-center font-bold text-lg';
-                    if (line) line.className = 'flex-1 h-2 bg-gray-300 rounded-full mx-2';
-                }
-            }
-            
-            currentStep = step;
-        }
-
-        function sendOTP() {
-            const email = document.getElementById('email').value;
-            const phone = document.getElementById('phone').value;
-            const errorDiv = document.getElementById('contact-error');
-            const button = event.target;
-
-            if (!email || !phone) {
-                errorDiv.textContent = 'Please fill in all fields';
-                errorDiv.classList.remove('hidden');
-                return;
-            }
-
-            // Disable button to prevent double clicks
-            button.disabled = true;
-            button.textContent = 'Sending...';
-            errorDiv.classList.add('hidden');
-
-            console.log('Sending OTP to:', { email, phone });
-
-            fetch('{{ route('admin.send-admin-otp') }}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify({ email, phone })
-            })
-            .then(response => {
-                console.log('Response status:', response.status);
-                return response.json().then(data => ({ status: response.status, data }));
-            })
-            .then(({ status, data }) => {
-                console.log('Response status:', status);
-                console.log('Response data:', data);
-                console.log('Data.success:', data.success);
-                
-                button.disabled = false;
-                button.textContent = 'Send OTP';
-                
-                // Check if successful (status 200 or data.success is true)
-                if (data.success === true || (status === 200 && data.success !== false)) {
-                    console.log('OTP sent successfully, moving to step 2');
-                    verifiedEmail = email;
-                    verifiedPhone = phone;
-                    goToStep(2);
-                } else {
-                    console.log('OTP send failed:', data.message);
-                    errorDiv.textContent = data.message || 'Failed to send OTP';
-                    errorDiv.classList.remove('hidden');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                button.disabled = false;
-                button.textContent = 'Send OTP';
-                errorDiv.textContent = 'An error occurred: ' + error.message;
-                errorDiv.classList.remove('hidden');
-            });
-        }
-
-        function verifyOTP() {
-            const otp = document.getElementById('otp').value;
-            const errorDiv = document.getElementById('otp-error');
-
-            if (!otp || otp.length !== 6) {
-                errorDiv.textContent = 'Please enter a valid 6-digit OTP';
-                errorDiv.classList.remove('hidden');
-                return;
-            }
-
-            errorDiv.classList.add('hidden');
-
-            fetch('{{ route('admin.verify-admin-otp') }}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
-                body: JSON.stringify({ phone: verifiedPhone, otp })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    document.getElementById('verified_email').value = verifiedEmail;
-                    document.getElementById('verified_phone').value = verifiedPhone;
-                    goToStep(3);
-                } else {
-                    errorDiv.textContent = data.message || 'Invalid OTP';
-                    errorDiv.classList.remove('hidden');
-                }
-            })
-            .catch(error => {
-                errorDiv.textContent = 'An error occurred. Please try again.';
-                errorDiv.classList.remove('hidden');
-            });
-        }
+        // Pass routes to JavaScript
+        window.routes = {
+            sendAdminOtp: '{{ route('admin.send-admin-otp') }}',
+            verifyAdminOtp: '{{ route('admin.verify-admin-otp') }}'
+        };
     </script>
+    @vite(['resources/js/pages/admin-creation.js'])
 </x-layout>

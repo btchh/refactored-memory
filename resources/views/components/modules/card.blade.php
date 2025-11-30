@@ -5,14 +5,14 @@
 ])
 
 @php
-    $cardClasses = 'card bg-white rounded-lg shadow-md overflow-hidden';
-    $bodyClasses = $padding ? 'card-body p-6' : 'card-body';
+    $cardClasses = 'card bg-base-100 shadow-xl';
+    $bodyClasses = $padding ? 'card-body' : '';
 @endphp
 
 <div {{ $attributes->merge(['class' => $cardClasses]) }}>
     @if($title)
-        <div class="card-header px-6 py-4 border-b border-gray-200 bg-gray-50">
-            <h3 class="text-lg font-semibold text-gray-800">{{ $title }}</h3>
+        <div class="card-header px-6 py-4 border-b border-base-300 bg-base-200">
+            <h3 class="card-title">{{ $title }}</h3>
         </div>
     @endif
     
@@ -21,7 +21,7 @@
     </div>
     
     @if($footer)
-        <div class="card-footer px-6 py-4 border-t border-gray-200 bg-gray-50">
+        <div class="card-footer px-6 py-4 border-t border-base-300 bg-base-200">
             {{ $footer }}
         </div>
     @endif

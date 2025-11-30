@@ -17,6 +17,9 @@ return new class extends Migration
             $table->string('fname');
             $table->string('lname');
             $table->string('address');
+            $table->string('branch_address')->nullable(); // Branch/Shop location
+            $table->decimal('branch_latitude', 10, 8)->nullable();
+            $table->decimal('branch_longitude', 11, 8)->nullable();
             $table->string('email')->unique();
             $table->string('phone')->unique();
             $table->string('password');

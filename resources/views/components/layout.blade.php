@@ -7,23 +7,42 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ config('app.name', 'WashHour') }}{{ $title ? ' | ' . $title : '' }}</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <script>
-        // Prevent back button after logout
-        window.addEventListener('pageshow', function(event) {
-            if (event.persisted || (window.performance && window.performance.navigation.type === 2)) {
-                window.location.reload();
-            }
-        });
-    </script>
 </head>
-<body class="bg-gray-100">
-    <!-- ✅ Top Navigation -->
+<body class="bg-gray-50" x-data="{ sidebarOpen: false }">
+    <!-- Top Navigation -->
     <x-nav />
 
-    <!-- ✅ Page Layout -->
-    <div class="flex min-h-screen pt-[5.5rem]">
+    <!-- Page Layout -->
+    <div class="flex min-h-screen pt-16">
+        <!-- Mobile/Tablet Menu Button -->
+        <button @click="sidebarOpen = !sidebarOpen" 
+                class="lg:hidden fixed bottom-6 right-6 z-[100] w-14 h-14 bg-primary-600 text-white rounded-full shadow-lg flex items-center justify-center hover:bg-primary-700 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+                aria-label="Toggle menu">
+            <svg x-show="!sidebarOpen" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+            </svg>
+            <svg x-show="sidebarOpen" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: none;">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+        </button>
+
+        <!-- Mobile/Tablet Sidebar Backdrop -->
+        <div x-show="sidebarOpen" 
+             @click="sidebarOpen = false"
+             x-transition:enter="transition-opacity ease-linear duration-300"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100"
+             x-transition:leave="transition-opacity ease-linear duration-300"
+             x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0"
+             class="lg:hidden fixed inset-0 bg-black/50 z-[95] top-16"
+             style="display: none;"
+             aria-hidden="true"></div>
+
         <!-- Sidebar -->
-        <aside class="w-64 fixed top-[5.5rem] bottom-0 left-0 z-[90] overflow-y-auto bg-white border-r border-gray-200 shadow-lg">
+        <aside class="w-64 md:w-56 lg:w-64 fixed top-16 bottom-0 left-0 z-[96] overflow-y-auto bg-white border-r border-gray-200 transition-transform duration-300 lg:translate-x-0"
+               :class="{ '-translate-x-full': !sidebarOpen, 'translate-x-0': sidebarOpen }"
+               x-cloak>
             @if(Auth::guard('admin')->check())
                 @include('components.modules.admin-sidebar')
             @else
@@ -32,9 +51,19 @@
         </aside>
 
         <!-- Main Content -->
-        <main class="flex-1 ml-64 p-6">
+        <main class="flex-1 lg:ml-64 md:ml-56 p-4 sm:p-6 md:p-7 lg:p-8 w-full">
             {{ $slot }}
         </main>
     </div>
+
+    <!-- Scripts Stack -->
+    @stack('scripts')
+    
+    <!-- Alpine.js for mobile menu -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    
+    <style>
+        [x-cloak] { display: none !important; }
+    </style>
 </body>
 </html>

@@ -5,11 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable;
+    use HasFactory;
 
     protected $table = 'users';
 
@@ -23,6 +22,7 @@ class User extends Authenticatable
         'password',
         'latitude',
         'longitude',
+        'status',
     ];
 
     protected $hidden = [
@@ -38,5 +38,21 @@ class User extends Authenticatable
     public function transactions(): HasMany
     {
         return $this->hasMany(Transaction::class);
+    }
+
+    /**
+     * Get upcoming bookings (alias for transactions)
+     */
+    public function upcomingBookings()
+    {
+        return $this->transactions()->upcoming();
+    }
+
+    /**
+     * Get past bookings (alias for transactions)
+     */
+    public function pastBookings()
+    {
+        return $this->transactions()->past();
     }
 }

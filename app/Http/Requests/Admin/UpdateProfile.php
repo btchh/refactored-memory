@@ -35,6 +35,7 @@ class UpdateProfile extends FormRequest
             'email' => 'required|email|unique:admins,email,' . $admin->id,
             'phone' => ['required', 'string', 'regex:/^(09|\+639)\d{9}$/', 'unique:admins,phone,' . $admin->id],
             'address' => 'required|string',
+            'branch_address' => 'nullable|string',
         ];
     }
 

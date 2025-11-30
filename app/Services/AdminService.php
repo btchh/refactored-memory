@@ -21,6 +21,7 @@ class AdminService
             'fname' => $data['fname'],
             'lname' => $data['lname'],
             'address' => $data['address'],
+            'branch_address' => $data['branch_address'] ?? null,
             'phone' => $data['phone'],
             'email' => $data['email'],
             'password' => $data['password'],
@@ -55,8 +56,50 @@ class AdminService
         return $admin->fresh();
     }
 
+    //send OTP for admin creation
+    public function sendOtp(string $phone, string $email): array
+    {
+        //send otp via sms
+        $result = $this->messageService->sendVerificationOtp($phone);
+
+        Log::info("Admin OTP Send Result: " . json_encode($result));
+
+        if (isset($result['status']) && $result['status'] === 'success') {
+            return [
+                'success' => true,
+                'message' => $result['message'] ?? 'OTP sent successfully to your phone.',
+            ];
+        }
+
+        return [
+            'success' => false,
+            'message' => 'Failed to send OTP. ' . ($result['message'] ?? 'Please try again.'),
+        ];
+    }
+
+    //verify otp for admin creation
+    public function verifyOtp(string $phone, string $otp): array
+    {
+        $result = $this->messageService->verifyOtp($phone, $otp);
+        
+        Log::info("Admin OTP Verification Result: " . json_encode($result));
+        
+        // Normalize response format
+        if (isset($result['status']) && $result['status'] === 'success') {
+            return [
+                'success' => true,
+                'message' => $result['message'] ?? 'OTP verified successfully.',
+            ];
+        }
+        
+        return [
+            'success' => false,
+            'message' => $result['message'] ?? 'Invalid or expired OTP code.',
+        ];
+    }
+
     //change password
-    public function changePass(int $adminId, string $currentPassword, string $newPassword): bool
+    public function changePassword(int $adminId, string $currentPassword, string $newPassword): bool
     {
         $admin = Admin::find($adminId);
 
@@ -77,34 +120,15 @@ class AdminService
         return true;
     }
 
-    //select all admin
-    public function getAllAdmins()
-    {
-        return Admin::orderBy('id', 'desc')->get();
-    }
-
     //select by id
     public function findAdmin(int $adminId): ?Admin
     {
         return Admin::find($adminId);
     }
 
-    //select by name
-    public function findAdminByName(string $adminName): ?Admin
-    {
-        return Admin::where('admin_name', $adminName)->first();
-    }
-
     //select by email
     public function findAdminByEmail(string $email): ?Admin
     {
         return Admin::where('email', $email)->first();
-    }
-
-    //delete admin
-    public function deleteAdmin(int $adminId): bool
-    {
-        $admin = Admin::findOrFail($adminId);
-        return $admin->delete();
     }
 }
