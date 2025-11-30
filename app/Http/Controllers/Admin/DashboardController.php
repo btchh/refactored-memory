@@ -70,7 +70,7 @@ class DashboardController extends Controller
             ->orderBy('booking_time')
             ->get();
         
-        return view('admin.dashboard', compact(
+        return view('admin.dashboard.index', compact(
             'totalCustomers',
             'pendingBookings',
             'inProgressBookings',

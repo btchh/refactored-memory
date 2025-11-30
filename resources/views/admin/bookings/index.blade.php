@@ -3,17 +3,17 @@
 
     <div class="space-y-6">
         <!-- Header -->
-        <div class="card p-6">
+        <x-modules.card class="p-6">
             <h1 class="text-2xl font-bold text-gray-900 mb-1">Booking Management</h1>
             <p class="text-gray-600">Create and manage customer bookings</p>
-        </div>
+        </x-modules.card>
 
         <!-- Alerts -->
         @if(session('success'))
-            <div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg">{{ session('success') }}</div>
+            <x-modules.alert type="success">{{ session('success') }}</x-modules.alert>
         @endif
         @if(session('error'))
-            <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">{{ session('error') }}</div>
+            <x-modules.alert type="error">{{ session('error') }}</x-modules.alert>
         @endif
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">

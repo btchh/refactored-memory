@@ -3,10 +3,10 @@
 
     <div class="space-y-6">
         <!-- Header -->
-        <div class="card p-6">
+        <x-modules.card class="p-6">
             <h1 class="text-2xl font-bold text-gray-900 mb-1">Pricing Management</h1>
             <p class="text-gray-600">Manage your services and products pricing</p>
-        </div>
+        </x-modules.card>
 
         <!-- Alert Container -->
         <div id="alert-container"></div>

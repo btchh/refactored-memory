@@ -44,7 +44,7 @@ class HistoryController extends Controller
             ];
         });
 
-        return view('user.history', compact('bookings'));
+        return view('user.history.index', compact('bookings'));
     }
 
     /**
@@ -85,7 +85,7 @@ class HistoryController extends Controller
             ];
         });
 
-        return view('user.status', compact('bookings'));
+        return view('user.status.index', compact('bookings'));
     }
 }
 

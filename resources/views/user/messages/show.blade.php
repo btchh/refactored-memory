@@ -3,7 +3,7 @@
 
     <div class="max-w-4xl mx-auto">
         <!-- Header -->
-        <div class="card p-4 mb-4">
+        <x-modules.card class="p-4 mb-4">
             <div class="flex items-center">
                 <a href="{{ route('user.messages.index') }}" class="mr-4 text-gray-500 hover:text-gray-700">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -18,10 +18,10 @@
                     <p class="text-sm text-gray-500">{{ $admin->admin_name }}</p>
                 </div>
             </div>
-        </div>
+        </x-modules.card>
 
         <!-- Messages Container -->
-        <div class="card">
+        <x-modules.card :padding="false">
             <div id="messages-container" class="h-[500px] overflow-y-auto p-4 space-y-4">
                 @forelse($messages as $message)
                     <div class="flex {{ $message->sender_type === 'user' ? 'justify-end' : 'justify-start' }}">
@@ -48,14 +48,14 @@
                            class="form-input flex-1"
                            maxlength="1000"
                            autocomplete="off">
-                    <button type="submit" class="btn btn-primary">
+                    <x-modules.button type="submit" variant="primary">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
                         </svg>
-                    </button>
+                    </x-modules.button>
                 </form>
             </div>
-        </div>
+        </x-modules.card>
     </div>
 
     @push('scripts')

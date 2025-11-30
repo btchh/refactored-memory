@@ -30,7 +30,7 @@ class LoginController extends Controller
             return redirect()->route('admin.dashboard');
         }
 
-        return view('user.login');
+        return view('user.auth.login');
     }
 
     /**

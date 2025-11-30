@@ -3,7 +3,7 @@
 
     <div class="space-y-6">
         <!-- Header -->
-        <div class="card p-6">
+        <x-modules.card class="p-6">
             <div class="flex items-center gap-4">
                 <div class="w-12 h-12 rounded-full bg-primary-50 flex items-center justify-center">
                     <svg class="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -15,14 +15,14 @@
                     <p class="text-gray-600 mt-1">Manage customer accounts and access</p>
                 </div>
             </div>
-        </div>
+        </x-modules.card>
 
         <!-- Alert Container -->
         <div id="alert-container"></div>
 
         <!-- Stats -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div class="card p-6">
+            <x-modules.card class="p-6">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-gray-600">Total Users</p>
@@ -34,9 +34,9 @@
                         </svg>
                     </div>
                 </div>
-            </div>
+            </x-modules.card>
 
-            <div class="card p-6">
+            <x-modules.card class="p-6">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-gray-600">Active Users</p>
@@ -48,9 +48,9 @@
                         </svg>
                     </div>
                 </div>
-            </div>
+            </x-modules.card>
 
-            <div class="card p-6">
+            <x-modules.card class="p-6">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-gray-600">Disabled Users</p>
@@ -62,11 +62,11 @@
                         </svg>
                     </div>
                 </div>
-            </div>
+            </x-modules.card>
         </div>
 
         <!-- Filters & Search -->
-        <div class="card p-6">
+        <x-modules.card class="p-6">
             <form method="GET" class="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center">
                 <div class="flex-1 min-w-0">
                     <input type="text" 
@@ -81,21 +81,21 @@
                         <option value="active" {{ $status === 'active' ? 'selected' : '' }}>Active</option>
                         <option value="disabled" {{ $status === 'disabled' ? 'selected' : '' }}>Disabled</option>
                     </select>
-                    <button type="submit" class="btn btn-primary whitespace-nowrap">
+                    <x-modules.button type="submit" variant="primary">
                         <svg class="w-4 h-4 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                         </svg>
                         <span class="hidden sm:inline">Search</span>
-                    </button>
+                    </x-modules.button>
                     @if($search || $status)
                         <a href="{{ route('admin.users.index') }}" class="btn btn-outline whitespace-nowrap">Clear</a>
                     @endif
                 </div>
             </form>
-        </div>
+        </x-modules.card>
 
         <!-- Users Table -->
-        <div class="card">
+        <x-modules.card :padding="false">
             <div class="overflow-x-auto">
                 <table class="w-full">
                     <thead class="bg-gray-50">

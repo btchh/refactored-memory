@@ -17,7 +17,7 @@ class RouteController extends Controller
      */
     public function showRouteToUser()
     {
-        return view('admin.route-to-user');
+        return view('admin.delivery.index');
     }
 
     /**

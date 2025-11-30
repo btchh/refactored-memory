@@ -21,7 +21,7 @@ class ProfileController extends Controller
      */
     public function showProfile()
     {
-        return view('admin.profile');
+        return view('admin.profile.index');
     }
 
     /**
@@ -74,7 +74,7 @@ class ProfileController extends Controller
      */
     public function showChangePassword()
     {
-        return view('admin.change-password');
+        return view('admin.auth.change-password');
     }
 
     /**

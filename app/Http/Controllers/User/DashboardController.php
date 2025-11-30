@@ -39,7 +39,7 @@ class DashboardController extends Controller
             ->take(5)
             ->get();
         
-        return view('user.dashboard', compact(
+        return view('user.dashboard.index', compact(
             'activeOrders',
             'completedOrders', 
             'nextBooking',

@@ -24,7 +24,7 @@ class PasswordResetController extends Controller
      */
     public function showForgotPassword()
     {
-        return view('admin.forgot-password');
+        return view('admin.auth.forgot-password');
     }
 
     /**
@@ -55,7 +55,7 @@ class PasswordResetController extends Controller
      */
     public function showResetPassword($token)
     {
-        return view('admin.forgot-password', ['token' => $token]);
+        return view('admin.auth.forgot-password', ['token' => $token]);
     }
 
     /**

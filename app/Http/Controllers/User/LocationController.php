@@ -20,7 +20,7 @@ class LocationController extends Controller
      */
     public function showRouteToAdmin()
     {
-        return view('user.route-to-admin');
+        return view('user.location.index');
     }
 
     /**

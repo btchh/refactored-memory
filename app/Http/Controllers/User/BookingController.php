@@ -33,7 +33,7 @@ class BookingController extends Controller
                 ];
             });
         
-        return view('user.booking', compact('services', 'products', 'user', 'branches')); 
+        return view('user.bookings.index', compact('services', 'products', 'user', 'branches')); 
     }
 
     /**
@@ -154,7 +154,7 @@ class BookingController extends Controller
             ->where('user_id', auth()->id())
             ->findOrFail($id);
 
-        return view('user.receipt', compact('transaction'));
+        return view('user.bookings.receipt', compact('transaction'));
     }
 
     /**

@@ -19,7 +19,7 @@ class RegisterController extends Controller
      */
     public function showRegister()
     {
-        return view('user.register');
+        return view('user.auth.register');
     }
 
     /**

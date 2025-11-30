@@ -11,12 +11,12 @@
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <!-- Shop Selection -->
                 <div class="lg:col-span-1">
-                    <div class="bg-white rounded-lg border border-gray-200 p-6 mb-6">
+                    <x-modules.card class="p-6 mb-6">
                         <h2 class="text-xl font-semibold text-gray-900 mb-4">Select Shop</h2>
                         <div id="admin-list" class="space-y-3 max-h-96 overflow-y-auto">
                             <p class="text-gray-500 text-center py-8">Loading shops...</p>
                         </div>
-                    </div>
+                    </x-modules.card>
 
                     <!-- Route Info -->
                     <div id="route-info" class="bg-white rounded-lg border border-gray-200 p-6 hidden">

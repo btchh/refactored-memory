@@ -3,7 +3,7 @@
 
     <div class="space-y-6">
         <!-- Page Header -->
-        <div class="bg-white rounded-lg border border-gray-200 p-8">
+        <x-modules.card class="p-8">
             <div class="flex items-center gap-4">
                 <div class="bg-primary-50 rounded-full p-4">
                     <svg class="w-12 h-12 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -15,7 +15,7 @@
                     <p class="text-lg text-gray-600">Track your orders in real-time</p>
                 </div>
             </div>
-        </div>
+        </x-modules.card>
 
         <!-- Status Cards -->
         <div class="space-y-4">

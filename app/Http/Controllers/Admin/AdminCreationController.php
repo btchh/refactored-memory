@@ -18,7 +18,7 @@ class AdminCreationController extends Controller
      */
     public function showCreateAdmin()
     {
-        return view('admin.create-admin');
+        return view('admin.admins.create');
     }
 
     /**

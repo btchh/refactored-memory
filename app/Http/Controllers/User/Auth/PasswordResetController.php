@@ -19,7 +19,7 @@ class PasswordResetController extends Controller
      */
     public function showForgotPassword()
     {
-        return view('user.forgot-password');
+        return view('user.auth.forgot-password');
     }
 
     /**
@@ -60,7 +60,7 @@ class PasswordResetController extends Controller
      */
     public function showResetPassword($phone)
     {
-        return view('user.forgot-password', ['phone' => $phone]);
+        return view('user.auth.forgot-password', ['phone' => $phone]);
     }
 
     /**

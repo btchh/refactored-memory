@@ -1,8 +1,9 @@
-<x-layout>
+<x-guest>
     <x-slot:title>User Registration</x-slot:title>
+    
     <div class="min-h-screen bg-gray-50 flex items-center justify-center p-4">
         <div class="w-full max-w-2xl">
-            <div class="card p-8">
+            <x-modules.card class="p-8">
                 <!-- Header -->
                 <div class="text-center mb-8">
                     <h1 class="text-2xl font-bold text-gray-900 mb-2">Create Account</h1>
@@ -33,23 +34,17 @@
                 <div id="step1" class="step-content">
                     <h2 class="text-lg font-semibold text-gray-900 mb-6">Step 1: Contact Information</h2>
                     <form id="contact-form" class="space-y-6">
-                        <div class="form-group">
-                            <label for="email" class="form-label">Email Address</label>
-                            <input type="email" id="email" name="email" class="form-input" 
-                                placeholder="your@email.com" required>
-                        </div>
+                        <x-modules.input type="email" name="email" label="Email Address" 
+                            placeholder="your@email.com" required />
+                        
+                        <x-modules.input type="tel" name="phone" label="Phone Number" 
+                            placeholder="09123456789" required />
 
-                        <div class="form-group">
-                            <label for="phone" class="form-label">Phone Number</label>
-                            <input type="tel" id="phone" name="phone" class="form-input" 
-                                placeholder="09123456789" required>
-                        </div>
+                        <div id="contact-error" class="hidden"></div>
 
-                        <div id="contact-error" class="hidden form-error"></div>
-
-                        <button type="button" onclick="sendOTP()" class="btn btn-primary btn-block">
+                        <x-modules.button type="button" variant="primary" :fullWidth="true" onclick="sendOTP()">
                             Send OTP
-                        </button>
+                        </x-modules.button>
                     </form>
                 </div>
 
@@ -58,21 +53,18 @@
                     <h2 class="text-lg font-semibold text-gray-900 mb-4">Step 2: Verify OTP</h2>
                     <p class="text-sm text-gray-600 mb-6">Enter the OTP sent to your phone</p>
                     <form id="otp-form" class="space-y-6">
-                        <div class="form-group">
-                            <label for="otp" class="form-label">OTP Code</label>
-                            <input type="text" id="otp" name="otp" class="form-input" 
-                                placeholder="Enter 6-digit code" maxlength="6" required>
-                        </div>
+                        <x-modules.input type="text" name="otp" label="OTP Code" 
+                            placeholder="Enter 6-digit code" required />
 
-                        <div id="otp-error" class="hidden form-error"></div>
+                        <div id="otp-error" class="hidden"></div>
 
                         <div class="flex gap-3">
-                            <button type="button" onclick="goToStep(1)" class="btn btn-secondary flex-1">
+                            <x-modules.button type="button" variant="outline" onclick="goToStep(1)" class="flex-1">
                                 Back
-                            </button>
-                            <button type="button" onclick="verifyOTP()" class="btn btn-primary flex-1">
+                            </x-modules.button>
+                            <x-modules.button type="button" variant="primary" onclick="verifyOTP()" class="flex-1">
                                 Verify OTP
-                            </button>
+                            </x-modules.button>
                         </div>
                     </form>
                 </div>
@@ -81,7 +73,6 @@
                 <div id="step3" class="step-content hidden">
                     <h2 class="text-lg font-semibold text-gray-900 mb-6">Step 3: Complete Your Profile</h2>
                     
-                    <!-- Notification Area -->
                     <div id="registration-notification" class="hidden mb-4"></div>
                     
                     <form action="{{ route('user.register') }}" method="POST" class="space-y-6" id="registration-form">
@@ -90,40 +81,24 @@
                         <input type="hidden" id="verified_phone" name="phone">
                         <input type="hidden" id="verified_otp" name="otp">
 
-                        <div class="form-group">
-                            <label for="username" class="form-label">Username</label>
-                            <input type="text" id="username" name="username" class="form-input" 
-                                placeholder="Choose a username" required>
-                        </div>
+                        <x-modules.input type="text" name="username" label="Username" 
+                            placeholder="Choose a username" required />
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div class="form-group">
-                                <label for="fname" class="form-label">First Name</label>
-                                <input type="text" id="fname" name="fname" class="form-input" 
-                                    placeholder="First name" required>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="lname" class="form-label">Last Name</label>
-                                <input type="text" id="lname" name="lname" class="form-input" 
-                                    placeholder="Last name" required>
-                            </div>
+                            <x-modules.input type="text" name="fname" label="First Name" 
+                                placeholder="First name" required />
+                            
+                            <x-modules.input type="text" name="lname" label="Last Name" 
+                                placeholder="Last name" required />
                         </div>
 
-                        <div class="form-group">
-                            <label for="address" class="form-label">Address</label>
-                            <input type="text" id="address" name="address" class="form-input" 
-                                placeholder="Your full address" required>
-                        </div>
+                        <x-modules.input type="text" name="address" label="Address" 
+                            placeholder="Your full address" required />
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <div class="form-group">
-                                    <label for="password" class="form-label">Password</label>
-                                    <input type="password" id="password" name="password" class="form-input" 
-                                        placeholder="Min 8 characters" required>
-                                </div>
-                                <!-- Password Strength Indicator -->
+                                <x-modules.input type="password" name="password" label="Password" 
+                                    placeholder="Min 8 characters" required />
                                 <div class="mt-2">
                                     <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
                                         <div id="password-strength-bar" class="h-full transition-all duration-300" style="width: 0%"></div>
@@ -133,23 +108,19 @@
                             </div>
 
                             <div>
-                                <div class="form-group">
-                                    <label for="password_confirmation" class="form-label">Confirm Password</label>
-                                    <input type="password" id="password_confirmation" name="password_confirmation" class="form-input" 
-                                        placeholder="Confirm password" required>
-                                </div>
-                                <!-- Password Match Indicator -->
+                                <x-modules.input type="password" name="password_confirmation" label="Confirm Password" 
+                                    placeholder="Confirm password" required />
                                 <p id="password-match-text" class="text-xs mt-2"></p>
                             </div>
                         </div>
 
                         <div class="flex gap-3 pt-4">
-                            <button type="button" onclick="goToStep(2)" class="btn btn-secondary flex-1">
+                            <x-modules.button type="button" variant="outline" onclick="goToStep(2)" class="flex-1">
                                 Back
-                            </button>
-                            <button type="submit" class="btn btn-primary flex-1" id="register-submit-btn">
+                            </x-modules.button>
+                            <x-modules.button type="submit" variant="primary" class="flex-1" id="register-submit-btn">
                                 Create Account
-                            </button>
+                            </x-modules.button>
                         </div>
                     </form>
                 </div>
@@ -163,16 +134,15 @@
                         </a>
                     </p>
                 </div>
-            </div>
+            </x-modules.card>
         </div>
     </div>
 
     <script>
-        // Pass routes to JavaScript
         window.routes = {
             sendRegistrationOtp: '{{ route('user.send-registration-otp') }}',
             verifyOtp: '{{ route('user.verify-otp') }}'
         };
     </script>
     @vite(['resources/js/pages/user-registration.js'])
-</x-layout>
+</x-guest>

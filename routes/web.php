@@ -28,7 +28,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
     require __DIR__.'/admin/pricing.php';
     require __DIR__.'/admin/analytics.php';
     require __DIR__.'/admin/revenue.php';
-    require __DIR__.'/admin/route.php';
+    require __DIR__.'/admin/delivery.php';
     require __DIR__.'/admin/admin-management.php';
     require __DIR__.'/admin/messages.php';
 });
