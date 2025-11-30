@@ -90,7 +90,7 @@ class PricingController extends Controller
             $service = Service::findOrFail($id);
             
             // Check if service is used in any transactions
-            $usageCount = DB::table('service_transaction')->where('service_id', $id)->count();
+            $usageCount = DB::table('service_transactions')->where('service_id', $id)->count();
             
             if ($usageCount > 0) {
                 return response()->json([
@@ -182,7 +182,7 @@ class PricingController extends Controller
             $product = Product::findOrFail($id);
             
             // Check if product is used in any transactions
-            $usageCount = DB::table('product_transaction')->where('product_id', $id)->count();
+            $usageCount = DB::table('product_transactions')->where('product_id', $id)->count();
             
             if ($usageCount > 0) {
                 return response()->json([

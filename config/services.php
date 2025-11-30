@@ -42,4 +42,10 @@ return [
     'geoapify' => [
         'api_key' => env('GEOAPIFY_API_KEY'),
     ],
+
+    'tawkto' => [
+        'property_id' => env('TAWKTO_PROPERTY_ID'),
+        'widget_id' => env('TAWKTO_WIDGET_ID', 'default'),
+        'enabled' => env('TAWKTO_ENABLED', true),
+    ],
 ];

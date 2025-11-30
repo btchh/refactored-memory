@@ -29,6 +29,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
     require __DIR__.'/admin/analytics.php';
     require __DIR__.'/admin/revenue.php';
     require __DIR__.'/admin/route.php';
+    require __DIR__.'/admin/admin-management.php';
+    require __DIR__.'/admin/messages.php';
 });
 
 // User Routes
@@ -39,4 +41,5 @@ Route::prefix('user')->name('user.')->group(function () {
     require __DIR__.'/user/bookings.php';
     require __DIR__.'/user/location.php';
     require __DIR__.'/user/history.php';
+    require __DIR__.'/user/messages.php';
 });

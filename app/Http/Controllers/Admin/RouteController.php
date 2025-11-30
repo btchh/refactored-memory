@@ -3,9 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Transaction;
 use App\Services\GeocodeService;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class RouteController extends Controller
@@ -221,99 +219,6 @@ class RouteController extends Controller
                 'longitude' => (float) $user->longitude,
                 'address' => $user->address,
                 'phone' => $user->phone
-            ],
-            'distance_km' => round($actualDistance, 2),
-            'eta_minutes' => round($travelTimeMinutes, 1),
-            'eta' => now('Asia/Manila')->addMinutes($travelTimeMinutes)->format('h:i A')
-        ]);
-    }
-
-    /**
-     * Show route to customer for a booking
-     */
-    public function showRoute($bookingId)
-    {
-        $booking = Transaction::with('user')->findOrFail($bookingId);
-        
-        return view('admin.route', compact('booking'));
-    }
-
-    /**
-     * Get route data from admin to customer
-     */
-    public function getRouteData($bookingId)
-    {
-        $admin = Auth::guard('admin')->user();
-        $booking = Transaction::with('user')->findOrFail($bookingId);
-
-        // Geocode admin's address if needed
-        if ((!$admin->latitude || !$admin->longitude) && $admin->address) {
-            $adminCoords = $this->geocodeService->geocodeAddress($admin->address);
-            if ($adminCoords) {
-                $admin->update([
-                    'latitude' => $adminCoords['latitude'],
-                    'longitude' => $adminCoords['longitude']
-                ]);
-            }
-        }
-
-        // Use booking's pickup address coordinates
-        $customerLat = $booking->latitude;
-        $customerLng = $booking->longitude;
-
-        // If booking doesn't have coordinates, try to geocode
-        if (!$customerLat || !$customerLng) {
-            $customerCoords = $this->geocodeService->geocodeAddress($booking->pickup_address);
-            if ($customerCoords) {
-                $booking->update([
-                    'latitude' => $customerCoords['latitude'],
-                    'longitude' => $customerCoords['longitude']
-                ]);
-                $customerLat = $customerCoords['latitude'];
-                $customerLng = $customerCoords['longitude'];
-            }
-        }
-
-        if (!$admin->latitude || !$admin->longitude || !$customerLat || !$customerLng) {
-            return response()->json(['error' => 'Unable to geocode addresses'], 400);
-        }
-
-        $distance = $this->calculateDistance(
-            $admin->latitude,
-            $admin->longitude,
-            $customerLat,
-            $customerLng
-        );
-
-        // Apply road factor
-        $roadFactor = 1.4;
-        $actualDistance = $distance * $roadFactor;
-
-        // Calculate ETA (30 km/h average)
-        $averageSpeed = 30;
-        $travelTimeMinutes = ($actualDistance / $averageSpeed) * 60;
-
-        return response()->json([
-            'success' => true,
-            'admin' => [
-                'name' => $admin->fname . ' ' . $admin->lname,
-                'latitude' => (float) $admin->latitude,
-                'longitude' => (float) $admin->longitude,
-                'address' => $admin->address
-            ],
-            'customer' => [
-                'name' => $booking->user->fname . ' ' . $booking->user->lname,
-                'latitude' => (float) $customerLat,
-                'longitude' => (float) $customerLng,
-                'address' => $booking->pickup_address,
-                'phone' => $booking->user->phone
-            ],
-            'booking' => [
-                'id' => $booking->id,
-                'date' => $booking->formatted_date,
-                'time' => $booking->formatted_time,
-                'service_type' => $booking->item_type,
-                'status' => $booking->status
             ],
             'distance_km' => round($actualDistance, 2),
             'eta_minutes' => round($travelTimeMinutes, 1),

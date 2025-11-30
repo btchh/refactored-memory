@@ -99,8 +99,8 @@
                             <tr class="hover:bg-gray-50">
                                 <td class="px-6 py-4 text-sm">{{ $transaction->created_at->format('M d, Y') }}</td>
                                 <td class="px-6 py-4 text-sm font-medium">#{{ $transaction->id }}</td>
-                                <td class="px-6 py-4 text-sm">{{ $transaction->user->name ?? 'N/A' }}</td>
-                                <td class="px-6 py-4 text-sm">{{ ucfirst(str_replace('_', ' ', $transaction->service_type)) }}</td>
+                                <td class="px-6 py-4 text-sm">{{ $transaction->user ? $transaction->user->fname . ' ' . $transaction->user->lname : 'N/A' }}</td>
+                                <td class="px-6 py-4 text-sm">{{ ucfirst(str_replace('_', ' ', $transaction->item_type)) }}</td>
                                 <td class="px-6 py-4">
                                     <span class="badge badge-{{ $transaction->status === 'completed' ? 'success' : 'primary' }}">
                                         {{ ucfirst($transaction->status) }}

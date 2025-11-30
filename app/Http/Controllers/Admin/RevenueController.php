@@ -53,8 +53,8 @@ class RevenueController extends Controller
         $totalTransactions = $transactions->count();
         $averageOrder = $totalTransactions > 0 ? $totalRevenue / $totalTransactions : 0;
 
-        // Group by service type
-        $revenueByService = $transactions->groupBy('service_type')->map(function ($items) {
+        // Group by item type
+        $revenueByService = $transactions->groupBy('item_type')->map(function ($items) {
             return [
                 'count' => $items->count(),
                 'revenue' => $items->sum('total_price')

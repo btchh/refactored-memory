@@ -100,7 +100,7 @@ class LocationController extends Controller
                     $adminData = [
                         'id' => $admin->id,
                         'name' => $admin->fname . ' ' . $admin->lname,
-                        'branch_name' => $admin->branch_name,
+                        'branch_name' => $admin->admin_name,
                         'phone' => $admin->phone,
                         'address' => $admin->address,
                         'latitude' => (float) $admin->latitude,
