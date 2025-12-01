@@ -15,6 +15,14 @@ use Illuminate\Support\Facades\Route;
 
 // Landing Page
 Route::get('/', function () {
+    if (auth('admin')->check()) {
+        return redirect()->route('admin.dashboard');
+    }
+    
+    if (auth('web')->check()) {
+        return redirect()->route('user.dashboard');
+    }
+    
     return view('landingPage');
 });
 
