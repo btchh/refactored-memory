@@ -16,9 +16,6 @@ return Application::configure(basePath: dirname(__DIR__))
         ['prefix' => 'api', 'middleware' => ['web', 'auth:web,admin']],
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        // Trust proxies (Railway, load balancers)
-        $middleware->trustProxies(at: '*');
-        
         // Global security headers for production
         $middleware->append(\App\Http\Middleware\SecurityHeaders::class);
         

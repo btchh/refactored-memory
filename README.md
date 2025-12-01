@@ -81,96 +81,38 @@ PUSHER_APP_SECRET=
 PUSHER_APP_CLUSTER=ap1
 ```
 
-## Railway Deployment (Recommended)
+## Production Deployment Checklist
 
-### Quick Deploy
+### Before Deployment
 
-1. **Push to GitHub**
-   ```bash
-   git add .
-   git commit -m "Ready for Railway"
-   git push origin main
-   ```
+- [ ] Set `APP_ENV=production`
+- [ ] Set `APP_DEBUG=false`
+- [ ] Set proper `APP_URL`
+- [ ] Configure database credentials
+- [ ] Set all required API keys
+- [ ] Generate new `APP_KEY` on production server
 
-2. **Create Railway Project**
-   - Go to [railway.app](https://railway.app)
-   - Click "New Project" → "Deploy from GitHub repo"
-   - Select your repository
+### Deployment Commands
 
-3. **Add MySQL Database**
-   - In Railway dashboard, click "New" → "Database" → "MySQL"
-   - Railway auto-creates `DATABASE_URL`
-
-4. **Set Environment Variables**
-   In Railway dashboard → Variables, add:
-   ```
-   APP_NAME=WashHour
-   APP_ENV=production
-   APP_DEBUG=false
-   APP_KEY=base64:YOUR_KEY_HERE
-   APP_URL=https://your-app.up.railway.app
-   
-   DB_CONNECTION=mysql
-   MYSQL_ATTR_SSL_CA=/etc/ssl/certs/ca-certificates.crt
-   
-   SESSION_DRIVER=database
-   SESSION_ENCRYPT=true
-   SESSION_SECURE_COOKIE=true
-   
-   BROADCAST_CONNECTION=pusher
-   PUSHER_APP_ID=your_id
-   PUSHER_APP_KEY=your_key
-   PUSHER_APP_SECRET=your_secret
-   PUSHER_APP_CLUSTER=ap1
-   
-   VITE_PUSHER_APP_KEY=${PUSHER_APP_KEY}
-   VITE_PUSHER_APP_CLUSTER=${PUSHER_APP_CLUSTER}
-   
-   CALAPI_KEY=your_calapi_key
-   CALAPI_BASE_URL=https://api.calapi.io
-   CALAPI_TIMEZONE=Asia/Manila
-   
-   GEOAPIFY_API_KEY=your_geoapify_key
-   IPROG_SMS_API_TOKEN=your_sms_token
-   ```
-
-5. **Generate APP_KEY**
-   ```bash
-   php artisan key:generate --show
-   ```
-   Copy the output to Railway's APP_KEY variable.
-
-6. **Deploy**
-   Railway auto-deploys on push. Check logs for any issues.
-
-### Railway Environment Variables from MySQL
-
-Railway provides these automatically when you add MySQL:
-- `MYSQLHOST`
-- `MYSQLPORT`
-- `MYSQLDATABASE`
-- `MYSQLUSER`
-- `MYSQLPASSWORD`
-
-Add these to connect:
-```
-DB_HOST=${MYSQLHOST}
-DB_PORT=${MYSQLPORT}
-DB_DATABASE=${MYSQLDATABASE}
-DB_USERNAME=${MYSQLUSER}
-DB_PASSWORD=${MYSQLPASSWORD}
-```
-
-### Post-Deployment
-
-After first deploy, run seeders via Railway CLI:
 ```bash
-railway run php artisan db:seed
+# Install dependencies (no dev)
+composer install --no-dev --optimize-autoloader
+
+# Build frontend assets
+npm run build
+
+# Cache configuration
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+
+# Run migrations
+php artisan migrate --force
+
+# Set proper permissions
+chmod -R 755 storage bootstrap/cache
+chown -R www-data:www-data storage bootstrap/cache
 ```
-
----
-
-## Manual Deployment
 
 ### Security Checklist
 
