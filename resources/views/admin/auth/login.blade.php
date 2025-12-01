@@ -33,8 +33,9 @@
 
                     <!-- Remember Me -->
                     <div class="flex items-center">
-                        <input type="checkbox" id="remember" name="remember" class="form-checkbox">
-                        <label for="remember" class="ml-2 text-sm text-gray-600">Remember me</label>
+                        <input type="checkbox" id="remember" name="remember" 
+                            class="w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 rounded focus:ring-primary-500 focus:ring-2 cursor-pointer">
+                        <label for="remember" class="ml-2 text-sm text-gray-600 cursor-pointer select-none">Remember me</label>
                     </div>
 
                     <x-modules.button type="submit" variant="primary" :fullWidth="true">

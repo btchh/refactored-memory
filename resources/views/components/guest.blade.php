@@ -15,6 +15,9 @@
 
     {{ $slot }}
     
+    <!-- Cookie Consent -->
+    <x-modules.cookie-consent />
+
     <!-- Toast Container -->
     <div id="toast-container" class="fixed top-4 right-4 z-[200] flex flex-col gap-3 max-w-sm w-full pointer-events-none"></div>
 
