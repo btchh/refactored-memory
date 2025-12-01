@@ -149,6 +149,18 @@ class MessageService
     }
 
     /**
+     * Send booking rescheduled notification
+     */
+    public function sendBookingRescheduled(string $phoneNumber, array $data): array
+    {
+        $message = $this->replaceVariables(
+            config('messages.booking.rescheduled'),
+            $data
+        );
+        return $this->smsService->sendSms($phoneNumber, $message);
+    }
+
+    /**
      * Send pickup reminder (tomorrow)
      */
     public function sendPickupReminder(string $phoneNumber, array $data): array

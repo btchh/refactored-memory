@@ -34,6 +34,8 @@ return [
         'cancelled' => 'Hi :customer_name! Your booking #:booking_id scheduled for :schedule has been cancelled. Reason: :reason. For concerns, please contact us.',
 
         'cancelled_by_admin' => 'Hi :customer_name! We apologize, but your booking #:booking_id for :schedule has been cancelled by our admin. Reason: :reason. Please contact us for rebooking.',
+
+        'rescheduled' => 'Hi :customer_name! Your booking #:booking_id has been rescheduled to :schedule. Thank you for your understanding!',
     ],
 
     'reminder' => [

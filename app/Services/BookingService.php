@@ -11,10 +11,12 @@ use Illuminate\Support\Facades\Log;
 class BookingService
 {
     protected $calApiService;
+    protected $messageService;
 
-    public function __construct(CalApiService $calApiService)
+    public function __construct(CalApiService $calApiService, MessageService $messageService)
     {
         $this->calApiService = $calApiService;
+        $this->messageService = $messageService;
     }
 
     /**
@@ -193,7 +195,7 @@ class BookingService
         DB::beginTransaction();
 
         try {
-            $transaction = Transaction::findOrFail($transactionId);
+            $transaction = Transaction::with('user')->findOrFail($transactionId);
             $oldDate = $transaction->booking_date;
 
             $transaction->update([
@@ -211,6 +213,9 @@ class BookingService
             $this->calApiService->clearCache($newDate);
 
             DB::commit();
+
+            // Send SMS notification
+            $this->sendRescheduledSms($transaction->fresh()->load('user'));
 
             return [
                 'success' => true,
@@ -234,12 +239,12 @@ class BookingService
     /**
      * Cancel a booking
      */
-    public function cancelBooking($transactionId, $reason = null)
+    public function cancelBooking($transactionId, $reason = null, $byAdmin = false)
     {
         DB::beginTransaction();
 
         try {
-            $transaction = Transaction::findOrFail($transactionId);
+            $transaction = Transaction::with('user')->findOrFail($transactionId);
 
             // Update status
             $transaction->update(['status' => 'cancelled']);
@@ -260,6 +265,9 @@ class BookingService
             $this->calApiService->clearCache($transaction->booking_date);
 
             DB::commit();
+
+            // Send SMS notification
+            $this->sendCancelledSms($transaction, $reason, $byAdmin);
 
             return [
                 'success' => true,
@@ -285,8 +293,12 @@ class BookingService
     public function changeStatus($transactionId, $status)
     {
         try {
-            $transaction = Transaction::findOrFail($transactionId);
+            $transaction = Transaction::with('user')->findOrFail($transactionId);
+            $oldStatus = $transaction->status;
             $transaction->update(['status' => $status]);
+
+            // Send SMS for key status changes
+            $this->sendStatusChangeSms($transaction, $status, $oldStatus);
 
             return [
                 'success' => true,
@@ -362,5 +374,100 @@ class BookingService
         }
 
         return $total;
+    }
+
+    /**
+     * Send SMS for status changes (only key statuses)
+     */
+    private function sendStatusChangeSms($transaction, $newStatus, $oldStatus)
+    {
+        if (!$transaction->user || !$transaction->user->phone) {
+            return;
+        }
+
+        try {
+            $data = $this->getSmsData($transaction);
+
+            switch ($newStatus) {
+                case 'completed':
+                    $data['action'] = $transaction->service_type === 'delivery' ? 'delivery' : 'pickup';
+                    $this->messageService->sendLaundryCompleted($transaction->user->phone, $data);
+                    break;
+
+                case 'out_for_delivery':
+                    $data['eta'] = 'within 1-2 hours';
+                    $this->messageService->sendOutForDelivery($transaction->user->phone, $data);
+                    break;
+
+                case 'delivered':
+                    $this->messageService->sendDelivered($transaction->user->phone, $data);
+                    break;
+            }
+        } catch (\Exception $e) {
+            Log::error('Failed to send status SMS', [
+                'booking_id' => $transaction->id,
+                'status' => $newStatus,
+                'error' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    /**
+     * Send SMS for cancelled booking
+     */
+    private function sendCancelledSms($transaction, $reason, $byAdmin)
+    {
+        if (!$transaction->user || !$transaction->user->phone) {
+            return;
+        }
+
+        try {
+            $data = $this->getSmsData($transaction);
+            $data['reason'] = $reason ?: 'No reason provided';
+
+            if ($byAdmin) {
+                $this->messageService->sendBookingCancelledByAdmin($transaction->user->phone, $data);
+            } else {
+                $this->messageService->sendBookingCancelled($transaction->user->phone, $data);
+            }
+        } catch (\Exception $e) {
+            Log::error('Failed to send cancellation SMS', [
+                'booking_id' => $transaction->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    /**
+     * Send SMS for rescheduled booking
+     */
+    private function sendRescheduledSms($transaction)
+    {
+        if (!$transaction->user || !$transaction->user->phone) {
+            return;
+        }
+
+        try {
+            $data = $this->getSmsData($transaction);
+            $this->messageService->sendBookingRescheduled($transaction->user->phone, $data);
+        } catch (\Exception $e) {
+            Log::error('Failed to send reschedule SMS', [
+                'booking_id' => $transaction->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    /**
+     * Get common SMS data from transaction
+     */
+    private function getSmsData($transaction): array
+    {
+        return [
+            'customer_name' => $transaction->user->fname,
+            'booking_id' => $transaction->id,
+            'schedule' => date('M j, Y', strtotime($transaction->booking_date)) . ' at ' . date('g:i A', strtotime($transaction->booking_time)),
+            'service_type' => ucfirst($transaction->service_type ?? 'pickup'),
+        ];
     }
 }
