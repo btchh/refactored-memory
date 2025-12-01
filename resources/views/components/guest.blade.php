@@ -9,6 +9,10 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="bg-gray-50">
+    @if(isset($showNav) && $showNav)
+        <x-modules.guest-nav :isAdmin="$isAdmin ?? false" />
+    @endif
+
     {{ $slot }}
     
     <!-- Toast Container -->

@@ -22,6 +22,9 @@ return new class extends Migration
             $table->decimal('branch_longitude', 11, 8)->nullable();
             $table->string('email')->unique();
             $table->string('phone')->unique();
+            $table->decimal('latitude', 10, 8)->nullable();
+            $table->decimal('longitude', 11, 8)->nullable();
+            $table->timestamp('location_updated_at')->nullable();
             $table->string('password');
             $table->rememberToken();
             $table->timestamps();

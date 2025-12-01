@@ -12,7 +12,7 @@ class BookingService
 {
     protected $calApiService;
 
-    public function __construct(CalAPIService $calApiService)
+    public function __construct(CalApiService $calApiService)
     {
         $this->calApiService = $calApiService;
     }
@@ -70,6 +70,9 @@ class BookingService
             $transaction->refresh();
             $transaction->calculateTotalPrice();
             $transaction->save();
+
+            // Load relationships needed for CalAPI event
+            $transaction->load('user', 'services', 'products');
 
             // Create CalAPI event
             $eventId = $this->calApiService->createEvent($transaction);

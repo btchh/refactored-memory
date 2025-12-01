@@ -23,6 +23,7 @@ return new class extends Migration
             $table->decimal('latitude', 10, 8)->nullable();
             $table->decimal('longitude', 11, 8)->nullable();
             $table->enum('item_type', ['clothes', 'comforter', 'shoes']);
+            $table->enum('service_type', ['pickup', 'dropoff'])->default('pickup');
             $table->text('notes')->nullable();
             
             // CalAPI integration

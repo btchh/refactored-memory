@@ -22,6 +22,7 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->string('phone')->unique();
             $table->string('password');
+            $table->enum('status', ['active', 'disabled'])->default('active');
             $table->rememberToken();
             $table->timestamps();
         });

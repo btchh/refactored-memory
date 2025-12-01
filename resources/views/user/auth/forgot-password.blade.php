@@ -1,7 +1,7 @@
-<x-guest>
+<x-guest :showNav="true">
     <x-slot:title>Reset Password</x-slot:title>
     
-    <div class="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+    <div class="min-h-screen bg-gray-50 flex items-center justify-center p-4 pt-20">
         <div class="w-full max-w-md">
             <x-modules.card class="p-8">
                 <!-- Header -->

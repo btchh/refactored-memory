@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Cache;
 use Carbon\Carbon;
 
-class CalAPIService
+class CalApiService
 {
     protected $apiKey;
     protected $baseUrl;
@@ -183,16 +183,28 @@ class CalAPIService
 
         $calendarId = $this->calendarId;
         
-        // If using 'primary', find the actual primary calendar ID
+        // If using 'primary', find a calendar with write access
         if ($calendarId === 'primary') {
+            // First, look for a calendar with writer/owner access
             foreach ($calendars as $calendar) {
-                if (isset($calendar['primary']) && $calendar['primary']) {
+                if (isset($calendar['access_role']) && in_array($calendar['access_role'], ['writer', 'owner'])) {
                     $calendarId = $calendar['id'];
+                    Log::info('Selected writable calendar', ['id' => $calendarId, 'title' => $calendar['title'] ?? 'Unknown']);
                     break;
                 }
             }
             
-            // If no primary found, use first calendar
+            // Fallback: find primary calendar
+            if ($calendarId === 'primary') {
+                foreach ($calendars as $calendar) {
+                    if (isset($calendar['primary']) && $calendar['primary']) {
+                        $calendarId = $calendar['id'];
+                        break;
+                    }
+                }
+            }
+            
+            // If still no calendar found, use first writable or first available
             if ($calendarId === 'primary' && !empty($calendars)) {
                 $calendarId = $calendars[0]['id'];
             }
@@ -237,10 +249,11 @@ class CalAPIService
             $startDateTime = Carbon::parse($transaction->booking_date->format('Y-m-d') . ' ' . $transaction->booking_time);
             $endDateTime = $startDateTime->copy()->addHour();
 
-            // CalAPI.io event payload (using snake_case)
+            // CalAPI.io event payload
+            $serviceType = ucfirst($transaction->service_type ?? 'pickup');
             $payload = [
-                'summary' => 'Laundry Pickup - ' . $transaction->user->fname . ' ' . $transaction->user->lname,
-                'description' => $this->buildEventDescription($transaction),
+                'title' => "[{$serviceType}] {$transaction->user->username} - {$transaction->user->fname} {$transaction->user->lname}",
+                'description' => $this->buildReceiptDescription($transaction),
                 'start' => [
                     'date_time' => $startDateTime->toIso8601String(),
                     'time_zone' => $this->timezone,
@@ -273,7 +286,9 @@ class CalAPIService
 
             if ($response->successful()) {
                 $data = $response->json();
-                $eventId = $data['id'] ?? null;
+                // CalAPI returns data nested in 'data' key
+                $eventData = $data['data'] ?? $data;
+                $eventId = $eventData['id'] ?? null;
                 
                 Log::info('CalAPI event created successfully', [
                     'transaction_id' => $transaction->id,
@@ -303,9 +318,101 @@ class CalAPIService
     }
 
     /**
-     * Build event description from transaction details
+     * Build receipt-style description for calendar event
+     */
+    protected function buildReceiptDescription($transaction)
+    {
+        $serviceType = ucfirst($transaction->service_type ?? 'pickup');
+        $date = $transaction->booking_date->format('F d, Y');
+        $time = Carbon::parse($transaction->booking_time)->format('g:i A');
+        
+        $receipt = "═══════════════════════════════════\n";
+        $receipt .= "         WASHHOUR BOOKING RECEIPT\n";
+        $receipt .= "═══════════════════════════════════\n\n";
+        
+        $receipt .= "📋 BOOKING DETAILS\n";
+        $receipt .= "───────────────────────────────────\n";
+        $receipt .= "Booking #: {$transaction->id}\n";
+        $receipt .= "Date: {$date}\n";
+        $receipt .= "Time: {$time}\n";
+        $receipt .= "Service Type: {$serviceType}\n";
+        $receipt .= "Item Type: " . ucfirst($transaction->item_type) . "\n\n";
+        
+        $receipt .= "👤 CUSTOMER INFO\n";
+        $receipt .= "───────────────────────────────────\n";
+        $receipt .= "Name: {$transaction->user->fname} {$transaction->user->lname}\n";
+        $receipt .= "Username: {$transaction->user->username}\n";
+        $receipt .= "Phone: {$transaction->user->phone}\n";
+        $receipt .= "Email: {$transaction->user->email}\n";
+        
+        if ($transaction->pickup_address) {
+            $receipt .= "Address: {$transaction->pickup_address}\n";
+        }
+        $receipt .= "\n";
+        
+        // Services section
+        if ($transaction->services->count() > 0) {
+            $receipt .= "🧺 SERVICES\n";
+            $receipt .= "───────────────────────────────────\n";
+            $servicesTotal = 0;
+            foreach ($transaction->services as $service) {
+                $price = $service->pivot->price_at_purchase ?? $service->price;
+                $servicesTotal += $price;
+                $receipt .= "• {$service->service_name}";
+                $receipt .= str_repeat(' ', max(1, 25 - strlen($service->service_name)));
+                $receipt .= "₱" . number_format($price, 2) . "\n";
+            }
+            $receipt .= "───────────────────────────────────\n";
+            $receipt .= "Services Subtotal:         ₱" . number_format($servicesTotal, 2) . "\n\n";
+        }
+        
+        // Products section
+        if ($transaction->products->count() > 0) {
+            $receipt .= "🧴 PRODUCTS\n";
+            $receipt .= "───────────────────────────────────\n";
+            $productsTotal = 0;
+            foreach ($transaction->products as $product) {
+                $price = $product->pivot->price_at_purchase ?? $product->price;
+                $productsTotal += $price;
+                $receipt .= "• {$product->product_name}";
+                $receipt .= str_repeat(' ', max(1, 25 - strlen($product->product_name)));
+                $receipt .= "₱" . number_format($price, 2) . "\n";
+            }
+            $receipt .= "───────────────────────────────────\n";
+            $receipt .= "Products Subtotal:         ₱" . number_format($productsTotal, 2) . "\n\n";
+        }
+        
+        // Total
+        $receipt .= "═══════════════════════════════════\n";
+        $receipt .= "💰 TOTAL:                  ₱" . number_format($transaction->total_price, 2) . "\n";
+        $receipt .= "═══════════════════════════════════\n\n";
+        
+        // Notes
+        if ($transaction->notes) {
+            $receipt .= "📝 NOTES\n";
+            $receipt .= "───────────────────────────────────\n";
+            $receipt .= "{$transaction->notes}\n\n";
+        }
+        
+        $receipt .= "Status: " . strtoupper($transaction->status) . "\n";
+        $receipt .= "───────────────────────────────────\n";
+        $receipt .= "Thank you for choosing WashHour!\n";
+        
+        return $receipt;
+    }
+
+    /**
+     * Build event description from transaction details (legacy)
      */
     protected function buildEventDescription($transaction)
+    {
+        return $this->buildReceiptDescription($transaction);
+    }
+
+    /**
+     * Legacy description builder
+     */
+    protected function buildSimpleDescription($transaction)
     {
         $description = "Laundry Pickup Booking\n\n";
         $description .= "Customer: {$transaction->user->fname} {$transaction->user->lname}\n";
@@ -346,9 +453,10 @@ class CalAPIService
             $startDateTime = Carbon::parse($transaction->booking_date->format('Y-m-d') . ' ' . $transaction->booking_time);
             $endDateTime = $startDateTime->copy()->addHour();
 
+            $serviceType = ucfirst($transaction->service_type ?? 'pickup');
             $payload = [
-                'summary' => 'Laundry Pickup - ' . $transaction->user->fname . ' ' . $transaction->user->lname,
-                'description' => $this->buildEventDescription($transaction),
+                'title' => "[{$serviceType}] {$transaction->user->username} - {$transaction->user->fname} {$transaction->user->lname}",
+                'description' => $this->buildReceiptDescription($transaction),
                 'start' => [
                     'date_time' => $startDateTime->toIso8601String(),
                     'time_zone' => $this->timezone,
