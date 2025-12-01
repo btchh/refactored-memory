@@ -11,7 +11,7 @@ cmds = [
 
 [phases.build]
 cmds = [
-    "npx vite build",
+    "node node_modules/vite/bin/vite.js build",
     "php artisan config:cache",
     "php artisan route:cache",
     "php artisan view:cache"
