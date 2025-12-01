@@ -4,8 +4,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\Auth\LoginController;
 use App\Http\Controllers\Admin\Auth\PasswordResetController;
 
-// Public routes (Authentication)
-Route::middleware('guest:admin')->group(function () {
+// Public routes (Authentication) with rate limiting
+Route::middleware(['guest:admin', 'throttle:5,1'])->group(function () {
     // Login
     Route::get('login', [LoginController::class, 'showLogin'])->name('login');
     Route::post('login', [LoginController::class, 'login'])->name('login.submit');

@@ -23,6 +23,7 @@ class Transaction extends Model
         'latitude',
         'longitude',
         'item_type',
+        'service_type',
         'notes',
         'calapi_event_id',
         'weight',

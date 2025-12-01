@@ -17,7 +17,7 @@
             </div>
 
             <x-modules.card class="p-6 md:p-8">
-                    <!-- Alert Messages -->
+                    <!-- Validation Errors -->
                     @if (isset($errors) && $errors->any())
                         <x-modules.alert type="error" dismissible class="mb-4">
                             <ul class="list-disc list-inside">
@@ -25,12 +25,6 @@
                                     <li>{{ $error }}</li>
                                 @endforeach
                             </ul>
-                        </x-modules.alert>
-                    @endif
-
-                    @if (session('success'))
-                        <x-modules.alert type="success" dismissible class="mb-4">
-                            {{ session('success') }}
                         </x-modules.alert>
                     @endif
 

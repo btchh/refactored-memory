@@ -134,3 +134,35 @@
                 </a>
             </div>
         </div>
+        <!-- Recent Orders -->
+        @if($recentBookings->count() > 0)
+        <div class="bg-white rounded-xl border border-gray-200 p-6">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-lg font-bold text-gray-900">Recent Orders</h2>
+                <a href="{{ route('user.history') }}" class="text-sm text-primary-600 hover:text-primary-700 font-medium">View all</a>
+            </div>
+            <div class="space-y-3">
+                @foreach($recentBookings as $order)
+                <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-primary-100 rounded-lg flex items-center justify-center">
+                            <span class="text-sm font-bold text-primary-600">#{{ $order->id }}</span>
+                        </div>
+                        <div>
+                            <p class="font-medium text-gray-900">{{ $order->services->pluck('service_name')->join(', ') ?: 'Order' }}</p>
+                            <p class="text-sm text-gray-500">{{ $order->booking_date?->format('M d, Y') ?? $order->created_at->format('M d, Y') }}</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <p class="font-bold text-gray-900">₱{{ number_format($order->total_price, 2) }}</p>
+                        <span class="text-xs px-2 py-1 rounded-full {{ $order->status === 'completed' ? 'bg-green-100 text-green-700' : ($order->status === 'pending' ? 'bg-yellow-100 text-yellow-700' : 'bg-blue-100 text-blue-700') }}">
+                            {{ ucfirst(str_replace('_', ' ', $order->status)) }}
+                        </span>
+                    </div>
+                </div>
+                @endforeach
+            </div>
+        </div>
+        @endif
+    </div>
+</x-layout>

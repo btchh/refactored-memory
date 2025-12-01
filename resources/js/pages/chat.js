@@ -76,12 +76,12 @@ document.addEventListener('DOMContentLoaded', () => {
             if (data.success) {
                 addMessage(data.message, true);
             } else {
-                alert('Failed to send message');
+                window.Toast?.error('Failed to send message');
                 messageInput.value = message;
             }
         } catch (error) {
             console.error('Error sending message:', error);
-            alert('Failed to send message. Please try again.');
+            window.Toast?.error('Failed to send message. Please try again.');
             messageInput.value = message;
         } finally {
             messageInput.disabled = false;

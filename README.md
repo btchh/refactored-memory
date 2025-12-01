@@ -1,59 +1,221 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# WashHour - Laundry Management System
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A modern laundry booking and management system built with Laravel 12 and Vite.
 
-## About Laravel
+## Features
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- **User Portal**: Book laundry services, track orders, view history
+- **Admin Portal**: Manage bookings, customers, pricing, analytics
+- **Real-time Messaging**: Chat between users and admins
+- **Route Planning**: Map-based delivery tracking with Geoapify
+- **Calendar Integration**: CalAPI for scheduling
+- **Toast Notifications**: Centralized notification system
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Requirements
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- PHP 8.2+
+- MySQL 8.0+ or SQLite
+- Node.js 18+
+- Composer 2.x
 
-## Learning Laravel
+## Installation
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+```bash
+# Clone the repository
+git clone <repository-url>
+cd washhour
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+# Install PHP dependencies
+composer install
 
-## Laravel Sponsors
+# Install Node dependencies
+npm install
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+# Copy environment file
+cp .env.example .env
 
-### Premium Partners
+# Generate application key
+php artisan key:generate
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+# Run migrations
+php artisan migrate
 
-## Contributing
+# Seed the database (optional)
+php artisan db:seed
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+# Build assets
+npm run build
 
-## Code of Conduct
+# Start the server
+php artisan serve
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## Environment Configuration
 
-## Security Vulnerabilities
+Copy `.env.example` to `.env` and configure:
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```env
+# Required
+APP_NAME=WashHour
+APP_ENV=production
+APP_DEBUG=false
+APP_URL=https://your-domain.com
+
+# Database
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=washhour
+DB_USERNAME=your_username
+DB_PASSWORD=your_password
+
+# API Keys (required for full functionality)
+CALAPI_KEY=your_calapi_key
+GEOAPIFY_API_KEY=your_geoapify_key
+IPROG_SMS_API_TOKEN=your_sms_token
+
+# Optional - Real-time messaging
+PUSHER_APP_ID=
+PUSHER_APP_KEY=
+PUSHER_APP_SECRET=
+PUSHER_APP_CLUSTER=ap1
+```
+
+## Railway Deployment (Recommended)
+
+### Quick Deploy
+
+1. **Push to GitHub**
+   ```bash
+   git add .
+   git commit -m "Ready for Railway"
+   git push origin main
+   ```
+
+2. **Create Railway Project**
+   - Go to [railway.app](https://railway.app)
+   - Click "New Project" → "Deploy from GitHub repo"
+   - Select your repository
+
+3. **Add MySQL Database**
+   - In Railway dashboard, click "New" → "Database" → "MySQL"
+   - Railway auto-creates `DATABASE_URL`
+
+4. **Set Environment Variables**
+   In Railway dashboard → Variables, add:
+   ```
+   APP_NAME=WashHour
+   APP_ENV=production
+   APP_DEBUG=false
+   APP_KEY=base64:YOUR_KEY_HERE
+   APP_URL=https://your-app.up.railway.app
+   
+   DB_CONNECTION=mysql
+   MYSQL_ATTR_SSL_CA=/etc/ssl/certs/ca-certificates.crt
+   
+   SESSION_DRIVER=database
+   SESSION_ENCRYPT=true
+   SESSION_SECURE_COOKIE=true
+   
+   BROADCAST_CONNECTION=pusher
+   PUSHER_APP_ID=your_id
+   PUSHER_APP_KEY=your_key
+   PUSHER_APP_SECRET=your_secret
+   PUSHER_APP_CLUSTER=ap1
+   
+   VITE_PUSHER_APP_KEY=${PUSHER_APP_KEY}
+   VITE_PUSHER_APP_CLUSTER=${PUSHER_APP_CLUSTER}
+   
+   CALAPI_KEY=your_calapi_key
+   CALAPI_BASE_URL=https://api.calapi.io
+   CALAPI_TIMEZONE=Asia/Manila
+   
+   GEOAPIFY_API_KEY=your_geoapify_key
+   IPROG_SMS_API_TOKEN=your_sms_token
+   ```
+
+5. **Generate APP_KEY**
+   ```bash
+   php artisan key:generate --show
+   ```
+   Copy the output to Railway's APP_KEY variable.
+
+6. **Deploy**
+   Railway auto-deploys on push. Check logs for any issues.
+
+### Railway Environment Variables from MySQL
+
+Railway provides these automatically when you add MySQL:
+- `MYSQLHOST`
+- `MYSQLPORT`
+- `MYSQLDATABASE`
+- `MYSQLUSER`
+- `MYSQLPASSWORD`
+
+Add these to connect:
+```
+DB_HOST=${MYSQLHOST}
+DB_PORT=${MYSQLPORT}
+DB_DATABASE=${MYSQLDATABASE}
+DB_USERNAME=${MYSQLUSER}
+DB_PASSWORD=${MYSQLPASSWORD}
+```
+
+### Post-Deployment
+
+After first deploy, run seeders via Railway CLI:
+```bash
+railway run php artisan db:seed
+```
+
+---
+
+## Manual Deployment
+
+### Security Checklist
+
+- [ ] HTTPS enabled
+- [ ] Database credentials secured
+- [ ] API keys not exposed in frontend
+- [ ] CSRF protection enabled (default)
+- [ ] Session encryption enabled
+- [ ] Rate limiting configured
+
+### Performance Optimization
+
+```bash
+# Enable OPcache in php.ini
+opcache.enable=1
+opcache.memory_consumption=256
+
+# Use Redis for sessions/cache (recommended)
+SESSION_DRIVER=redis
+CACHE_STORE=redis
+QUEUE_CONNECTION=redis
+```
+
+## Default Accounts
+
+After seeding, use these credentials:
+
+**Admin:**
+- Email: admin@washhour.com
+- Password: password
+
+**User:**
+- Email: user@washhour.com
+- Password: password
+
+## API Integrations
+
+| Service | Purpose | Required |
+|---------|---------|----------|
+| CalAPI | Calendar/Scheduling | Yes |
+| Geoapify | Maps/Routing | Yes |
+| iProg SMS | OTP/Notifications | Optional |
+| Pusher | Real-time messaging | Optional |
+| Tawk.to | Live chat widget | Optional |
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+This project is proprietary software.

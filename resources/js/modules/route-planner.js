@@ -86,11 +86,11 @@ export class RoutePlanner {
             if (data.success) {
                 this.displayRoute(data);
             } else {
-                alert(data.message || 'Failed to calculate route');
+                window.Toast?.error(data.message || 'Failed to calculate route');
             }
         } catch (error) {
             console.error('Error getting route:', error);
-            alert('Failed to calculate route: ' + error.message);
+            window.Toast?.error('Failed to calculate route: ' + error.message);
         }
     }
 

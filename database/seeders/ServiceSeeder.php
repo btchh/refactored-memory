@@ -10,10 +10,11 @@ class ServiceSeeder extends Seeder
 {
     /**
      * Run the database seeds.
+     * Services = Actions/Labor performed on items
      */
     public function run(): void
     {
-        // Clothes services
+        // Clothes services (actions only)
         Service::create([
             'service_name' => 'Wash',
             'price' => 70.00,
@@ -23,18 +24,6 @@ class ServiceSeeder extends Seeder
         Service::create([
             'service_name' => 'Dry',
             'price' => 70.00,
-            'item_type' => 'clothes',
-            'is_bundle' => false,
-        ]);
-        Service::create([
-            'service_name' => 'Detergent',
-            'price' => 15.00,
-            'item_type' => 'clothes',
-            'is_bundle' => false,
-        ]);
-        Service::create([
-            'service_name' => 'Fabric Conditioner',
-            'price' => 20.00,
             'item_type' => 'clothes',
             'is_bundle' => false,
         ]);
@@ -65,48 +54,18 @@ class ServiceSeeder extends Seeder
             'bundle_items' => ['Wash', 'Dry', 'Detergent', 'Fabric Conditioner'],
         ]);
 
-        // Comforter services
+        // Comforter services (actions only)
         Service::create([
             'service_name' => 'Single Piece',
             'price' => 200.00,
             'item_type' => 'comforter',
             'is_bundle' => false,
         ]);
-        Service::create([
-            'service_name' => 'Safai',
-            'price' => 15.00,
-            'item_type' => 'comforter',
-            'is_bundle' => false,
-        ]);
-        Service::create([
-            'service_name' => 'Color Protection',
-            'price' => 25.00,
-            'item_type' => 'comforter',
-            'is_bundle' => false,
-        ]);
-        Service::create([
-            'service_name' => 'Packaging',
-            'price' => 20.00,
-            'item_type' => 'comforter',
-            'is_bundle' => false,
-        ]);
 
-        // Shoes services
+        // Shoes services (actions only)
         Service::create([
             'service_name' => 'Shoe Cleaning',
             'price' => 50.00,
-            'item_type' => 'shoes',
-            'is_bundle' => false,
-        ]);
-        Service::create([
-            'service_name' => 'Polish',
-            'price' => 20.00,
-            'item_type' => 'shoes',
-            'is_bundle' => false,
-        ]);
-        Service::create([
-            'service_name' => 'Deodorize',
-            'price' => 15.00,
             'item_type' => 'shoes',
             'is_bundle' => false,
         ]);

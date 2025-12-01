@@ -16,6 +16,12 @@ return Application::configure(basePath: dirname(__DIR__))
         ['prefix' => 'api', 'middleware' => ['web', 'auth:web,admin']],
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // Trust proxies (Railway, load balancers)
+        $middleware->trustProxies(at: '*');
+        
+        // Global security headers for production
+        $middleware->append(\App\Http\Middleware\SecurityHeaders::class);
+        
         $middleware->alias([
             'prevent.back' => \App\Http\Middleware\PreventBackHistory::class,
             'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
@@ -42,5 +48,21 @@ return Application::configure(basePath: dirname(__DIR__))
         });
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        // Log all exceptions in production
+        $exceptions->reportable(function (\Throwable $e) {
+            // Add custom logging if needed
+        });
+        
+        // Render custom error pages
+        $exceptions->render(function (\Symfony\Component\HttpKernel\Exception\NotFoundHttpException $e, $request) {
+            if ($request->expectsJson()) {
+                return response()->json(['message' => 'Not found'], 404);
+            }
+        });
+        
+        $exceptions->render(function (\Illuminate\Auth\AuthenticationException $e, $request) {
+            if ($request->expectsJson()) {
+                return response()->json(['message' => 'Unauthenticated'], 401);
+            }
+        });
     })->create();

@@ -16,7 +16,7 @@
                     </p>
                 </div>
 
-                <!-- Alert Messages -->
+                <!-- Validation Errors -->
                 @if ($errors->any())
                     <x-modules.alert type="error" class="mb-6">
                         <ul class="list-disc list-inside">
@@ -25,10 +25,6 @@
                             @endforeach
                         </ul>
                     </x-modules.alert>
-                @endif
-
-                @if (session('success'))
-                    <x-modules.alert type="success" class="mb-6">{{ session('success') }}</x-modules.alert>
                 @endif
 
                 @if(!isset($phone))

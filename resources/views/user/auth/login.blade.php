@@ -10,7 +10,7 @@
                     <p class="text-sm text-gray-600">Sign in to your account</p>
                 </div>
 
-                <!-- Alert Messages -->
+                <!-- Validation Errors -->
                 @if ($errors->any())
                     <x-modules.alert type="error" class="mb-6">
                         <ul class="list-disc list-inside">
@@ -19,14 +19,6 @@
                             @endforeach
                         </ul>
                     </x-modules.alert>
-                @endif
-
-                @if (session('success'))
-                    <x-modules.alert type="success" class="mb-6">{{ session('success') }}</x-modules.alert>
-                @endif
-
-                @if (session('error'))
-                    <x-modules.alert type="error" class="mb-6">{{ session('error') }}</x-modules.alert>
                 @endif
 
                 <!-- Login Form -->

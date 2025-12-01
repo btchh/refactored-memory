@@ -229,8 +229,13 @@ window.deleteProduct = async (id, name) => {
     }
 };
 
-// Alert Helper
+// Alert Helper - Use Toast system
 function showAlert(type, message) {
+    if (window.Toast) {
+        window.Toast.show(message, type);
+        return;
+    }
+    // Fallback to container if Toast not available
     const container = document.getElementById('alert-container');
     if (!container) return;
 

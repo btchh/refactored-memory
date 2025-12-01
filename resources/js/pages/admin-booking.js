@@ -332,11 +332,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 document.getElementById('view-booking-modal').showModal();
             } else {
-                alert('Failed to load booking details');
+                window.Toast?.error('Failed to load booking details');
             }
         } catch (error) {
             console.error('Error:', error);
-            alert('Failed to load booking details');
+            window.Toast?.error('Failed to load booking details');
         }
     };
     
@@ -372,18 +372,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 const result = await response.json();
 
                 if (result.success) {
-                    alert(result.message);
+                    window.Toast?.success(result.message);
                     document.getElementById('edit-weight-modal').close();
                     // Reload the bookings for the selected date
                     if (selectedDate) {
                         loadBookingsByDate(selectedDate);
                     }
                 } else {
-                    alert(result.message || 'Failed to update weight');
+                    window.Toast?.error(result.message || 'Failed to update weight');
                 }
             } catch (error) {
                 console.error('Error:', error);
-                alert('Failed to update weight');
+                window.Toast?.error('Failed to update weight');
             }
         });
     }
@@ -402,7 +402,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const data = await response.json();
                 
                 if (data.success) {
-                    alert('Booking cancelled successfully');
+                    window.Toast?.success('Booking cancelled successfully');
                     // Reload the date bookings
                     const dateInput = document.getElementById('booking_date');
                     if (dateInput && dateInput.value) {
@@ -411,11 +411,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     // Refresh calendar
                     calendar.render();
                 } else {
-                    alert('Failed to cancel booking: ' + data.message);
+                    window.Toast?.error('Failed to cancel booking: ' + data.message);
                 }
             } catch (error) {
                 console.error('Failed to cancel booking:', error);
-                alert('Failed to cancel booking');
+                window.Toast?.error('Failed to cancel booking');
             }
         }
     };
@@ -479,6 +479,32 @@ document.addEventListener('DOMContentLoaded', () => {
             if (userBookingsSection) userBookingsSection.classList.add('hidden');
         });
     }
+
+    // Service type toggle (pickup vs dropoff)
+    const serviceTypeRadios = document.querySelectorAll('input[name="service_type"]');
+    const pickupAddressSection = document.getElementById('pickup-address-section');
+    const pickupAddressInput = document.getElementById('pickup_address');
+
+    function updateServiceTypeUI() {
+        const selectedType = document.querySelector('input[name="service_type"]:checked')?.value;
+        
+        if (pickupAddressSection) {
+            if (selectedType === 'dropoff') {
+                pickupAddressSection.classList.add('hidden');
+                if (pickupAddressInput) pickupAddressInput.removeAttribute('required');
+            } else {
+                pickupAddressSection.classList.remove('hidden');
+                if (pickupAddressInput) pickupAddressInput.setAttribute('required', 'required');
+            }
+        }
+    }
+
+    serviceTypeRadios.forEach(radio => {
+        radio.addEventListener('change', updateServiceTypeUI);
+    });
+
+    // Initialize service type UI
+    updateServiceTypeUI();
 
     // Clear form button
     const clearBtn = document.getElementById('clear-form');

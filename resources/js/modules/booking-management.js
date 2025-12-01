@@ -105,13 +105,13 @@ export class BookingManagement {
             const data = await api.delete(`/admin/bookings/${id}`, { reason });
             
             if (data.success) {
-                alert('Booking cancelled successfully');
+                window.Toast?.success('Booking cancelled successfully');
                 this.loadUserBookings(this.userId);
                 this.onBookingUpdate();
             }
         } catch (error) {
             console.error('Error cancelling booking:', error);
-            alert('Failed to cancel booking');
+            window.Toast?.error('Failed to cancel booking');
         }
     }
 
@@ -122,13 +122,13 @@ export class BookingManagement {
             const data = await api.patch(`/admin/bookings/${id}/status`, { status });
             
             if (data.success) {
-                alert('Status updated successfully');
+                window.Toast?.success('Status updated successfully');
                 this.loadUserBookings(this.userId);
                 this.onBookingUpdate();
             }
         } catch (error) {
             console.error('Error updating status:', error);
-            alert('Failed to update status');
+            window.Toast?.error('Failed to update status');
         }
     }
 
@@ -153,7 +153,7 @@ export class BookingManagement {
             });
             
             if (data.success) {
-                alert('Booking rescheduled successfully');
+                window.Toast?.success('Booking rescheduled successfully');
                 
                 const modal = document.getElementById('reschedule-modal');
                 if (modal && modal.close) {
@@ -165,7 +165,7 @@ export class BookingManagement {
             }
         } catch (error) {
             console.error('Error rescheduling:', error);
-            alert('Failed to reschedule booking');
+            window.Toast?.error('Failed to reschedule booking');
         }
     }
 

@@ -54,15 +54,18 @@ export class BookingForm {
         const products = this.productsData[itemType] || [];
         
         if (products.length === 0) {
-            container.innerHTML = '<p class="text-gray-500 col-span-2">No products available</p>';
+            container.innerHTML = '<p class="text-gray-400 col-span-2 text-sm text-center py-4 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200">No products available</p>';
             return;
         }
         
         container.innerHTML = products.map(product => `
-            <label class="flex items-center gap-2 p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:bg-purple-50 hover:border-purple-300 transition-all">
+            <label class="group flex items-center gap-3 p-4 border-2 border-gray-200 rounded-xl cursor-pointer hover:bg-gradient-to-r hover:from-purple-50 hover:to-pink-50 hover:border-purple-400 hover:shadow-md transition-all duration-300 transform hover:scale-105">
                 <input type="checkbox" name="products[]" value="${product.id}" 
-                    class="checkbox checkbox-secondary" data-price="${product.price}" data-name="${product.product_name}">
-                <span class="text-sm font-medium">${product.product_name} <span class="text-green-600">(₱${product.price})</span></span>
+                    class="checkbox checkbox-secondary checkbox-lg" data-price="${product.price}" data-name="${product.product_name}">
+                <div class="flex-1">
+                    <span class="text-sm font-semibold text-gray-800 group-hover:text-purple-600 transition-colors">${product.product_name}</span>
+                    <span class="block text-xs font-bold text-green-600 mt-1">₱${product.price}</span>
+                </div>
             </label>
         `).join('');
 
@@ -122,24 +125,43 @@ export class BookingForm {
     }
 
     setupItemTypeListener() {
+        // Handle select element (admin booking)
         const itemTypeSelect = document.getElementById('item_type');
-        if (itemTypeSelect) {
+        if (itemTypeSelect && itemTypeSelect.tagName === 'SELECT') {
             itemTypeSelect.addEventListener('change', (e) => {
-                const itemType = e.target.value;
-                this.selectedServices = [];
-                this.selectedProducts = [];
-                
-                if (!itemType) {
-                    document.getElementById('services-container').innerHTML = '<p class="text-gray-500 col-span-2">Select an item type first</p>';
-                    document.getElementById('products-container').innerHTML = '<p class="text-gray-500 col-span-2">Select an item type first</p>';
-                    return;
-                }
-                
-                this.loadServices(itemType);
-                this.loadProducts(itemType);
-                this.calculateTotal();
+                this.handleItemTypeChange(e.target.value);
             });
         }
+
+        // Handle radio buttons (user booking)
+        const itemTypeRadios = document.querySelectorAll('input[name="item_type"]');
+        if (itemTypeRadios.length > 0) {
+            itemTypeRadios.forEach(radio => {
+                radio.addEventListener('change', (e) => {
+                    this.handleItemTypeChange(e.target.value);
+                    // Also update hidden select if exists
+                    const hiddenSelect = document.getElementById('item_type');
+                    if (hiddenSelect && hiddenSelect.tagName === 'SELECT') {
+                        hiddenSelect.value = e.target.value;
+                    }
+                });
+            });
+        }
+    }
+
+    handleItemTypeChange(itemType) {
+        this.selectedServices = [];
+        this.selectedProducts = [];
+        
+        if (!itemType) {
+            document.getElementById('services-container').innerHTML = '<p class="text-gray-400 col-span-2 text-sm text-center py-4 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200">Select an item type first</p>';
+            document.getElementById('products-container').innerHTML = '<p class="text-gray-400 col-span-2 text-sm text-center py-4 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200">Select an item type first</p>';
+            return;
+        }
+        
+        this.loadServices(itemType);
+        this.loadProducts(itemType);
+        this.calculateTotal();
     }
 
     init() {

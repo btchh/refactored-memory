@@ -9,10 +9,11 @@ class ProductSeeder extends Seeder
 {
     /**
      * Run the database seeds.
+     * Products = Physical items/add-ons
      */
     public function run(): void
     {
-        // Clothes products
+        // Clothes products (add-ons)
         Product::create([
             'product_name' => 'Detergent',
             'price' => 15.00,
@@ -24,7 +25,7 @@ class ProductSeeder extends Seeder
             'item_type' => 'clothes',
         ]);
 
-        // Comforter products
+        // Comforter products (add-ons)
         Product::create([
             'product_name' => 'Safai',
             'price' => 15.00,
@@ -41,7 +42,7 @@ class ProductSeeder extends Seeder
             'item_type' => 'comforter',
         ]);
 
-        // Shoes products
+        // Shoes products (add-ons)
         Product::create([
             'product_name' => 'Polish',
             'price' => 20.00,

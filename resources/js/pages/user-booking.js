@@ -109,40 +109,126 @@ document.addEventListener('DOMContentLoaded', () => {
         form.addEventListener('submit', (e) => {
             const bookingDate = document.getElementById('booking_date').value;
             const bookingTime = document.getElementById('booking_time').value;
-            const itemType = document.getElementById('item_type').value;
+            const itemType = document.querySelector('input[name="item_type"]:checked')?.value || document.getElementById('item_type')?.value;
             const totalPrice = parseFloat(document.getElementById('total-price').textContent);
 
             if (!bookingDate) {
                 e.preventDefault();
-                alert('Please select a date from the calendar');
+                window.Toast?.warning('Please select a date from the calendar');
                 return false;
             }
 
             if (!bookingTime) {
                 e.preventDefault();
-                alert('Please select a time slot');
+                window.Toast?.warning('Please select a time slot');
                 return false;
             }
 
             if (!itemType) {
                 e.preventDefault();
-                alert('Please select an item type');
+                window.Toast?.warning('Please select an item type');
                 return false;
             }
 
             if (totalPrice <= 0) {
                 e.preventDefault();
-                alert('Please select at least one service or product');
+                window.Toast?.warning('Please select at least one service or product');
                 return false;
             }
 
-            // Confirm booking
-            if (!confirm(`Confirm booking for ${bookingDate} at ${bookingTime}?\nTotal: ₱${totalPrice.toFixed(2)}`)) {
-                e.preventDefault();
-                return false;
-            }
+            // Show confirmation modal instead of native confirm
+            e.preventDefault();
+            showBookingConfirmation(bookingDate, bookingTime, totalPrice, form);
         });
     }
+
+    // Booking confirmation modal
+    function showBookingConfirmation(date, time, total, formElement) {
+        // Create modal if it doesn't exist
+        let modal = document.getElementById('booking-confirm-modal');
+        if (!modal) {
+            modal = document.createElement('div');
+            modal.id = 'booking-confirm-modal';
+            modal.className = 'fixed inset-0 z-[300] flex items-center justify-center p-4 hidden';
+            modal.innerHTML = `
+                <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="closeBookingModal()"></div>
+                <div class="relative bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 transform scale-95 opacity-0 transition-all duration-300" id="booking-modal-content">
+                    <div class="text-center">
+                        <div class="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-8 h-8 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-900 mb-2">Confirm Booking</h3>
+                        <p class="text-gray-600 mb-4" id="booking-confirm-details"></p>
+                        <div class="bg-green-50 rounded-xl p-4 mb-6">
+                            <p class="text-sm text-gray-600">Total Amount</p>
+                            <p class="text-3xl font-bold text-green-600" id="booking-confirm-total"></p>
+                        </div>
+                        <div class="flex gap-3">
+                            <button type="button" onclick="closeBookingModal()" class="flex-1 px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-xl transition-colors">
+                                Cancel
+                            </button>
+                            <button type="button" onclick="submitBookingForm()" class="flex-1 px-4 py-3 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-xl transition-colors">
+                                Confirm Booking
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        // Format date nicely
+        const dateObj = new Date(date + 'T00:00:00');
+        const formattedDate = dateObj.toLocaleDateString('en-US', { 
+            weekday: 'long', 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+        });
+
+        // Update modal content
+        document.getElementById('booking-confirm-details').textContent = `${formattedDate} at ${time}`;
+        document.getElementById('booking-confirm-total').textContent = `₱${total.toFixed(2)}`;
+
+        // Store form reference
+        window._bookingForm = formElement;
+
+        // Show modal with animation
+        modal.classList.remove('hidden');
+        setTimeout(() => {
+            const content = document.getElementById('booking-modal-content');
+            content.classList.remove('scale-95', 'opacity-0');
+            content.classList.add('scale-100', 'opacity-100');
+        }, 10);
+    }
+
+    // Global functions for modal
+    window.closeBookingModal = function() {
+        const modal = document.getElementById('booking-confirm-modal');
+        const content = document.getElementById('booking-modal-content');
+        if (modal && content) {
+            content.classList.add('scale-95', 'opacity-0');
+            content.classList.remove('scale-100', 'opacity-100');
+            setTimeout(() => modal.classList.add('hidden'), 300);
+        }
+    };
+
+    window.submitBookingForm = function() {
+        closeBookingModal();
+        if (window._bookingForm) {
+            // Remove the submit event listener temporarily and submit
+            const form = window._bookingForm;
+            const submitBtn = form.querySelector('button[type="submit"]');
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<svg class="animate-spin w-5 h-5 mr-2 inline" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Submitting...';
+            }
+            // Use HTMLFormElement.submit() to bypass event listeners
+            HTMLFormElement.prototype.submit.call(form);
+        }
+    };
 
     // Branch selection handler
     const adminSelect = document.getElementById('admin_id');
@@ -165,4 +251,30 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
+    // Service type toggle (pickup vs dropoff)
+    const serviceTypeRadios = document.querySelectorAll('input[name="service_type"]');
+    const pickupAddressSection = document.getElementById('pickup-address-section');
+    const pickupAddressInput = document.getElementById('pickup_address');
+
+    function updateServiceTypeUI() {
+        const selectedType = document.querySelector('input[name="service_type"]:checked')?.value;
+        
+        if (pickupAddressSection) {
+            if (selectedType === 'dropoff') {
+                pickupAddressSection.classList.add('hidden');
+                if (pickupAddressInput) pickupAddressInput.removeAttribute('required');
+            } else {
+                pickupAddressSection.classList.remove('hidden');
+                if (pickupAddressInput) pickupAddressInput.setAttribute('required', 'required');
+            }
+        }
+    }
+
+    serviceTypeRadios.forEach(radio => {
+        radio.addEventListener('change', updateServiceTypeUI);
+    });
+
+    // Initialize on load
+    updateServiceTypeUI();
 });

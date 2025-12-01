@@ -76,6 +76,11 @@ window.deleteUser = async function(userId, userName) {
 };
 
 function showAlert(type, message) {
+    if (window.Toast) {
+        window.Toast.show(message, type);
+        return;
+    }
+    // Fallback to container if Toast not available
     const container = document.getElementById('alert-container');
     if (!container) return;
 

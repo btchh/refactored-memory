@@ -5,8 +5,8 @@ use App\Http\Controllers\User\Auth\LoginController;
 use App\Http\Controllers\User\Auth\RegisterController;
 use App\Http\Controllers\User\Auth\PasswordResetController;
 
-// Public routes (Authentication)
-Route::middleware('guest:web')->group(function () {
+// Public routes (Authentication) with rate limiting
+Route::middleware(['guest:web', 'throttle:5,1'])->group(function () {
     // Login
     Route::get('login', [LoginController::class, 'showLogin'])->name('login');
     Route::post('login', [LoginController::class, 'login'])->name('login.submit');
