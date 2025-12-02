@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Service extends Model
@@ -13,6 +14,7 @@ class Service extends Model
     protected $table = 'services';
 
     protected $fillable = [
+        'admin_id',
         'service_name',
         'price',
         'item_type',
@@ -25,11 +27,24 @@ class Service extends Model
         'bundle_items' => 'array',
     ];
 
+    public function admin(): BelongsTo
+    {
+        return $this->belongsTo(Admin::class);
+    }
+
     public function transactions(): BelongsToMany
     {
         return $this->belongsToMany(Transaction::class, 'service_transactions')
             ->using(ServiceTransaction::class)
             ->withPivot('price_at_purchase')
             ->withTimestamps();
+    }
+
+    /**
+     * Scope to filter by admin
+     */
+    public function scopeForAdmin($query, $adminId)
+    {
+        return $query->where('admin_id', $adminId);
     }
 }

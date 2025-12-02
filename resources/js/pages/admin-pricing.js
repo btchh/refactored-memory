@@ -12,8 +12,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const targetPanel = tab.dataset.tab;
             
             // Update tabs
-            tabs.forEach(t => t.classList.remove('active'));
-            tab.classList.add('active');
+            tabs.forEach(t => {
+                t.classList.remove('active', 'border-blue-600', 'text-blue-600', 'bg-white', '-mb-px');
+                t.classList.add('border-transparent', 'text-gray-500');
+            });
+            tab.classList.add('active', 'border-blue-600', 'text-blue-600', 'bg-white', '-mb-px');
+            tab.classList.remove('border-transparent', 'text-gray-500');
             
             // Update panels
             panels.forEach(panel => {
@@ -40,9 +44,16 @@ function initServiceForm() {
         e.preventDefault();
         
         const id = document.getElementById('service-id').value;
+        const itemType = document.querySelector('input[name="service_item_type"]:checked')?.value;
+        
+        if (!itemType) {
+            showAlert('error', 'Please select an item type');
+            return;
+        }
+
         const data = {
             service_name: document.getElementById('service-name').value,
-            item_type: document.getElementById('service-item-type').value,
+            item_type: itemType,
             price: document.getElementById('service-price').value,
             description: document.getElementById('service-description').value
         };
@@ -67,7 +78,7 @@ function initServiceForm() {
 
             if (result.success) {
                 showAlert('success', result.message);
-                document.getElementById('service-modal').close();
+                closeServiceModal();
                 setTimeout(() => window.location.reload(), 1000);
             } else {
                 showAlert('error', result.message);
@@ -79,33 +90,35 @@ function initServiceForm() {
     });
 }
 
-window.openServiceModal = (service = null) => {
+window.openServiceModal = () => {
     const modal = document.getElementById('service-modal');
-    const title = document.getElementById('service-modal-title');
-    const form = document.getElementById('service-form');
-    
-    if (service) {
-        title.textContent = 'Edit Service';
-        document.getElementById('service-id').value = service.id;
-        document.getElementById('service-name').value = service.service_name;
-        document.getElementById('service-item-type').value = service.item_type;
-        document.getElementById('service-price').value = service.price;
-        document.getElementById('service-description').value = service.description || '';
-    } else {
-        title.textContent = 'Add Service';
-        form.reset();
-        document.getElementById('service-id').value = '';
-    }
-    
-    modal.showModal();
+    document.getElementById('service-modal-title').textContent = 'Add Service';
+    document.getElementById('service-form').reset();
+    document.getElementById('service-id').value = '';
+    modal.classList.remove('hidden');
+};
+
+window.closeServiceModal = () => {
+    document.getElementById('service-modal').classList.add('hidden');
 };
 
 window.editService = (service) => {
-    window.openServiceModal(service);
+    const modal = document.getElementById('service-modal');
+    document.getElementById('service-modal-title').textContent = 'Edit Service';
+    document.getElementById('service-id').value = service.id;
+    document.getElementById('service-name').value = service.service_name;
+    document.getElementById('service-price').value = service.price;
+    document.getElementById('service-description').value = service.description || '';
+    
+    // Set radio button
+    const radio = document.querySelector(`input[name="service_item_type"][value="${service.item_type}"]`);
+    if (radio) radio.checked = true;
+    
+    modal.classList.remove('hidden');
 };
 
 window.deleteService = async (id, name) => {
-    if (!confirm(`Delete "${name}"?`)) return;
+    if (!confirm(`Delete "${name}"? This action cannot be undone.`)) return;
 
     try {
         const response = await fetch(window.pricingRoutes.services.delete.replace('__ID__', id), {
@@ -139,9 +152,16 @@ function initProductForm() {
         e.preventDefault();
         
         const id = document.getElementById('product-id').value;
+        const itemType = document.querySelector('input[name="product_item_type"]:checked')?.value;
+        
+        if (!itemType) {
+            showAlert('error', 'Please select an item type');
+            return;
+        }
+
         const data = {
             product_name: document.getElementById('product-name').value,
-            item_type: document.getElementById('product-item-type').value,
+            item_type: itemType,
             price: document.getElementById('product-price').value,
             description: document.getElementById('product-description').value
         };
@@ -166,7 +186,7 @@ function initProductForm() {
 
             if (result.success) {
                 showAlert('success', result.message);
-                document.getElementById('product-modal').close();
+                closeProductModal();
                 setTimeout(() => window.location.reload(), 1000);
             } else {
                 showAlert('error', result.message);
@@ -178,33 +198,35 @@ function initProductForm() {
     });
 }
 
-window.openProductModal = (product = null) => {
+window.openProductModal = () => {
     const modal = document.getElementById('product-modal');
-    const title = document.getElementById('product-modal-title');
-    const form = document.getElementById('product-form');
-    
-    if (product) {
-        title.textContent = 'Edit Product';
-        document.getElementById('product-id').value = product.id;
-        document.getElementById('product-name').value = product.product_name;
-        document.getElementById('product-item-type').value = product.item_type;
-        document.getElementById('product-price').value = product.price;
-        document.getElementById('product-description').value = product.description || '';
-    } else {
-        title.textContent = 'Add Product';
-        form.reset();
-        document.getElementById('product-id').value = '';
-    }
-    
-    modal.showModal();
+    document.getElementById('product-modal-title').textContent = 'Add Product';
+    document.getElementById('product-form').reset();
+    document.getElementById('product-id').value = '';
+    modal.classList.remove('hidden');
+};
+
+window.closeProductModal = () => {
+    document.getElementById('product-modal').classList.add('hidden');
 };
 
 window.editProduct = (product) => {
-    window.openProductModal(product);
+    const modal = document.getElementById('product-modal');
+    document.getElementById('product-modal-title').textContent = 'Edit Product';
+    document.getElementById('product-id').value = product.id;
+    document.getElementById('product-name').value = product.product_name;
+    document.getElementById('product-price').value = product.price;
+    document.getElementById('product-description').value = product.description || '';
+    
+    // Set radio button
+    const radio = document.querySelector(`input[name="product_item_type"][value="${product.item_type}"]`);
+    if (radio) radio.checked = true;
+    
+    modal.classList.remove('hidden');
 };
 
 window.deleteProduct = async (id, name) => {
-    if (!confirm(`Delete "${name}"?`)) return;
+    if (!confirm(`Delete "${name}"? This action cannot be undone.`)) return;
 
     try {
         const response = await fetch(window.pricingRoutes.products.delete.replace('__ID__', id), {
@@ -233,35 +255,5 @@ window.deleteProduct = async (id, name) => {
 function showAlert(type, message) {
     if (window.Toast) {
         window.Toast.show(message, type);
-        return;
     }
-    // Fallback to container if Toast not available
-    const container = document.getElementById('alert-container');
-    if (!container) return;
-
-    const alertClass = type === 'success' ? 'alert-success' : 'alert-error';
-    const iconPath = type === 'success' 
-        ? 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z'
-        : 'M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z';
-
-    const alert = document.createElement('div');
-    alert.className = `alert ${alertClass} mb-4`;
-    alert.innerHTML = `
-        <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${iconPath}" />
-        </svg>
-        <span>${message}</span>
-        <button onclick="this.parentElement.remove()" class="ml-auto">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-        </button>
-    `;
-
-    container.appendChild(alert);
-
-    setTimeout(() => {
-        alert.style.opacity = '0';
-        setTimeout(() => alert.remove(), 300);
-    }, 5000);
 }

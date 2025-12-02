@@ -5,19 +5,29 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Service;
 use App\Models\Product;
+use App\Services\AuditService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class PricingController extends Controller
 {
+    protected $auditService;
+
+    public function __construct(AuditService $auditService)
+    {
+        $this->auditService = $auditService;
+    }
     /**
      * Display pricing management page
      */
     public function index()
     {
-        $services = Service::orderBy('item_type')->orderBy('service_name')->get();
-        $products = Product::orderBy('item_type')->orderBy('product_name')->get();
+        $adminId = Auth::guard('admin')->id();
+        
+        $services = Service::forAdmin($adminId)->orderBy('item_type')->orderBy('service_name')->get();
+        $products = Product::forAdmin($adminId)->orderBy('item_type')->orderBy('product_name')->get();
 
         return view('admin.pricing.index', compact('services', 'products'));
     }
@@ -35,7 +45,10 @@ class PricingController extends Controller
         ]);
 
         try {
+            $validated['admin_id'] = Auth::guard('admin')->id();
             $service = Service::create($validated);
+
+            $this->auditService->logCreate(Service::class, $service, "Created service: {$service->service_name} (₱{$service->price})");
 
             return response()->json([
                 'success' => true,
@@ -64,8 +77,12 @@ class PricingController extends Controller
         ]);
 
         try {
-            $service = Service::findOrFail($id);
+            $adminId = Auth::guard('admin')->id();
+            $service = Service::forAdmin($adminId)->findOrFail($id);
+            $oldValues = $service->toArray();
             $service->update($validated);
+
+            $this->auditService->logUpdate(Service::class, $service, $oldValues, "Updated service: {$service->service_name}");
 
             return response()->json([
                 'success' => true,
@@ -87,7 +104,8 @@ class PricingController extends Controller
     public function deleteService($id)
     {
         try {
-            $service = Service::findOrFail($id);
+            $adminId = Auth::guard('admin')->id();
+            $service = Service::forAdmin($adminId)->findOrFail($id);
             
             // Check if service is used in any transactions
             $usageCount = DB::table('service_transactions')->where('service_id', $id)->count();
@@ -99,6 +117,8 @@ class PricingController extends Controller
                 ], 400);
             }
 
+            $serviceName = $service->service_name;
+            $this->auditService->logDelete(Service::class, $service, "Deleted service: {$serviceName}");
             $service->delete();
 
             return response()->json([
@@ -127,7 +147,10 @@ class PricingController extends Controller
         ]);
 
         try {
+            $validated['admin_id'] = Auth::guard('admin')->id();
             $product = Product::create($validated);
+
+            $this->auditService->logCreate(Product::class, $product, "Created product: {$product->product_name} (₱{$product->price})");
 
             return response()->json([
                 'success' => true,
@@ -156,8 +179,12 @@ class PricingController extends Controller
         ]);
 
         try {
-            $product = Product::findOrFail($id);
+            $adminId = Auth::guard('admin')->id();
+            $product = Product::forAdmin($adminId)->findOrFail($id);
+            $oldValues = $product->toArray();
             $product->update($validated);
+
+            $this->auditService->logUpdate(Product::class, $product, $oldValues, "Updated product: {$product->product_name}");
 
             return response()->json([
                 'success' => true,
@@ -179,7 +206,8 @@ class PricingController extends Controller
     public function deleteProduct($id)
     {
         try {
-            $product = Product::findOrFail($id);
+            $adminId = Auth::guard('admin')->id();
+            $product = Product::forAdmin($adminId)->findOrFail($id);
             
             // Check if product is used in any transactions
             $usageCount = DB::table('product_transactions')->where('product_id', $id)->count();
@@ -191,6 +219,8 @@ class PricingController extends Controller
                 ], 400);
             }
 
+            $productName = $product->product_name;
+            $this->auditService->logDelete(Product::class, $product, "Deleted product: {$productName}");
             $product->delete();
 
             return response()->json([

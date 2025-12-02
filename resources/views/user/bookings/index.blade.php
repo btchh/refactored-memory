@@ -280,7 +280,7 @@
                             <div class="md:col-span-2">
                                 <label class="block text-sm font-medium text-gray-700 mb-3">Services</label>
                                 <div id="services-container" class="grid grid-cols-2 gap-3">
-                                    <p class="text-gray-400 col-span-2 text-sm text-center py-4 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200">Select an item type first</p>
+                                    <p class="text-gray-400 col-span-2 text-sm text-center py-4 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200">Select a branch and item type first</p>
                                 </div>
                             </div>
                             
@@ -288,7 +288,7 @@
                             <div class="md:col-span-2">
                                 <label class="block text-sm font-medium text-gray-700 mb-3">Products</label>
                                 <div id="products-container" class="grid grid-cols-2 gap-3">
-                                    <p class="text-gray-400 col-span-2 text-sm text-center py-4 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200">Select an item type first</p>
+                                    <p class="text-gray-400 col-span-2 text-sm text-center py-4 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200">Select a branch and item type first</p>
                                 </div>
                             </div>
                             
@@ -337,7 +337,8 @@
             products: @json($products),
             routes: {
                 slots: '{{ route('user.api.calendar.slots') }}',
-                calculate: '{{ route('user.api.bookings.calculate') }}'
+                calculate: '{{ route('user.api.bookings.calculate') }}',
+                branchPricing: '{{ route('user.api.branch.pricing') }}'
             }
         };
     </script>

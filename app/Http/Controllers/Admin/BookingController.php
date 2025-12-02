@@ -27,8 +27,10 @@ class BookingController extends Controller
      */
     public function index()
     {
-        $services = Service::all()->groupBy('item_type');
-        $products = Product::all()->groupBy('item_type');
+        $adminId = Auth::guard('admin')->id();
+        
+        $services = Service::forAdmin($adminId)->get()->groupBy('item_type');
+        $products = Product::forAdmin($adminId)->get()->groupBy('item_type');
 
         return view('admin.bookings.index', compact('services', 'products'));
     }

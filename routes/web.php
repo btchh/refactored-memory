@@ -39,6 +39,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
     require __DIR__.'/admin/delivery.php';
     require __DIR__.'/admin/admin-management.php';
     require __DIR__.'/admin/messages.php';
+    require __DIR__.'/admin/audit.php';
 });
 
 // User Routes

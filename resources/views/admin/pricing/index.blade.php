@@ -2,23 +2,54 @@
     <x-slot name="title">Pricing Management</x-slot>
 
     <div class="space-y-6">
-        <!-- Header -->
-        <x-modules.card class="p-6">
-            <h1 class="text-2xl font-bold text-gray-900 mb-1">Pricing Management</h1>
-            <p class="text-gray-600">Manage your services and products pricing</p>
-        </x-modules.card>
-
-        <!-- Alert Container -->
-        <div id="alert-container"></div>
+        <!-- Header with Stats -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <x-modules.card class="p-6 md:col-span-2">
+                <h1 class="text-2xl font-bold text-gray-900 mb-1">Pricing Management</h1>
+                <p class="text-gray-600">Manage your branch's services and products</p>
+            </x-modules.card>
+            <x-modules.card class="p-6 bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="text-2xl font-bold text-blue-700">{{ $services->count() }}</p>
+                        <p class="text-sm text-blue-600">Services</p>
+                    </div>
+                </div>
+            </x-modules.card>
+            <x-modules.card class="p-6 bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 bg-purple-500 rounded-xl flex items-center justify-center">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="text-2xl font-bold text-purple-700">{{ $products->count() }}</p>
+                        <p class="text-sm text-purple-600">Products</p>
+                    </div>
+                </div>
+            </x-modules.card>
+        </div>
 
         <!-- Tabs -->
-        <div class="bg-white rounded-lg border border-gray-200">
-            <div class="border-b border-gray-200 px-6">
-                <nav class="flex gap-6">
-                    <button type="button" data-tab="services" class="pricing-tab active py-4 text-sm font-medium border-b-2 border-primary-600 text-primary-600">
+        <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+            <div class="border-b border-gray-200 px-6 bg-gray-50">
+                <nav class="flex gap-1">
+                    <button type="button" data-tab="services" class="pricing-tab active px-6 py-4 text-sm font-semibold border-b-2 border-blue-600 text-blue-600 bg-white -mb-px rounded-t-lg">
+                        <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                        </svg>
                         Services
                     </button>
-                    <button type="button" data-tab="products" class="pricing-tab py-4 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700">
+                    <button type="button" data-tab="products" class="pricing-tab px-6 py-4 text-sm font-semibold border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-t-lg transition-colors">
+                        <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                        </svg>
                         Products
                     </button>
                 </nav>
@@ -26,101 +57,143 @@
 
             <!-- Services Panel -->
             <div id="services-panel" class="pricing-panel p-6">
-                <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-lg font-bold text-gray-900">Services</h2>
-                    <button type="button" onclick="openServiceModal()" class="btn btn-primary btn-sm">
-                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                    <div>
+                        <h2 class="text-lg font-bold text-gray-900">Services</h2>
+                        <p class="text-sm text-gray-500">Labor and actions performed on items</p>
+                    </div>
+                    <button type="button" onclick="openServiceModal()" class="btn btn-primary">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                         </svg>
                         Add Service
                     </button>
                 </div>
 
-                @foreach(['clothes' => 'Clothes', 'comforter' => 'Comforter', 'shoes' => 'Shoes'] as $type => $label)
-                    @php $typeServices = $services->where('item_type', $type); @endphp
-                    @if($typeServices->count() > 0)
-                        <div class="mb-6">
-                            <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">{{ $label }}</h3>
-                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                @foreach($typeServices as $service)
-                                    <div class="bg-gray-50 rounded-lg p-4 border border-gray-200 hover:border-primary-300 transition-colors">
-                                        <div class="flex justify-between items-start mb-2">
-                                            <h4 class="font-semibold text-gray-900">{{ $service->service_name }}</h4>
-                                            <span class="text-lg font-bold text-green-600">₱{{ number_format($service->price, 2) }}</span>
-                                        </div>
-                                        @if($service->description)
-                                            <p class="text-sm text-gray-500 mb-3">{{ $service->description }}</p>
-                                        @endif
-                                        <div class="flex gap-2">
-                                            <button type="button" onclick='editService(@json($service))' class="text-sm text-primary-600 hover:text-primary-700 font-medium">Edit</button>
-                                            <span class="text-gray-300">|</span>
-                                            <button type="button" onclick="deleteService({{ $service->id }}, '{{ addslashes($service->service_name) }}')" class="text-sm text-red-600 hover:text-red-700 font-medium">Delete</button>
-                                        </div>
+                @if($services->count() > 0)
+                    @foreach(['clothes' => ['Clothes', 'bg-blue-500', 'from-blue-50'], 'comforter' => ['Comforter', 'bg-green-500', 'from-green-50'], 'shoes' => ['Shoes', 'bg-orange-500', 'from-orange-50']] as $type => $config)
+                        @php $typeServices = $services->where('item_type', $type); @endphp
+                        @if($typeServices->count() > 0)
+                            <div class="mb-8">
+                                <div class="flex items-center gap-3 mb-4">
+                                    <div class="w-8 h-8 {{ $config[1] }} rounded-lg flex items-center justify-center">
+                                        <span class="text-white text-xs font-bold">{{ $typeServices->count() }}</span>
                                     </div>
-                                @endforeach
+                                    <h3 class="text-sm font-bold text-gray-700 uppercase tracking-wide">{{ $config[0] }}</h3>
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                                    @foreach($typeServices as $service)
+                                        <div class="group bg-gradient-to-br {{ $config[2] }} to-white rounded-xl p-5 border border-gray-200 hover:border-blue-300 hover:shadow-lg transition-all duration-200">
+                                            <div class="flex justify-between items-start mb-3">
+                                                <div class="flex-1">
+                                                    <h4 class="font-bold text-gray-900 group-hover:text-blue-600 transition-colors">{{ $service->service_name }}</h4>
+                                                    @if($service->is_bundle)
+                                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-700 mt-1">Bundle</span>
+                                                    @endif
+                                                </div>
+                                                <div class="text-right">
+                                                    <span class="text-2xl font-bold text-green-600">₱{{ number_format($service->price, 0) }}</span>
+                                                </div>
+                                            </div>
+                                            @if($service->description)
+                                                <p class="text-sm text-gray-500 mb-4 line-clamp-2">{{ $service->description }}</p>
+                                            @endif
+                                            <div class="flex gap-2 pt-3 border-t border-gray-200/50">
+                                                <button type="button" onclick='editService(@json($service))' class="flex-1 btn btn-sm bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-blue-300 hover:text-blue-600">
+                                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                                                    Edit
+                                                </button>
+                                                <button type="button" onclick="deleteService({{ $service->id }}, '{{ addslashes($service->service_name) }}')" class="btn btn-sm bg-white border border-gray-200 text-red-600 hover:bg-red-50 hover:border-red-300">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
                             </div>
+                        @endif
+                    @endforeach
+                @else
+                    <div class="text-center py-16 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200">
+                        <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                            </svg>
                         </div>
-                    @endif
-                @endforeach
-
-                @if($services->count() === 0)
-                    <div class="text-center py-12">
-                        <svg class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                        </svg>
-                        <p class="text-gray-500 mb-4">No services yet</p>
-                        <button type="button" onclick="openServiceModal()" class="btn btn-primary btn-sm">Add Your First Service</button>
+                        <h3 class="text-lg font-semibold text-gray-700 mb-2">No services yet</h3>
+                        <p class="text-gray-500 mb-6">Start by adding your first service</p>
+                        <button type="button" onclick="openServiceModal()" class="btn btn-primary">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                            Add Your First Service
+                        </button>
                     </div>
                 @endif
             </div>
 
-
             <!-- Products Panel -->
             <div id="products-panel" class="pricing-panel p-6 hidden">
-                <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-lg font-bold text-gray-900">Products</h2>
-                    <button type="button" onclick="openProductModal()" class="btn btn-primary btn-sm">
-                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                    <div>
+                        <h2 class="text-lg font-bold text-gray-900">Products</h2>
+                        <p class="text-sm text-gray-500">Physical items and add-ons</p>
+                    </div>
+                    <button type="button" onclick="openProductModal()" class="btn btn-primary">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                         </svg>
                         Add Product
                     </button>
                 </div>
 
-                @foreach(['clothes' => 'Clothes', 'comforter' => 'Comforter', 'shoes' => 'Shoes'] as $type => $label)
-                    @php $typeProducts = $products->where('item_type', $type); @endphp
-                    @if($typeProducts->count() > 0)
-                        <div class="mb-6">
-                            <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">{{ $label }}</h3>
-                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                @foreach($typeProducts as $product)
-                                    <div class="bg-gray-50 rounded-lg p-4 border border-gray-200 hover:border-primary-300 transition-colors">
-                                        <div class="flex justify-between items-start mb-2">
-                                            <h4 class="font-semibold text-gray-900">{{ $product->product_name }}</h4>
-                                            <span class="text-lg font-bold text-green-600">₱{{ number_format($product->price, 2) }}</span>
-                                        </div>
-                                        @if($product->description)
-                                            <p class="text-sm text-gray-500 mb-3">{{ $product->description }}</p>
-                                        @endif
-                                        <div class="flex gap-2">
-                                            <button type="button" onclick='editProduct(@json($product))' class="text-sm text-primary-600 hover:text-primary-700 font-medium">Edit</button>
-                                            <span class="text-gray-300">|</span>
-                                            <button type="button" onclick="deleteProduct({{ $product->id }}, '{{ addslashes($product->product_name) }}')" class="text-sm text-red-600 hover:text-red-700 font-medium">Delete</button>
-                                        </div>
+                @if($products->count() > 0)
+                    @foreach(['clothes' => ['Clothes', 'bg-blue-500', 'from-blue-50'], 'comforter' => ['Comforter', 'bg-green-500', 'from-green-50'], 'shoes' => ['Shoes', 'bg-orange-500', 'from-orange-50']] as $type => $config)
+                        @php $typeProducts = $products->where('item_type', $type); @endphp
+                        @if($typeProducts->count() > 0)
+                            <div class="mb-8">
+                                <div class="flex items-center gap-3 mb-4">
+                                    <div class="w-8 h-8 {{ $config[1] }} rounded-lg flex items-center justify-center">
+                                        <span class="text-white text-xs font-bold">{{ $typeProducts->count() }}</span>
                                     </div>
-                                @endforeach
+                                    <h3 class="text-sm font-bold text-gray-700 uppercase tracking-wide">{{ $config[0] }}</h3>
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                                    @foreach($typeProducts as $product)
+                                        <div class="group bg-gradient-to-br {{ $config[2] }} to-white rounded-xl p-5 border border-gray-200 hover:border-purple-300 hover:shadow-lg transition-all duration-200">
+                                            <div class="flex justify-between items-start mb-3">
+                                                <h4 class="font-bold text-gray-900 group-hover:text-purple-600 transition-colors">{{ $product->product_name }}</h4>
+                                                <span class="text-2xl font-bold text-green-600">₱{{ number_format($product->price, 0) }}</span>
+                                            </div>
+                                            @if($product->description)
+                                                <p class="text-sm text-gray-500 mb-4 line-clamp-2">{{ $product->description }}</p>
+                                            @endif
+                                            <div class="flex gap-2 pt-3 border-t border-gray-200/50">
+                                                <button type="button" onclick='editProduct(@json($product))' class="flex-1 btn btn-sm bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-purple-300 hover:text-purple-600">
+                                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                                                    Edit
+                                                </button>
+                                                <button type="button" onclick="deleteProduct({{ $product->id }}, '{{ addslashes($product->product_name) }}')" class="btn btn-sm bg-white border border-gray-200 text-red-600 hover:bg-red-50 hover:border-red-300">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
                             </div>
+                        @endif
+                    @endforeach
+                @else
+                    <div class="text-center py-16 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200">
+                        <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                            </svg>
                         </div>
-                    @endif
-                @endforeach
-
-                @if($products->count() === 0)
-                    <div class="text-center py-12">
-                        <svg class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                        </svg>
-                        <p class="text-gray-500 mb-4">No products yet</p>
-                        <button type="button" onclick="openProductModal()" class="btn btn-primary btn-sm">Add Your First Product</button>
+                        <h3 class="text-lg font-semibold text-gray-700 mb-2">No products yet</h3>
+                        <p class="text-gray-500 mb-6">Start by adding your first product</p>
+                        <button type="button" onclick="openProductModal()" class="btn btn-primary">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                            Add Your First Product
+                        </button>
                     </div>
                 @endif
             </div>
@@ -128,78 +201,122 @@
     </div>
 
     <!-- Service Modal -->
-    <dialog id="service-modal" class="modal">
-        <div class="modal-box bg-white rounded-lg shadow-xl max-w-md w-full p-6">
-            <h3 class="text-lg font-bold text-gray-900 mb-4" id="service-modal-title">Add Service</h3>
-            <form id="service-form">
-                <input type="hidden" id="service-id">
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Service Name</label>
-                        <input type="text" id="service-name" class="form-input" required>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Item Type</label>
-                        <select id="service-item-type" class="form-select" required>
-                            <option value="">Select type</option>
-                            <option value="clothes">Clothes</option>
-                            <option value="comforter">Comforter</option>
-                            <option value="shoes">Shoes</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Price (₱)</label>
-                        <input type="number" id="service-price" class="form-input" step="0.01" min="0" required>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Description (Optional)</label>
-                        <textarea id="service-description" class="form-textarea" rows="2"></textarea>
-                    </div>
+    <div id="service-modal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="closeServiceModal()"></div>
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="relative bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 transform transition-all">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-xl font-bold text-gray-900" id="service-modal-title">Add Service</h3>
+                    <button type="button" onclick="closeServiceModal()" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                        <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
                 </div>
-                <div class="flex justify-end gap-3 mt-6">
-                    <button type="button" class="btn btn-outline" onclick="document.getElementById('service-modal').close()">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Save</button>
-                </div>
-            </form>
+                <form id="service-form">
+                    <input type="hidden" id="service-id">
+                    <div class="space-y-5">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Service Name</label>
+                            <input type="text" id="service-name" class="form-input rounded-xl" placeholder="e.g., Wash, Dry, Fold" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Item Type</label>
+                            <div class="grid grid-cols-3 gap-3">
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="service_item_type" value="clothes" class="hidden peer" required>
+                                    <div class="p-3 text-center border-2 border-gray-200 rounded-xl peer-checked:border-blue-500 peer-checked:bg-blue-50 hover:border-blue-300 transition-all">
+                                        <span class="text-sm font-medium">Clothes</span>
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="service_item_type" value="comforter" class="hidden peer">
+                                    <div class="p-3 text-center border-2 border-gray-200 rounded-xl peer-checked:border-green-500 peer-checked:bg-green-50 hover:border-green-300 transition-all">
+                                        <span class="text-sm font-medium">Comforter</span>
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="service_item_type" value="shoes" class="hidden peer">
+                                    <div class="p-3 text-center border-2 border-gray-200 rounded-xl peer-checked:border-orange-500 peer-checked:bg-orange-50 hover:border-orange-300 transition-all">
+                                        <span class="text-sm font-medium">Shoes</span>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Price (₱)</label>
+                            <input type="number" id="service-price" class="form-input rounded-xl" step="0.01" min="0" placeholder="0.00" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Description <span class="text-gray-400 font-normal">(Optional)</span></label>
+                            <textarea id="service-description" class="form-textarea rounded-xl" rows="2" placeholder="Brief description of the service..."></textarea>
+                        </div>
+                    </div>
+                    <div class="flex gap-3 mt-8">
+                        <button type="button" class="flex-1 btn btn-outline rounded-xl" onclick="closeServiceModal()">Cancel</button>
+                        <button type="submit" class="flex-1 btn btn-primary rounded-xl">Save Service</button>
+                    </div>
+                </form>
+            </div>
         </div>
-    </dialog>
+    </div>
 
     <!-- Product Modal -->
-    <dialog id="product-modal" class="modal">
-        <div class="modal-box bg-white rounded-lg shadow-xl max-w-md w-full p-6">
-            <h3 class="text-lg font-bold text-gray-900 mb-4" id="product-modal-title">Add Product</h3>
-            <form id="product-form">
-                <input type="hidden" id="product-id">
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Product Name</label>
-                        <input type="text" id="product-name" class="form-input" required>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Item Type</label>
-                        <select id="product-item-type" class="form-select" required>
-                            <option value="">Select type</option>
-                            <option value="clothes">Clothes</option>
-                            <option value="comforter">Comforter</option>
-                            <option value="shoes">Shoes</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Price (₱)</label>
-                        <input type="number" id="product-price" class="form-input" step="0.01" min="0" required>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Description (Optional)</label>
-                        <textarea id="product-description" class="form-textarea" rows="2"></textarea>
-                    </div>
+    <div id="product-modal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="closeProductModal()"></div>
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="relative bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 transform transition-all">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-xl font-bold text-gray-900" id="product-modal-title">Add Product</h3>
+                    <button type="button" onclick="closeProductModal()" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                        <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
                 </div>
-                <div class="flex justify-end gap-3 mt-6">
-                    <button type="button" class="btn btn-outline" onclick="document.getElementById('product-modal').close()">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Save</button>
-                </div>
-            </form>
+                <form id="product-form">
+                    <input type="hidden" id="product-id">
+                    <div class="space-y-5">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Product Name</label>
+                            <input type="text" id="product-name" class="form-input rounded-xl" placeholder="e.g., Detergent, Fabric Conditioner" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Item Type</label>
+                            <div class="grid grid-cols-3 gap-3">
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="product_item_type" value="clothes" class="hidden peer" required>
+                                    <div class="p-3 text-center border-2 border-gray-200 rounded-xl peer-checked:border-blue-500 peer-checked:bg-blue-50 hover:border-blue-300 transition-all">
+                                        <span class="text-sm font-medium">Clothes</span>
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="product_item_type" value="comforter" class="hidden peer">
+                                    <div class="p-3 text-center border-2 border-gray-200 rounded-xl peer-checked:border-green-500 peer-checked:bg-green-50 hover:border-green-300 transition-all">
+                                        <span class="text-sm font-medium">Comforter</span>
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="product_item_type" value="shoes" class="hidden peer">
+                                    <div class="p-3 text-center border-2 border-gray-200 rounded-xl peer-checked:border-orange-500 peer-checked:bg-orange-50 hover:border-orange-300 transition-all">
+                                        <span class="text-sm font-medium">Shoes</span>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Price (₱)</label>
+                            <input type="number" id="product-price" class="form-input rounded-xl" step="0.01" min="0" placeholder="0.00" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Description <span class="text-gray-400 font-normal">(Optional)</span></label>
+                            <textarea id="product-description" class="form-textarea rounded-xl" rows="2" placeholder="Brief description of the product..."></textarea>
+                        </div>
+                    </div>
+                    <div class="flex gap-3 mt-8">
+                        <button type="button" class="flex-1 btn btn-outline rounded-xl" onclick="closeProductModal()">Cancel</button>
+                        <button type="submit" class="flex-1 btn btn-primary rounded-xl">Save Product</button>
+                    </div>
+                </form>
+            </div>
         </div>
-    </dialog>
+    </div>
 
     @push('scripts')
     <script>

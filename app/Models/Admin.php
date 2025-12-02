@@ -49,4 +49,20 @@ class Admin extends Authenticatable
     {
         return $this->hasMany(Transaction::class);
     }
+
+    /**
+     * Get the services for this admin/branch
+     */
+    public function services()
+    {
+        return $this->hasMany(Service::class);
+    }
+
+    /**
+     * Get the products for this admin/branch
+     */
+    public function products()
+    {
+        return $this->hasMany(Product::class);
+    }
 }

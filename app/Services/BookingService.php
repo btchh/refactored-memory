@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Transaction;
 use App\Models\Service;
 use App\Models\Product;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -12,11 +13,13 @@ class BookingService
 {
     protected $calApiService;
     protected $messageService;
+    protected $auditService;
 
-    public function __construct(CalApiService $calApiService, MessageService $messageService)
+    public function __construct(CalApiService $calApiService, MessageService $messageService, AuditService $auditService)
     {
         $this->calApiService = $calApiService;
         $this->messageService = $messageService;
+        $this->auditService = $auditService;
     }
 
     /**
@@ -299,6 +302,17 @@ class BookingService
 
             // Send SMS for key status changes
             $this->sendStatusChangeSms($transaction, $status, $oldStatus);
+
+            // Audit log
+            if (Auth::guard('admin')->check()) {
+                $this->auditService->logStatusChange(
+                    Transaction::class,
+                    $transaction,
+                    $oldStatus,
+                    $status,
+                    "Booking #{$transaction->id} status changed from {$oldStatus} to {$status}"
+                );
+            }
 
             return [
                 'success' => true,

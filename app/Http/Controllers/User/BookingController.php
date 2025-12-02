@@ -16,24 +16,47 @@ class BookingController extends Controller
      */
     public function showBooking()
     {
-        $services = \App\Models\Service::all()->groupBy('item_type');
-        $products = \App\Models\Product::all()->groupBy('item_type');
         $user = Auth::guard('web')->user();
         
         // Get all branches/admins for selection
-        $branches = \App\Models\Admin::select('id', 'fname', 'lname', 'admin_name', 'address', 'phone')
+        $branches = \App\Models\Admin::select('id', 'fname', 'lname', 'admin_name', 'branch_address', 'phone')
             ->get()
             ->map(function ($admin) {
                 return [
                     'id' => $admin->id,
                     'name' => $admin->fname . ' ' . $admin->lname,
                     'branch_name' => $admin->admin_name,
-                    'address' => $admin->address,
+                    'address' => $admin->branch_address,
                     'phone' => $admin->phone,
                 ];
             });
         
+        // Services and products will be loaded via AJAX when branch is selected
+        $services = collect([]);
+        $products = collect([]);
+        
         return view('user.bookings.index', compact('services', 'products', 'user', 'branches')); 
+    }
+
+    /**
+     * Get services and products for a specific branch (AJAX)
+     */
+    public function getBranchPricing(Request $request)
+    {
+        $adminId = $request->input('admin_id');
+        
+        if (!$adminId) {
+            return response()->json(['error' => 'Branch is required'], 400);
+        }
+
+        $services = \App\Models\Service::forAdmin($adminId)->get()->groupBy('item_type');
+        $products = \App\Models\Product::forAdmin($adminId)->get()->groupBy('item_type');
+
+        return response()->json([
+            'success' => true,
+            'services' => $services,
+            'products' => $products,
+        ]);
     }
 
     /**

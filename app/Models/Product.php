@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Product extends Model
@@ -13,11 +14,17 @@ class Product extends Model
     protected $table = 'products';
 
     protected $fillable = [
+        'admin_id',
         'product_name',
         'price',
         'item_type',
         'description'
     ];
+
+    public function admin(): BelongsTo
+    {
+        return $this->belongsTo(Admin::class);
+    }
 
     public function transactions(): BelongsToMany
     {
@@ -25,5 +32,13 @@ class Product extends Model
             ->using(ProductTransaction::class)
             ->withPivot('price_at_purchase')
             ->withTimestamps();
+    }
+
+    /**
+     * Scope to filter by admin
+     */
+    public function scopeForAdmin($query, $adminId)
+    {
+        return $query->where('admin_id', $adminId);
     }
 }

@@ -13,4 +13,5 @@ Route::middleware(['auth:web', 'prevent.back'])->group(function () {
     Route::get('api/calendar/slots', [BookingController::class, 'getAvailableSlots'])->name('api.calendar.slots');
     Route::get('api/bookings', [BookingController::class, 'getMyBookings'])->name('api.bookings');
     Route::post('api/bookings/calculate', [BookingController::class, 'calculateTotal'])->name('api.bookings.calculate');
+    Route::get('api/branch/pricing', [BookingController::class, 'getBranchPricing'])->name('api.branch.pricing');
 });

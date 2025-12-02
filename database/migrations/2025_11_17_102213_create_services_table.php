@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('services', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('admin_id')->nullable()->constrained('admins')->onDelete('cascade');
             $table->string('service_name');
             $table->decimal('price', 10, 2);
             $table->enum('item_type', ['clothes', 'comforter', 'shoes']);

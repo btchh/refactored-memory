@@ -233,7 +233,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Branch selection handler
     const adminSelect = document.getElementById('admin_id');
     if (adminSelect) {
-        adminSelect.addEventListener('change', function() {
+        adminSelect.addEventListener('change', async function() {
             const selectedOption = this.options[this.selectedIndex];
             const branchInfo = document.getElementById('branch-info');
             const branchAddress = document.getElementById('branch-address');
@@ -246,8 +246,34 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (branchAddress) branchAddress.textContent = `📍 ${address}`;
                 if (branchPhone) branchPhone.textContent = `📞 ${phone}`;
                 if (branchInfo) branchInfo.classList.remove('hidden');
+
+                // Load branch-specific pricing
+                try {
+                    const response = await fetch(`${routes.branchPricing}?admin_id=${this.value}`);
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        // Update booking form with new services/products
+                        bookingForm.servicesData = result.services;
+                        bookingForm.productsData = result.products;
+                        
+                        // Reload current item type if selected
+                        const currentItemType = document.querySelector('input[name="item_type"]:checked')?.value;
+                        if (currentItemType) {
+                            bookingForm.handleItemTypeChange(currentItemType);
+                        }
+                    }
+                } catch (error) {
+                    console.error('Failed to load branch pricing:', error);
+                    window.Toast?.error('Failed to load branch pricing');
+                }
             } else {
                 if (branchInfo) branchInfo.classList.add('hidden');
+                // Clear services/products
+                bookingForm.servicesData = {};
+                bookingForm.productsData = {};
+                document.getElementById('services-container').innerHTML = '<p class="text-gray-400 col-span-2 text-sm text-center py-4 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200">Select a branch first</p>';
+                document.getElementById('products-container').innerHTML = '<p class="text-gray-400 col-span-2 text-sm text-center py-4 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200">Select a branch first</p>';
             }
         });
     }

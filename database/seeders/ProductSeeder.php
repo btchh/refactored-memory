@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Admin;
 use App\Models\Product;
 use Illuminate\Database\Seeder;
 
@@ -13,45 +14,59 @@ class ProductSeeder extends Seeder
      */
     public function run(): void
     {
-        // Clothes products (add-ons)
-        Product::create([
-            'product_name' => 'Detergent',
-            'price' => 15.00,
-            'item_type' => 'clothes',
-        ]);
-        Product::create([
-            'product_name' => 'Fabric Conditioner',
-            'price' => 20.00,
-            'item_type' => 'clothes',
-        ]);
+        $admins = Admin::all();
 
-        // Comforter products (add-ons)
-        Product::create([
-            'product_name' => 'Safai',
-            'price' => 15.00,
-            'item_type' => 'comforter',
-        ]);
-        Product::create([
-            'product_name' => 'Color Protection',
-            'price' => 25.00,
-            'item_type' => 'comforter',
-        ]);
-        Product::create([
-            'product_name' => 'Packaging',
-            'price' => 20.00,
-            'item_type' => 'comforter',
-        ]);
+        foreach ($admins as $index => $admin) {
+            // Slight price variation for second branch
+            $priceMultiplier = $index === 0 ? 1.0 : 1.1;
 
-        // Shoes products (add-ons)
-        Product::create([
-            'product_name' => 'Polish',
-            'price' => 20.00,
-            'item_type' => 'shoes',
-        ]);
-        Product::create([
-            'product_name' => 'Deodorize',
-            'price' => 15.00,
-            'item_type' => 'shoes',
-        ]);
+            // Clothes products (add-ons)
+            Product::create([
+                'admin_id' => $admin->id,
+                'product_name' => 'Detergent',
+                'price' => round(15.00 * $priceMultiplier, 2),
+                'item_type' => 'clothes',
+            ]);
+            Product::create([
+                'admin_id' => $admin->id,
+                'product_name' => 'Fabric Conditioner',
+                'price' => round(20.00 * $priceMultiplier, 2),
+                'item_type' => 'clothes',
+            ]);
+
+            // Comforter products (add-ons)
+            Product::create([
+                'admin_id' => $admin->id,
+                'product_name' => 'Safai',
+                'price' => round(15.00 * $priceMultiplier, 2),
+                'item_type' => 'comforter',
+            ]);
+            Product::create([
+                'admin_id' => $admin->id,
+                'product_name' => 'Color Protection',
+                'price' => round(25.00 * $priceMultiplier, 2),
+                'item_type' => 'comforter',
+            ]);
+            Product::create([
+                'admin_id' => $admin->id,
+                'product_name' => 'Packaging',
+                'price' => round(20.00 * $priceMultiplier, 2),
+                'item_type' => 'comforter',
+            ]);
+
+            // Shoes products (add-ons)
+            Product::create([
+                'admin_id' => $admin->id,
+                'product_name' => 'Polish',
+                'price' => round(20.00 * $priceMultiplier, 2),
+                'item_type' => 'shoes',
+            ]);
+            Product::create([
+                'admin_id' => $admin->id,
+                'product_name' => 'Deodorize',
+                'price' => round(15.00 * $priceMultiplier, 2),
+                'item_type' => 'shoes',
+            ]);
+        }
     }
 }
