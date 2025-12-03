@@ -22,6 +22,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'prevent.back' => \App\Http\Middleware\PreventBackHistory::class,
             'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
+            'check.user.status' => \App\Http\Middleware\CheckUserStatus::class,
         ]);
         
         // Configure authentication redirects for different guards

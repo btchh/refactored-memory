@@ -82,12 +82,6 @@
                         <span class="text-sm font-medium text-gray-600">Cancelled</span>
                         <span class="text-lg font-bold text-error">{{ $bookingStats['cancelled'] }}</span>
                     </div>
-                    <div class="pt-4 border-t border-gray-200">
-                        <div class="flex justify-between items-center">
-                            <span class="text-sm font-medium text-gray-600">Total Spent</span>
-                            <span class="text-xl font-bold text-primary-600">₱{{ number_format($bookingStats['total_spent'], 2) }}</span>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>

@@ -158,8 +158,13 @@
                             <tr class="hover:bg-gray-50">
                                 <td class="px-6 py-4 text-sm font-medium">#{{ $booking->id }}</td>
                                 <td class="px-6 py-4">
-                                    <p class="font-medium text-gray-900">{{ $booking->user->fname }} {{ $booking->user->lname }}</p>
-                                    <p class="text-xs text-gray-500">{{ $booking->user->email }}</p>
+                                    @if($booking->user)
+                                        <p class="font-medium text-gray-900">{{ $booking->user->fname }} {{ $booking->user->lname }}</p>
+                                        <p class="text-xs text-gray-500">{{ $booking->user->email }}</p>
+                                    @else
+                                        <p class="font-medium text-gray-500">Archived User</p>
+                                        <p class="text-xs text-gray-400">User no longer available</p>
+                                    @endif
                                 </td>
                                 <td class="px-6 py-4 text-sm">
                                     <p>{{ $booking->formatted_date }}</p>

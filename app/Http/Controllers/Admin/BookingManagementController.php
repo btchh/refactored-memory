@@ -121,9 +121,9 @@ class BookingManagementController extends Controller
             'booking' => [
                 'id' => $booking->id,
                 'customer' => [
-                    'name' => $booking->user->fname . ' ' . $booking->user->lname,
-                    'email' => $booking->user->email,
-                    'phone' => $booking->user->phone,
+                    'name' => $booking->user ? $booking->user->fname . ' ' . $booking->user->lname : 'Archived User',
+                    'email' => $booking->user ? $booking->user->email : 'N/A',
+                    'phone' => $booking->user ? $booking->user->phone : 'N/A',
                 ],
                 'booking_date' => $booking->formatted_date,
                 'booking_time' => $booking->formatted_time,

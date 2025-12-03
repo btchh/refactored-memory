@@ -90,6 +90,12 @@ class BookingService
 
             DB::commit();
 
+            // Send booking confirmation SMS
+            $this->sendBookingConfirmedSms($transaction->fresh()->load('user'));
+
+            // Send reminder if booking is tomorrow
+            $this->sendReminderIfTomorrow($transaction);
+
             return [
                 'success' => true,
                 'booking' => $transaction->load('user', 'services', 'products'),
@@ -475,6 +481,64 @@ class BookingService
             $this->messageService->sendBookingRescheduled($transaction->user->phone, $data);
         } catch (\Exception $e) {
             Log::error('Failed to send reschedule SMS', [
+                'booking_id' => $transaction->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    /**
+     * Send booking confirmation SMS
+     */
+    private function sendBookingConfirmedSms($transaction)
+    {
+        if (!$transaction->user || !$transaction->user->phone) {
+            return;
+        }
+
+        try {
+            $data = $this->getSmsData($transaction);
+            $this->messageService->sendBookingConfirmed($transaction->user->phone, $data);
+        } catch (\Exception $e) {
+            Log::error('Failed to send booking confirmation SMS', [
+                'booking_id' => $transaction->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    /**
+     * Send reminder if booking is for tomorrow
+     */
+    private function sendReminderIfTomorrow($transaction)
+    {
+        if (!$transaction->user || !$transaction->user->phone) {
+            return;
+        }
+
+        $bookingDate = \Carbon\Carbon::parse($transaction->booking_date);
+        $tomorrow = now()->addDay()->startOfDay();
+
+        // Only send reminder if booking is tomorrow
+        if (!$bookingDate->isSameDay($tomorrow)) {
+            return;
+        }
+
+        try {
+            $data = $this->getSmsData($transaction);
+
+            if ($transaction->service_type === 'delivery') {
+                $this->messageService->sendDeliveryReminder($transaction->user->phone, $data);
+            } else {
+                $this->messageService->sendPickupReminder($transaction->user->phone, $data);
+            }
+
+            Log::info('Booking reminder sent', [
+                'booking_id' => $transaction->id,
+                'user_id' => $transaction->user_id,
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Failed to send booking reminder', [
                 'booking_id' => $transaction->id,
                 'error' => $e->getMessage(),
             ]);

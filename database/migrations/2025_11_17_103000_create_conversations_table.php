@@ -11,11 +11,11 @@ return new class extends Migration
         Schema::create('conversations', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->foreignId('admin_id')->constrained()->onDelete('cascade');
+            $table->string('branch_address');
             $table->timestamp('last_message_at')->nullable();
             $table->timestamps();
             
-            $table->unique(['user_id', 'admin_id']);
+            $table->unique(['user_id', 'branch_address']);
             $table->index('last_message_at');
         });
     }

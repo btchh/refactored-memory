@@ -25,6 +25,7 @@ return new class extends Migration
             $table->enum('status', ['active', 'disabled'])->default('active');
             $table->rememberToken();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

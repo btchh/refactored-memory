@@ -112,7 +112,13 @@
                                     <p class="text-sm font-bold text-primary-600">{{ $booking->formatted_time }}</p>
                                 </div>
                                 <div class="flex-1 min-w-0">
-                                    <p class="font-semibold text-gray-900 truncate">{{ $booking->user->fname }} {{ $booking->user->lname }}</p>
+                                    <p class="font-semibold text-gray-900 truncate">
+                                        @if($booking->user)
+                                            {{ $booking->user->fname }} {{ $booking->user->lname }}
+                                        @else
+                                            <span class="text-gray-500">Archived User</span>
+                                        @endif
+                                    </p>
                                     <p class="text-xs text-gray-500 truncate">{{ $booking->services->pluck('service_name')->implode(', ') ?: 'No services' }}</p>
                                 </div>
                                 <span class="px-2 py-1 text-xs font-semibold rounded-full {{ $statusColor }}">
@@ -158,7 +164,13 @@
                                         <span class="text-primary-600 font-bold text-xs">#{{ $booking->id }}</span>
                                     </div>
                                     <div>
-                                        <p class="font-semibold text-gray-900 text-sm">{{ $booking->user->fname }} {{ $booking->user->lname }}</p>
+                                        <p class="font-semibold text-gray-900 text-sm">
+                                            @if($booking->user)
+                                                {{ $booking->user->fname }} {{ $booking->user->lname }}
+                                            @else
+                                                <span class="text-gray-500">Archived User</span>
+                                            @endif
+                                        </p>
                                         <p class="text-xs text-gray-500">{{ $booking->formatted_date }}</p>
                                     </div>
                                 </div>

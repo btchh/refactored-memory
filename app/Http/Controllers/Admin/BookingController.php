@@ -89,11 +89,16 @@ class BookingController extends Controller
                     'products' => $transaction->products->pluck('product_name')->join(', '),
                     'notes' => $transaction->notes,
                     'is_upcoming' => $transaction->isUpcoming(),
-                    'user' => [
+                    'user' => $transaction->user ? [
                         'id' => $transaction->user->id,
                         'name' => $transaction->user->fname . ' ' . $transaction->user->lname,
                         'email' => $transaction->user->email,
                         'phone' => $transaction->user->phone,
+                    ] : [
+                        'id' => null,
+                        'name' => 'Archived User',
+                        'email' => 'N/A',
+                        'phone' => 'N/A',
                     ],
                 ];
             }),
@@ -135,7 +140,7 @@ class BookingController extends Controller
                     'products' => $transaction->products->pluck('product_name')->join(', '),
                     'notes' => $transaction->notes,
                     'is_upcoming' => $transaction->isUpcoming(),
-                    'user' => [
+                    'user' => $transaction->user ? [
                         'id' => $transaction->user->id,
                         'name' => $transaction->user->fname . ' ' . $transaction->user->lname,
                         'email' => $transaction->user->email,
@@ -143,6 +148,14 @@ class BookingController extends Controller
                         'address' => $transaction->user->address,
                         'latitude' => $transaction->user->latitude,
                         'longitude' => $transaction->user->longitude,
+                    ] : [
+                        'id' => null,
+                        'name' => 'Archived User',
+                        'email' => 'N/A',
+                        'phone' => 'N/A',
+                        'address' => 'N/A',
+                        'latitude' => null,
+                        'longitude' => null,
                     ],
                 ];
             }),

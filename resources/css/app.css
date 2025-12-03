@@ -350,20 +350,20 @@
 
 /* Form Label */
 .form-label {
-    @apply block text-sm font-medium text-gray-700 mb-2;
+    @apply block text-sm font-medium text-gray-800 mb-2;
 }
 
 /* Required Field Indicator */
 .form-label .required {
-    @apply text-error ml-1;
+    @apply text-red-600 ml-1;
 }
 
 /* Text Input */
 .form-input {
-    @apply w-full px-3 py-2.5 border border-gray-300 rounded-md bg-white text-base;
+    @apply w-full px-3 py-2.5 border border-gray-300 rounded-md bg-white text-base text-gray-900;
     @apply focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500;
-    @apply disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed;
-    @apply placeholder:text-gray-400;
+    @apply disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed;
+    @apply placeholder:text-gray-500;
     @apply transition-all duration-200;
     min-height: 44px; /* Touch accessibility requirement */
 }
@@ -386,10 +386,10 @@
 
 /* Select Dropdown */
 .form-select {
-    @apply w-full px-3 py-2.5 border border-gray-300 rounded-md bg-white text-base;
+    @apply w-full px-3 py-2.5 border border-gray-300 rounded-md bg-white text-base text-gray-900;
     @apply appearance-none bg-no-repeat pr-10;
     @apply focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500;
-    @apply disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed;
+    @apply disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed;
     @apply transition-all duration-200 cursor-pointer;
     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
     background-position: right 0.75rem center;
@@ -411,10 +411,10 @@
 
 /* Textarea */
 .form-textarea {
-    @apply w-full px-3 py-2.5 border border-gray-300 rounded-md bg-white text-base resize-y;
+    @apply w-full px-3 py-2.5 border border-gray-300 rounded-md bg-white text-base text-gray-900 resize-y;
     @apply focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500;
-    @apply disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed;
-    @apply placeholder:text-gray-400;
+    @apply disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed;
+    @apply placeholder:text-gray-500;
     @apply transition-all duration-200;
     min-height: 100px;
 }
@@ -445,7 +445,7 @@
 
 /* Checkbox/Radio Label */
 .form-check-label {
-    @apply ml-2 text-sm text-gray-700 cursor-pointer select-none;
+    @apply ml-2 text-sm text-gray-800 cursor-pointer select-none;
 }
 
 /* Input Group (for icons/addons) */
@@ -463,15 +463,15 @@
 
 /* Validation Messages */
 .form-error {
-    @apply text-error text-sm mt-1 flex items-center gap-1;
+    @apply text-red-700 text-sm mt-1 flex items-center gap-1;
 }
 
 .form-success {
-    @apply text-success text-sm mt-1 flex items-center gap-1;
+    @apply text-green-700 text-sm mt-1 flex items-center gap-1;
 }
 
 .form-help {
-    @apply text-gray-500 text-sm mt-1;
+    @apply text-gray-600 text-sm mt-1;
 }
 
 /* Input with Icon */
@@ -516,7 +516,7 @@
 }
 
 .card-subtitle {
-    @apply text-sm text-gray-600 mt-1;
+    @apply text-sm text-gray-700 mt-1;
 }
 
 /* Card Body */
@@ -557,7 +557,7 @@
 }
 
 .stat-label {
-    @apply text-sm font-medium text-gray-600 mb-1;
+    @apply text-sm font-medium text-gray-700 mb-1;
 }
 
 .stat-value {
@@ -569,15 +569,15 @@
 }
 
 .stat-change.positive {
-    @apply text-success;
+    @apply text-green-700;
 }
 
 .stat-change.negative {
-    @apply text-error;
+    @apply text-red-700;
 }
 
 .stat-change.neutral {
-    @apply text-gray-500;
+    @apply text-gray-600;
 }
 
 /* Action Card (for quick actions) */
@@ -601,7 +601,7 @@
 }
 
 .action-card-description {
-    @apply text-sm text-gray-600;
+    @apply text-sm text-gray-700;
 }
 
 /* Admin Stat Card (with colored left border) */
@@ -648,15 +648,15 @@
 }
 
 .empty-state-icon {
-    @apply w-16 h-16 mx-auto mb-4 text-gray-400;
+    @apply w-16 h-16 mx-auto mb-4 text-gray-500;
 }
 
 .empty-state-title {
-    @apply text-xl font-semibold text-gray-700 mb-2;
+    @apply text-xl font-semibold text-gray-800 mb-2;
 }
 
 .empty-state-description {
-    @apply text-base text-gray-500 mb-6;
+    @apply text-base text-gray-600 mb-6;
 }
 
 /* ============================================
@@ -673,27 +673,27 @@
 
 /* Badge Variants (10% opacity backgrounds with solid text) */
 .badge-success {
-    @apply bg-success/10 text-success;
+    @apply bg-success/10 text-green-700;
 }
 
 .badge-warning {
-    @apply bg-warning/10 text-warning;
+    @apply bg-warning/10 text-amber-700;
 }
 
 .badge-error {
-    @apply bg-error/10 text-error;
+    @apply bg-error/10 text-red-700;
 }
 
 .badge-info {
-    @apply bg-info/10 text-info;
+    @apply bg-info/10 text-blue-700;
 }
 
 .badge-neutral {
-    @apply bg-gray-100 text-gray-700;
+    @apply bg-gray-100 text-gray-800;
 }
 
 .badge-primary {
-    @apply bg-primary-500/10 text-primary-600;
+    @apply bg-primary-500/10 text-primary-700;
 }
 
 /* Badge Sizes */
@@ -717,19 +717,19 @@
 }
 
 .status-pending {
-    @apply bg-warning/10 text-warning border border-warning/20;
+    @apply bg-warning/10 text-amber-700 border border-warning/20;
 }
 
 .status-in-progress {
-    @apply bg-info/10 text-info border border-info/20;
+    @apply bg-info/10 text-blue-700 border border-info/20;
 }
 
 .status-completed {
-    @apply bg-success/10 text-success border border-success/20;
+    @apply bg-success/10 text-green-700 border border-success/20;
 }
 
 .status-cancelled {
-    @apply bg-error/10 text-error border border-error/20;
+    @apply bg-error/10 text-red-700 border border-error/20;
 }
 
 /* Status Dot (for inline status) */
@@ -738,23 +738,23 @@
 }
 
 .status-dot.success {
-    @apply bg-success;
+    @apply bg-green-600;
 }
 
 .status-dot.warning {
-    @apply bg-warning;
+    @apply bg-amber-600;
 }
 
 .status-dot.error {
-    @apply bg-error;
+    @apply bg-red-600;
 }
 
 .status-dot.info {
-    @apply bg-info;
+    @apply bg-blue-600;
 }
 
 .status-dot.neutral {
-    @apply bg-gray-400;
+    @apply bg-gray-500;
 }
 
 /* Pulse Animation for Active Status */
@@ -786,7 +786,7 @@
 }
 
 .timeline-status-icon.pending {
-    @apply bg-white border-gray-300 text-gray-400;
+    @apply bg-white border-gray-300 text-gray-500;
 }
 
 .timeline-status-label {
@@ -794,20 +794,20 @@
 }
 
 .timeline-status-label.completed {
-    @apply text-success;
+    @apply text-green-700;
 }
 
 .timeline-status-label.active {
-    @apply text-primary-600;
+    @apply text-primary-700;
 }
 
 .timeline-status-label.pending {
-    @apply text-gray-400;
+    @apply text-gray-600;
 }
 
 /* Tab Components */
 .tab-button {
-    @apply inline-flex items-center gap-2 px-4 py-3 text-sm font-medium text-gray-600;
+    @apply inline-flex items-center gap-2 px-4 py-3 text-sm font-medium text-gray-700;
     @apply border-b-2 border-transparent transition-all duration-200;
     @apply hover:text-gray-900 hover:border-gray-300;
     @apply focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2;
@@ -815,7 +815,7 @@
 }
 
 .tab-button.active {
-    @apply text-primary-600 border-primary-600;
+    @apply text-primary-700 border-primary-600;
 }
 
 .tab-content {
@@ -849,21 +849,21 @@
 }
 
 .sidebar-link {
-    @apply flex items-center gap-3 px-3 py-3 rounded-md text-gray-700 transition-colors;
+    @apply flex items-center gap-3 px-3 py-3 rounded-md text-gray-800 transition-colors;
     @apply hover:bg-gray-50;
     min-height: 44px; /* Touch target requirement */
 }
 
 .sidebar-link.active {
-    @apply bg-primary-50 text-primary-600 font-medium;
+    @apply bg-primary-50 text-primary-700 font-medium;
 }
 
 .sidebar-icon {
-    @apply w-5 h-5 text-gray-500;
+    @apply w-5 h-5 text-gray-600;
 }
 
 .sidebar-link.active .sidebar-icon {
-    @apply text-primary-600;
+    @apply text-primary-700;
 }
 
 /* Mobile Navigation */
@@ -883,19 +883,19 @@
 }
 
 .alert-success {
-    @apply bg-success/5 border-success;
+    @apply bg-success/5 border-success text-green-800;
 }
 
 .alert-warning {
-    @apply bg-warning/5 border-warning;
+    @apply bg-warning/5 border-warning text-amber-800;
 }
 
 .alert-error {
-    @apply bg-error/5 border-error;
+    @apply bg-error/5 border-error text-red-800;
 }
 
 .alert-info {
-    @apply bg-info/5 border-info;
+    @apply bg-info/5 border-info text-blue-800;
 }
 
 .alert-icon {
@@ -915,7 +915,7 @@
 }
 
 .alert-close {
-    @apply text-gray-400 hover:text-gray-600 transition-colors;
+    @apply text-gray-500 hover:text-gray-700 transition-colors;
 }
 
 /* Modal Components */
@@ -1088,15 +1088,15 @@
     }
     
     .empty-state-icon {
-        @apply w-12 h-12;
+        @apply w-12 h-12 text-gray-500;
     }
     
     .empty-state-title {
-        @apply text-lg;
+        @apply text-lg font-semibold text-gray-800;
     }
     
     .empty-state-description {
-        @apply text-sm;
+        @apply text-sm text-gray-600;
     }
     
     /* Table responsiveness */
@@ -1124,7 +1124,7 @@
     }
     
     .alert-title {
-        @apply text-sm;
+        @apply text-sm font-semibold;
     }
     
     .alert-message {

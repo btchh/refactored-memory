@@ -78,6 +78,13 @@
             'badge_active' => 'bg-white/25 text-white',
             'badge_inactive' => 'bg-gray-100 text-gray-500 group-hover:bg-emerald-100 group-hover:text-emerald-600',
         ],
+        'gray' => [
+            'active' => 'bg-gray-500 text-white shadow-md shadow-gray-500/30 ring-2 ring-gray-500 ring-offset-1',
+            'inactive' => 'bg-white text-gray-600 border border-gray-200 hover:border-gray-300 hover:bg-gray-50 hover:text-gray-700',
+            'dot' => 'bg-gray-500',
+            'badge_active' => 'bg-white/25 text-white',
+            'badge_inactive' => 'bg-gray-100 text-gray-500 group-hover:bg-gray-200 group-hover:text-gray-700',
+        ],
         'red' => [
             'active' => 'bg-rose-500 text-white shadow-md shadow-rose-500/30 ring-2 ring-rose-500 ring-offset-1',
             'inactive' => 'bg-white text-gray-600 border border-gray-200 hover:border-rose-300 hover:bg-rose-50 hover:text-rose-700',

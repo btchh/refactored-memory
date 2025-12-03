@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\User\ProfileController;
 
-Route::middleware(['auth:web', 'prevent.back'])->group(function () {
+Route::middleware(['auth:web', 'prevent.back', 'check.user.status'])->group(function () {
     Route::get('profile', [ProfileController::class, 'showProfile'])->name('profile');
     Route::post('update-profile', [ProfileController::class, 'updateProfile'])->name('update-profile');
     Route::get('change-password', [ProfileController::class, 'showChangePassword'])->name('change-password');

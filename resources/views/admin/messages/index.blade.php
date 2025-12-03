@@ -36,12 +36,20 @@
                     <a href="{{ route('admin.messages.show', $conversation->user_id) }}" 
                        class="flex items-center p-5 hover:bg-gray-50 transition-colors">
                         <div class="w-14 h-14 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center mr-4 font-bold text-lg">
-                            {{ strtoupper(substr($conversation->user->fname, 0, 1)) }}{{ strtoupper(substr($conversation->user->lname, 0, 1)) }}
+                            @if($conversation->user)
+                                {{ strtoupper(substr($conversation->user->fname, 0, 1)) }}{{ strtoupper(substr($conversation->user->lname, 0, 1)) }}
+                            @else
+                                AU
+                            @endif
                         </div>
                         <div class="flex-1 min-w-0">
                             <div class="flex items-center justify-between mb-1">
-                                <h3 class="font-semibold text-gray-900 truncate">
-                                    {{ $conversation->user->fname }} {{ $conversation->user->lname }}
+                                <h3 class="font-semibold {{ $conversation->user ? 'text-gray-900' : 'text-gray-500' }} truncate">
+                                    @if($conversation->user)
+                                        {{ $conversation->user->fname }} {{ $conversation->user->lname }}
+                                    @else
+                                        Archived User
+                                    @endif
                                 </h3>
                                 @if($conversation->latestMessage)
                                     <span class="text-xs text-gray-400">

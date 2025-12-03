@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\User\BookingController;
 
-Route::middleware(['auth:web', 'prevent.back'])->group(function () {
+Route::middleware(['auth:web', 'prevent.back', 'check.user.status'])->group(function () {
     // Booking
     Route::get('booking', [BookingController::class, 'showBooking'])->name('booking');
     Route::post('booking', [BookingController::class, 'submitBooking'])->name('booking.submit');

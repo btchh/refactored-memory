@@ -24,13 +24,37 @@ class AuthService
     ): array {
         $feildType = filter_var($loginField, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
 
-        if (Auth::guard('web')->attempt([$feildType => $loginField, 'password' => $password], $remember)) {
-            $user = Auth::guard('web')->user();
-            return [
-                'success' => true,
-                'message' => 'Login Success',
-                'user' => $user
-            ];
+        // First check if user exists (including soft-deleted users)
+        $user = User::withTrashed()->where($feildType, $loginField)->first();
+        
+        if ($user && Hash::check($password, $user->password)) {
+            // Check if user is archived (soft deleted)
+            if ($user->trashed()) {
+                return [
+                    'success' => false,
+                    'message' => 'Your account has been suspended. You cannot access the site at this time. Please contact support for assistance.',
+                    'reason' => 'archived'
+                ];
+            }
+            
+            // Check if user is disabled
+            if ($user->status === 'disabled') {
+                return [
+                    'success' => false,
+                    'message' => 'Your account has been temporarily disabled. Please contact support to reactivate your account.',
+                    'reason' => 'disabled'
+                ];
+            }
+            
+            // User is active, proceed with login
+            if (Auth::guard('web')->attempt([$feildType => $loginField, 'password' => $password], $remember)) {
+                $user = Auth::guard('web')->user();
+                return [
+                    'success' => true,
+                    'message' => 'Login Success',
+                    'user' => $user
+                ];
+            }
         }
 
         return [

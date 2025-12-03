@@ -52,6 +52,15 @@ class LoginController extends Controller
         }
 
         Log::info('User login failed, redirecting back');
+        
+        // Check if account is restricted (archived or disabled)
+        if (isset($result['reason']) && in_array($result['reason'], ['archived', 'disabled'])) {
+            return redirect()->back()->withInput()->with([
+                'error' => $result['message'],
+                'account_restricted' => true
+            ]);
+        }
+        
         return redirect()->back()->withInput()->with('error', $result['message']);
     }
 
