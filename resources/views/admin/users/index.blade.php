@@ -3,19 +3,19 @@
 
     <div class="space-y-6">
         <!-- Header -->
-        <x-modules.card class="p-6">
-            <div class="flex items-center gap-4">
-                <div class="w-12 h-12 rounded-full bg-primary-50 flex items-center justify-center">
-                    <svg class="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                    </svg>
+        <x-modules.page-header
+            title="User Management"
+            subtitle="Manage customer accounts and access"
+            icon="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
+            gradient="indigo"
+        >
+            <x-slot name="stats">
+                <div class="bg-white/10 backdrop-blur rounded-xl px-4 py-2">
+                    <p class="text-white/70 text-xs">Total Users</p>
+                    <p class="text-xl font-bold">{{ number_format($stats['total']) }}</p>
                 </div>
-                <div>
-                    <h1 class="text-3xl font-bold text-gray-900">User Management</h1>
-                    <p class="text-gray-600 mt-1">Manage customer accounts and access</p>
-                </div>
-            </div>
-        </x-modules.card>
+            </x-slot>
+        </x-modules.page-header>
 
         <!-- Alert Container -->
         <div id="alert-container"></div>
@@ -68,25 +68,35 @@
         <!-- Filters & Search -->
         <x-modules.filter-panel
             :action="route('admin.users.index')"
+            :status-filters="[
+                ['key' => '', 'label' => 'All', 'count' => $stats['total'], 'color' => 'primary', 'icon' => 'list'],
+                ['key' => 'active', 'label' => 'Active', 'count' => $stats['active'], 'color' => 'green'],
+                ['key' => 'disabled', 'label' => 'Disabled', 'count' => $stats['disabled'], 'color' => 'red'],
+            ]"
+            :current-status="$status ?? ''"
             :show-search="true"
             search-placeholder="Search by name, email, username, or phone..."
             :search-value="$search"
             :clear-url="route('admin.users.index')"
             :show-clear="$search || $status"
             submit-text="Search"
-            grid-cols="lg:grid-cols-4"
+            grid-cols="lg:grid-cols-3"
         >
-            <x-slot name="fields">
-                <div class="form-group">
-                    <label class="form-label">Status</label>
-                    <select name="status" class="form-select w-full">
-                        <option value="">All Status</option>
-                        <option value="active" {{ $status === 'active' ? 'selected' : '' }}>Active</option>
-                        <option value="disabled" {{ $status === 'disabled' ? 'selected' : '' }}>Disabled</option>
-                    </select>
-                </div>
+            <x-slot name="hidden">
+                <input type="hidden" name="status" id="status-filter-input" value="{{ $status }}">
             </x-slot>
         </x-modules.filter-panel>
+
+        @push('scripts')
+        <script>
+            document.querySelectorAll('.filter-btn[data-filter]').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.getElementById('status-filter-input').value = this.dataset.filter;
+                    document.getElementById('filter-form').submit();
+                });
+            });
+        </script>
+        @endpush
 
         <!-- Users Table -->
         <x-modules.card :padding="false">
@@ -173,7 +183,7 @@
                     {{ $users->links() }}
                 </div>
             @endif
-        </div>
+        </x-modules.card>
     </div>
 
     @push('scripts')

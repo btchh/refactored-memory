@@ -3,10 +3,12 @@
 
     <div class="space-y-6">
         <!-- Welcome Banner -->
-        <div class="card p-6">
-            <h1 class="text-2xl font-bold text-gray-900 mb-1">Welcome back, {{ Auth::guard('admin')->user()->admin_name }}!</h1>
-            <p class="text-gray-600">Here's your business overview for {{ now()->format('l, F d, Y') }}</p>
-        </div>
+        <x-modules.page-header
+            title="Welcome back, {{ Auth::guard('admin')->user()->admin_name }}!"
+            subtitle="Here's your business overview for {{ now()->format('l, F d, Y') }}"
+            icon="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+            gradient="primary"
+        />
 
         <!-- Booking Stats -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">

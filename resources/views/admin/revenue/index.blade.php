@@ -49,67 +49,74 @@
 
     <div class="space-y-6">
         <!-- Header -->
-        <div class="card p-6 print:hidden">
-            <div class="flex justify-between items-start">
-                <div>
-                    <h1 class="text-3xl font-bold text-gray-900">Revenue Report</h1>
-                    <p class="text-gray-600 mt-1">{{ $allTime ? 'All Time Data' : $start->format('M d, Y') . ' - ' . $end->format('M d, Y') }}</p>
-                </div>
-                <div class="flex gap-2 print:hidden">
-                    <a href="{{ route('admin.revenue.export.csv', request()->all()) }}" class="btn btn-secondary">
-                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                        </svg>
-                        CSV
-                    </a>
-                    <a href="{{ route('admin.revenue.export', request()->all()) }}" class="btn btn-primary">
-                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-                        </svg>
-                        Export Report
-                    </a>
-                </div>
-            </div>
-        </div>
+        <x-modules.page-header
+            title="Revenue Report"
+            subtitle="{{ $allTime ? 'All Time Data' : $start->format('M d, Y') . ' - ' . $end->format('M d, Y') }}"
+            icon="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            gradient="emerald"
+        >
+            <x-slot name="actions">
+                <a href="{{ route('admin.revenue.export.csv', request()->all()) }}" class="inline-flex items-center px-4 py-2 bg-white/10 hover:bg-white/20 backdrop-blur text-white font-medium rounded-xl transition-colors text-sm">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    CSV
+                </a>
+                <a href="{{ route('admin.revenue.export', request()->all()) }}" class="inline-flex items-center px-4 py-2 bg-white hover:bg-white/90 text-emerald-700 font-medium rounded-xl transition-colors text-sm">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                    </svg>
+                    Export
+                </a>
+            </x-slot>
+        </x-modules.page-header>
 
         <!-- Filters -->
+        @php
+            $isCustom = request('custom') == '1' || (request('start_date') && request('end_date') && !in_array($period, ['today', 'week', 'month', 'year']));
+            $currentPeriod = $allTime ? 'all_time' : ($isCustom ? 'custom' : $period);
+        @endphp
         <x-modules.filter-panel
             :action="route('admin.revenue.index')"
-            :quick-filters="[
-                ['label' => 'Today', 'url' => route('admin.revenue.index', ['period' => 'today']), 'active' => $period === 'today' && !$allTime],
-                ['label' => 'This Week', 'url' => route('admin.revenue.index', ['period' => 'week']), 'active' => $period === 'week' && !$allTime],
-                ['label' => 'This Month', 'url' => route('admin.revenue.index', ['period' => 'month']), 'active' => $period === 'month' && !$allTime],
-                ['label' => 'This Year', 'url' => route('admin.revenue.index', ['period' => 'year']), 'active' => $period === 'year' && !$allTime],
-                ['label' => 'All Time', 'url' => route('admin.revenue.index', ['all_time' => 'true']), 'active' => $allTime],
+            :status-filters="[
+                ['key' => 'today', 'label' => 'Today', 'color' => 'blue'],
+                ['key' => 'week', 'label' => 'This Week', 'color' => 'green'],
+                ['key' => 'month', 'label' => 'This Month', 'color' => 'yellow'],
+                ['key' => 'year', 'label' => 'This Year', 'color' => 'purple'],
+                ['key' => 'all_time', 'label' => 'All Time', 'color' => 'primary', 'icon' => 'list'],
+                ['key' => 'custom', 'label' => 'Custom Range', 'color' => 'red'],
             ]"
+            :current-status="$currentPeriod"
             :show-date-range="true"
+            :show-custom-date-filter="true"
             :start-date-value="request('start_date')"
             :end-date-value="request('end_date')"
             :clear-url="route('admin.revenue.index')"
-            :show-clear="request()->hasAny(['period', 'start_date', 'end_date', 'all_time'])"
+            :show-clear="request()->hasAny(['period', 'start_date', 'end_date', 'all_time', 'custom'])"
             submit-text="Apply"
-        >
-            <x-slot name="fields">
-                <div class="form-group">
-                    <label class="form-label">Period</label>
-                    <select name="period" class="form-select" {{ $allTime ? 'disabled' : '' }} onchange="this.form.submit()">
-                        <option value="today" {{ $period === 'today' ? 'selected' : '' }}>Today</option>
-                        <option value="week" {{ $period === 'week' ? 'selected' : '' }}>This Week</option>
-                        <option value="month" {{ $period === 'month' ? 'selected' : '' }}>This Month</option>
-                        <option value="year" {{ $period === 'year' ? 'selected' : '' }}>This Year</option>
-                        <option value="custom" {{ $period === 'custom' ? 'selected' : '' }}>Custom Range</option>
-                    </select>
-                </div>
-            </x-slot>
-            <x-slot name="after">
-                <div class="form-group mt-4 pt-4 border-t border-gray-200">
-                    <label class="flex items-center gap-2 cursor-pointer">
-                        <input type="checkbox" name="all_time" value="true" class="form-checkbox h-5 w-5 text-primary-600 rounded" {{ $allTime ? 'checked' : '' }} onchange="this.form.submit()">
-                        <span class="text-sm font-medium text-gray-700">Show All Data</span>
-                    </label>
-                </div>
-            </x-slot>
-        </x-modules.filter-panel>
+            grid-cols="lg:grid-cols-4"
+        />
+
+        @push('scripts')
+        <script>
+            document.querySelectorAll('.filter-btn[data-filter]').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const filter = this.dataset.filter;
+                    let url = '{{ route("admin.revenue.index") }}';
+                    
+                    if (filter === 'custom') {
+                        url += '?custom=1';
+                    } else if (filter === 'all_time') {
+                        url += '?all_time=true';
+                    } else {
+                        url += `?period=${filter}`;
+                    }
+                    
+                    window.location.href = url;
+                });
+            });
+        </script>
+        @endpush
 
         <!-- Stats -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 print:grid-cols-3 print:gap-2">

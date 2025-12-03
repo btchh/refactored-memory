@@ -3,19 +3,38 @@
 
     <div class="space-y-6">
         <!-- Page Header -->
-        <x-modules.card class="p-8">
-            <div class="flex items-center gap-4">
-                <div class="bg-primary-50 rounded-full p-4">
-                    <svg class="w-12 h-12 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                    </svg>
+        @php
+            $totalOrders = count($bookings);
+            $pendingOrders = collect($bookings)->where('status', 'pending')->count();
+            $inProgressOrders = collect($bookings)->where('status', 'in_progress')->count();
+            $completedOrders = collect($bookings)->where('status', 'completed')->count();
+        @endphp
+        <x-modules.page-header
+            title="Laundry Status"
+            subtitle="Track your orders in real-time"
+            icon="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+            gradient="blue"
+        >
+            <!-- Quick Stats -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
+                <div class="bg-white/10 backdrop-blur rounded-xl p-4">
+                    <p class="text-white/70 text-sm">Total Orders</p>
+                    <p class="text-2xl font-bold">{{ $totalOrders }}</p>
                 </div>
-                <div>
-                    <h1 class="text-4xl font-bold text-gray-900 mb-2">Laundry Status</h1>
-                    <p class="text-lg text-gray-600">Track your orders in real-time</p>
+                <div class="bg-white/10 backdrop-blur rounded-xl p-4">
+                    <p class="text-white/70 text-sm">Pending</p>
+                    <p class="text-2xl font-bold">{{ $pendingOrders }}</p>
+                </div>
+                <div class="bg-white/10 backdrop-blur rounded-xl p-4">
+                    <p class="text-white/70 text-sm">In Progress</p>
+                    <p class="text-2xl font-bold">{{ $inProgressOrders }}</p>
+                </div>
+                <div class="bg-white/10 backdrop-blur rounded-xl p-4">
+                    <p class="text-white/70 text-sm">Completed</p>
+                    <p class="text-2xl font-bold">{{ $completedOrders }}</p>
                 </div>
             </div>
-        </x-modules.card>
+        </x-modules.page-header>
 
         <!-- Status Cards -->
         <div class="space-y-4">

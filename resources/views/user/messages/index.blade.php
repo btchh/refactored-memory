@@ -1,11 +1,25 @@
 <x-layout>
     <x-slot:title>Messages</x-slot:title>
 
-    <div class="max-w-4xl mx-auto">
-        <div class="mb-6">
-            <h1 class="text-2xl font-bold text-gray-900">Messages</h1>
-            <p class="text-gray-600">Chat with laundry branches you've booked with</p>
-        </div>
+    <div class="max-w-4xl mx-auto space-y-6">
+        <!-- Page Header -->
+        <x-modules.page-header
+            title="Messages"
+            subtitle="Chat with laundry branches you've booked with"
+            icon="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+            gradient="emerald"
+        >
+            <x-slot name="stats">
+                <div class="bg-white/10 backdrop-blur rounded-xl px-4 py-2">
+                    <p class="text-white/70 text-xs">Conversations</p>
+                    <p class="text-xl font-bold">{{ $conversations->count() }}</p>
+                </div>
+                <div class="bg-white/10 backdrop-blur rounded-xl px-4 py-2">
+                    <p class="text-white/70 text-xs">Unread</p>
+                    <p class="text-xl font-bold">{{ $conversations->sum('unread_count') }}</p>
+                </div>
+            </x-slot>
+        </x-modules.page-header>
 
         @if($conversations->isEmpty() && $availableBranches->isEmpty())
             <x-modules.card class="p-8 text-center">

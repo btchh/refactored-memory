@@ -1,17 +1,14 @@
 <x-layout>
     <x-slot:title>My Profile</x-slot:title>
 
-    <div class="max-w-2xl mx-auto py-8 px-4">
-        <!-- Header -->
-        <div class="text-center mb-8">
-            <div class="inline-flex items-center justify-center w-20 h-20 bg-primary-100 rounded-full mb-4">
-                <svg class="w-10 h-10 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
-            </div>
-            <h1 class="text-3xl font-bold text-gray-900 mb-2">My Profile</h1>
-            <p class="text-gray-600">Manage your account information</p>
-        </div>
+    <div class="max-w-2xl mx-auto space-y-6">
+        <!-- Page Header -->
+        <x-modules.page-header
+            title="My Profile"
+            subtitle="Manage your account information"
+            icon="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+            gradient="violet"
+        />
 
         <!-- Success Message -->
         @if(session('success'))

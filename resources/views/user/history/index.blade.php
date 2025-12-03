@@ -3,27 +3,22 @@
 
     <div class="space-y-6">
         <!-- Page Header -->
-        <div class="bg-gradient-to-r from-primary-600 to-primary-700 rounded-2xl p-8 text-white">
-            <div class="flex items-center gap-4">
-                <div class="bg-white/20 backdrop-blur rounded-xl p-4">
-                    <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
-                    </svg>
-                </div>
-                <div>
-                    <h1 class="text-3xl font-bold mb-1">Booking History</h1>
-                    <p class="text-white/80">Track all your laundry orders</p>
-                </div>
-            </div>
-            
+        @php
+            $totalOrders = count($bookings);
+            $completedOrders = collect($bookings)->where('status', 'completed')->count();
+            $pendingOrders = collect($bookings)->where('status', 'pending')->count();
+            $inProgressOrders = collect($bookings)->where('status', 'in_progress')->count();
+            $cancelledOrders = collect($bookings)->where('status', 'cancelled')->count();
+            $totalSpent = collect($bookings)->sum('total');
+        @endphp
+        <x-modules.page-header
+            title="Booking History"
+            subtitle="Track all your laundry orders"
+            icon="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"
+            gradient="primary"
+        >
             <!-- Quick Stats -->
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
-                @php
-                    $totalOrders = count($bookings);
-                    $completedOrders = collect($bookings)->where('status', 'completed')->count();
-                    $pendingOrders = collect($bookings)->where('status', 'pending')->count();
-                    $totalSpent = collect($bookings)->sum('total');
-                @endphp
                 <div class="bg-white/10 backdrop-blur rounded-xl p-4">
                     <p class="text-white/70 text-sm">Total Orders</p>
                     <p class="text-2xl font-bold">{{ $totalOrders }}</p>
@@ -41,34 +36,23 @@
                     <p class="text-2xl font-bold">₱{{ number_format($totalSpent, 0) }}</p>
                 </div>
             </div>
-        </div>
+        </x-modules.page-header>
 
         <!-- Search and Filter -->
-        <x-modules.card class="p-6 print:hidden">
-            {{-- Quick Filters --}}
-            <div class="flex flex-wrap items-center gap-2 mb-4">
-                <span class="text-xs font-medium text-gray-600">Quick:</span>
-                <button data-filter="all" class="filter-btn px-2 py-1 text-xs rounded transition-colors bg-primary-100 text-primary-700">All</button>
-                <button data-filter="pending" class="filter-btn px-2 py-1 text-xs rounded transition-colors bg-gray-100 hover:bg-gray-200 text-gray-700">Pending</button>
-                <button data-filter="in_progress" class="filter-btn px-2 py-1 text-xs rounded transition-colors bg-gray-100 hover:bg-gray-200 text-gray-700">In Progress</button>
-                <button data-filter="completed" class="filter-btn px-2 py-1 text-xs rounded transition-colors bg-gray-100 hover:bg-gray-200 text-gray-700">Completed</button>
-                <button data-filter="cancelled" class="filter-btn px-2 py-1 text-xs rounded transition-colors bg-gray-100 hover:bg-gray-200 text-gray-700">Cancelled</button>
-            </div>
-
-            {{-- Search --}}
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div class="form-group md:col-span-2 lg:col-span-3">
-                    <label class="form-label">Search</label>
-                    <input type="text" 
-                           id="search-input"
-                           placeholder="Search orders..." 
-                           class="form-input w-full">
-                </div>
-                <div class="form-group flex items-end">
-                    <button type="button" id="clear-filters" class="btn btn-outline w-full">Clear</button>
-                </div>
-            </div>
-        </x-modules.card>
+        <x-modules.filter-panel
+            :status-filters="[
+                ['key' => 'all', 'label' => 'All', 'count' => $totalOrders, 'color' => 'primary', 'icon' => 'list'],
+                ['key' => 'pending', 'label' => 'Pending', 'count' => $pendingOrders, 'color' => 'yellow'],
+                ['key' => 'in_progress', 'label' => 'In Progress', 'count' => $inProgressOrders, 'color' => 'blue'],
+                ['key' => 'completed', 'label' => 'Completed', 'count' => $completedOrders, 'color' => 'green'],
+                ['key' => 'cancelled', 'label' => 'Cancelled', 'count' => $cancelledOrders, 'color' => 'red'],
+            ]"
+            current-status="all"
+            :show-search="true"
+            search-id="search-input"
+            search-placeholder="Search by order ID or service name..."
+            :client-side="true"
+        />
 
         <!-- Bookings List -->
         <div id="bookings-container" class="space-y-4">
@@ -216,27 +200,30 @@
     </div>
 
     <!-- Receipt Modal -->
-    <div id="receipt-modal" class="fixed inset-0 z-50 hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-        <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0">
-            <!-- Backdrop -->
-            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" onclick="closeReceiptModal()"></div>
+    <div id="receipt-modal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="closeReceiptModal()"></div>
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="relative bg-white rounded-2xl shadow-2xl max-w-md w-full transform transition-all">
+                <!-- Header -->
+                <div class="flex items-center justify-between p-6 border-b border-gray-100">
+                    <h3 class="text-xl font-bold text-gray-900">Booking Receipt</h3>
+                    <button type="button" onclick="closeReceiptModal()" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                        <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
 
-            <!-- Modal Content -->
-            <div class="relative bg-white rounded-2xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:max-w-2xl sm:w-full">
-                <!-- Close Button -->
-                <button onclick="closeReceiptModal()" class="absolute top-4 right-4 z-10 p-2 bg-white/80 hover:bg-white rounded-full shadow-lg transition-colors">
-                    <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
-
-                <!-- Receipt Content Container -->
-                <div id="receipt-content">
-                    <!-- Loading State -->
-                    <div id="receipt-loading" class="p-12 text-center">
-                        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto"></div>
-                        <p class="mt-4 text-gray-500">Loading receipt...</p>
+                <!-- Content -->
+                <div id="receipt-content" class="p-6 max-h-[70vh] overflow-y-auto">
+                    <div class="flex items-center justify-center py-8">
+                        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
                     </div>
+                </div>
+
+                <!-- Footer -->
+                <div class="flex gap-3 p-6 border-t border-gray-100">
+                    <button type="button" onclick="closeReceiptModal()" class="flex-1 btn btn-outline rounded-xl">Close</button>
                 </div>
             </div>
         </div>
@@ -249,7 +236,6 @@
         function openReceiptModal(bookingId) {
             const modal = document.getElementById('receipt-modal');
             const content = document.getElementById('receipt-content');
-            const loading = document.getElementById('receipt-loading');
             
             modal.classList.remove('hidden');
             document.body.style.overflow = 'hidden';
@@ -289,13 +275,8 @@
             if (booking.services && booking.services.length > 0) {
                 servicesHTML = `
                     <div>
-                        <h3 class="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-                            <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                            </svg>
-                            Services
-                        </h3>
-                        <div class="bg-gray-50 rounded-lg p-3 space-y-2">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Services</label>
+                        <div class="bg-gray-50 rounded-xl p-3 space-y-2">
                             ${booking.services.map(s => `
                                 <div class="flex justify-between text-sm">
                                     <span class="text-gray-700">${s.name}</span>
@@ -311,13 +292,8 @@
             if (booking.products && booking.products.length > 0) {
                 productsHTML = `
                     <div>
-                        <h3 class="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-                            <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                            </svg>
-                            Products
-                        </h3>
-                        <div class="bg-gray-50 rounded-lg p-3 space-y-2">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Products</label>
+                        <div class="bg-gray-50 rounded-xl p-3 space-y-2">
                             ${booking.products.map(p => `
                                 <div class="flex justify-between text-sm">
                                     <span class="text-gray-700">${p.name}</span>
@@ -330,36 +306,22 @@
             }
 
             return `
-                <!-- Header -->
-                <div class="bg-primary-600 text-white p-6 text-center">
-                    <div class="inline-flex items-center justify-center w-12 h-12 bg-white/20 rounded-full mb-3">
-                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                        </svg>
-                    </div>
-                    <h2 class="text-xl font-bold mb-1">Booking Receipt</h2>
-                    <p class="text-primary-100 text-sm">Order #${String(booking.id).padStart(6, '0')}</p>
-                </div>
-
-                <!-- Content -->
-                <div class="p-6 space-y-5 max-h-[60vh] overflow-y-auto">
-                    <!-- Status -->
-                    <div class="flex items-center justify-between pb-4 border-b border-dashed">
-                        <span class="text-sm text-gray-500">Status</span>
-                        <span class="px-3 py-1 ${statusClass} rounded-full text-xs font-semibold uppercase tracking-wide">
+                <div class="space-y-5">
+                    <!-- Order ID & Status -->
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">Order ID</label>
+                            <span class="text-lg font-bold text-gray-900">#${String(booking.id).padStart(6, '0')}</span>
+                        </div>
+                        <span class="px-3 py-1.5 ${statusClass} rounded-full text-xs font-semibold uppercase tracking-wide">
                             ${statusText}
                         </span>
                     </div>
 
                     <!-- Booking Details -->
                     <div>
-                        <h3 class="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-                            <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                            </svg>
-                            Booking Details
-                        </h3>
-                        <div class="bg-gray-50 rounded-lg p-3 space-y-2 text-sm">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Booking Details</label>
+                        <div class="bg-gray-50 rounded-xl p-3 space-y-2 text-sm">
                             <div class="flex justify-between">
                                 <span class="text-gray-500">Date</span>
                                 <span class="font-medium">${booking.date}</span>
@@ -387,19 +349,12 @@
                     ${productsHTML}
 
                     <!-- Total -->
-                    <div class="pt-4 border-t border-dashed">
-                        <div class="bg-green-50 rounded-lg p-4 border border-green-200">
-                            <div class="flex justify-between items-center">
-                                <span class="text-lg font-semibold text-gray-700">Total Amount</span>
-                                <span class="text-2xl font-bold text-green-600">₱${parseFloat(booking.total || 0).toFixed(2)}</span>
-                            </div>
+                    <div class="bg-green-50 rounded-xl p-4 border border-green-200">
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm font-semibold text-gray-700">Total Amount</span>
+                            <span class="text-2xl font-bold text-green-600">₱${parseFloat(booking.total || 0).toFixed(2)}</span>
                         </div>
                     </div>
-                </div>
-
-                <!-- Footer -->
-                <div class="px-6 pb-6">
-                    <button onclick="closeReceiptModal()" class="w-full btn btn-outline">Close</button>
                 </div>
             `;
         }
@@ -413,46 +368,64 @@
             
             let currentFilter = 'all';
 
-            filterBtns.forEach(btn => {
-                btn.addEventListener('click', function() {
-                    filterBtns.forEach(b => {
-                        b.classList.remove('bg-primary-100', 'text-primary-700');
-                        b.classList.add('bg-gray-100', 'text-gray-700');
-                    });
-                    this.classList.remove('bg-gray-100', 'text-gray-700');
-                    this.classList.add('bg-primary-100', 'text-primary-700');
+            // Filter button color configurations
+            const filterStyles = {
+                all: { active: 'bg-primary-600 text-white shadow-lg shadow-primary-200', inactive: 'bg-gray-100 text-gray-600 hover:bg-primary-50 hover:text-primary-700' },
+                pending: { active: 'bg-yellow-500 text-white shadow-lg shadow-yellow-200', inactive: 'bg-gray-100 text-gray-600 hover:bg-yellow-50 hover:text-yellow-700' },
+                in_progress: { active: 'bg-blue-500 text-white shadow-lg shadow-blue-200', inactive: 'bg-gray-100 text-gray-600 hover:bg-blue-50 hover:text-blue-700' },
+                completed: { active: 'bg-green-500 text-white shadow-lg shadow-green-200', inactive: 'bg-gray-100 text-gray-600 hover:bg-green-50 hover:text-green-700' },
+                cancelled: { active: 'bg-red-500 text-white shadow-lg shadow-red-200', inactive: 'bg-gray-100 text-gray-600 hover:bg-red-50 hover:text-red-700' }
+            };
+
+            function updateFilterButtons() {
+                filterBtns.forEach(btn => {
+                    const filter = btn.dataset.filter;
+                    const styles = filterStyles[filter] || filterStyles.all;
+                    const isActive = filter === currentFilter;
                     
-                    currentFilter = this.dataset.filter;
-                    filterBookings();
+                    // Remove all possible classes
+                    btn.classList.remove(
+                        'bg-primary-600', 'bg-yellow-500', 'bg-blue-500', 'bg-green-500', 'bg-red-500',
+                        'text-white', 'shadow-lg', 'shadow-primary-200', 'shadow-yellow-200', 'shadow-blue-200', 'shadow-green-200', 'shadow-red-200',
+                        'bg-gray-100', 'text-gray-600', 'hover:bg-gray-200',
+                        'hover:bg-primary-50', 'hover:text-primary-700',
+                        'hover:bg-yellow-50', 'hover:text-yellow-700',
+                        'hover:bg-blue-50', 'hover:text-blue-700',
+                        'hover:bg-green-50', 'hover:text-green-700',
+                        'hover:bg-red-50', 'hover:text-red-700'
+                    );
+                    
+                    // Add appropriate classes
+                    const classesToAdd = isActive ? styles.active : styles.inactive;
+                    classesToAdd.split(' ').forEach(cls => btn.classList.add(cls));
+                    
+                    // Update count badge
+                    const badge = btn.querySelector('span > span:last-child');
+                    if (badge && badge.classList.contains('rounded-full')) {
+                        badge.classList.remove('bg-white/20', 'bg-gray-200', 'bg-yellow-100', 'bg-blue-100', 'bg-green-100', 'bg-red-100', 'group-hover:bg-yellow-100', 'group-hover:bg-blue-100', 'group-hover:bg-green-100', 'group-hover:bg-red-100', 'group-hover:bg-primary-100');
+                        if (isActive) {
+                            badge.classList.add('bg-white/20');
+                        } else {
+                            badge.classList.add('bg-gray-200');
+                        }
+                    }
                 });
-            });
-
-            searchInput.addEventListener('input', filterBookings);
-
-            clearFiltersBtn.addEventListener('click', function() {
-                searchInput.value = '';
-                filterBtns.forEach(b => {
-                    b.classList.remove('bg-primary-100', 'text-primary-700');
-                    b.classList.add('bg-gray-100', 'text-gray-700');
-                });
-                filterBtns[0].classList.remove('bg-gray-100', 'text-gray-700');
-                filterBtns[0].classList.add('bg-primary-100', 'text-primary-700');
-                currentFilter = 'all';
-                filterBookings();
-            });
+            }
 
             function filterBookings() {
-                const searchTerm = searchInput.value.toLowerCase();
+                const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
                 let visibleCount = 0;
 
                 bookingCards.forEach(card => {
                     const status = card.dataset.status;
-                    const orderId = card.dataset.orderId.toString();
-                    const services = card.dataset.services.toLowerCase();
+                    const orderId = card.dataset.orderId;
+                    const services = card.dataset.services?.toLowerCase() || '';
                     
                     const matchesFilter = currentFilter === 'all' || status === currentFilter;
-                    const matchesSearch = !searchTerm || orderId.includes(searchTerm) || services.includes(searchTerm);
-
+                    const matchesSearch = !searchTerm || 
+                        orderId.includes(searchTerm) || 
+                        services.includes(searchTerm);
+                    
                     if (matchesFilter && matchesSearch) {
                         card.classList.remove('hidden');
                         visibleCount++;
@@ -461,7 +434,34 @@
                     }
                 });
 
-                noResults.classList.toggle('hidden', visibleCount > 0 || bookingCards.length === 0);
+                // Show/hide no results message
+                if (noResults) {
+                    noResults.classList.toggle('hidden', visibleCount > 0);
+                }
+            }
+
+            // Filter button click handlers
+            filterBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    currentFilter = this.dataset.filter;
+                    updateFilterButtons();
+                    filterBookings();
+                });
+            });
+
+            // Search input handler
+            if (searchInput) {
+                searchInput.addEventListener('input', filterBookings);
+            }
+
+            // Clear filters button
+            if (clearFiltersBtn) {
+                clearFiltersBtn.addEventListener('click', function() {
+                    if (searchInput) searchInput.value = '';
+                    currentFilter = 'all';
+                    updateFilterButtons();
+                    filterBookings();
+                });
             }
         });
     </script>

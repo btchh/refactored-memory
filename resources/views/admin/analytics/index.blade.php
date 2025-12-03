@@ -3,22 +3,31 @@
 
     <div class="space-y-6">
         <!-- Header -->
-        <x-modules.card class="p-6">
-            <h1 class="text-2xl font-bold text-gray-900 mb-1">Analytics</h1>
-            <p class="text-gray-600">Business insights and performance metrics</p>
-        </x-modules.card>
+        <x-modules.page-header
+            title="Analytics"
+            subtitle="Business insights and performance metrics"
+            icon="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+            gradient="violet"
+        />
 
         <!-- Filters -->
+        @php
+            $isCustom = $useCustomRange || request('custom') == '1';
+            $currentPeriod = $allTime ? 'all_time' : ($isCustom ? 'custom' : $period);
+        @endphp
         <x-modules.filter-panel
             :action="route('admin.analytics.index')"
-            :quick-filters="[
-                ['label' => 'Today', 'url' => route('admin.analytics.index', ['period' => 'day']), 'active' => $period === 'day' && !$allTime && !$useCustomRange],
-                ['label' => 'This Week', 'url' => route('admin.analytics.index', ['period' => 'week']), 'active' => $period === 'week' && !$allTime && !$useCustomRange],
-                ['label' => 'This Month', 'url' => route('admin.analytics.index', ['period' => 'month']), 'active' => $period === 'month' && !$allTime && !$useCustomRange],
-                ['label' => 'This Year', 'url' => route('admin.analytics.index', ['period' => 'year']), 'active' => $period === 'year' && !$allTime && !$useCustomRange],
-                ['label' => 'All Time', 'url' => route('admin.analytics.index', ['all_time' => 'true']), 'active' => $allTime],
+            :status-filters="[
+                ['key' => 'day', 'label' => 'Today', 'color' => 'blue'],
+                ['key' => 'week', 'label' => 'This Week', 'color' => 'green'],
+                ['key' => 'month', 'label' => 'This Month', 'color' => 'yellow'],
+                ['key' => 'year', 'label' => 'This Year', 'color' => 'purple'],
+                ['key' => 'all_time', 'label' => 'All Time', 'color' => 'primary', 'icon' => 'list'],
+                ['key' => 'custom', 'label' => 'Custom Range', 'color' => 'red'],
             ]"
+            :current-status="$currentPeriod"
             :show-date-range="true"
+            :show-custom-date-filter="true"
             :start-date-value="$startDate"
             :end-date-value="$endDate"
             :clear-url="route('admin.analytics.index')"
@@ -26,6 +35,27 @@
             submit-text="Apply"
             grid-cols="lg:grid-cols-4"
         />
+
+        @push('scripts')
+        <script>
+            document.querySelectorAll('.filter-btn[data-filter]').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const filter = this.dataset.filter;
+                    let url = '{{ route("admin.analytics.index") }}';
+                    
+                    if (filter === 'custom') {
+                        url += '?custom=1';
+                    } else if (filter === 'all_time') {
+                        url += '?all_time=true';
+                    } else {
+                        url += `?period=${filter}`;
+                    }
+                    
+                    window.location.href = url;
+                });
+            });
+        </script>
+        @endpush
 
         <!-- Key Metrics -->
         <div class="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">

@@ -24,21 +24,31 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         
+        // Determine colors based on user type (green for user chat, blue for admin chat)
+        const isUserSide = currentUserType === 'user';
+        const ownBgColor = isUserSide ? 'bg-green-600' : 'bg-blue-600';
+        const ownTextColor = isUserSide ? 'text-green-200' : 'text-blue-200';
+        
         const messageDiv = document.createElement('div');
         messageDiv.className = `flex ${isOwn ? 'justify-end' : 'justify-start'}`;
         messageDiv.setAttribute('data-message-id', message.id);
         
         // Show sender name for admin messages (since multiple admins can respond from same branch)
         const showSenderName = message.sender_type === 'admin' && message.sender_name;
+        const senderNameColor = isUserSide ? 'text-green-600' : 'text-blue-600';
         const senderNameHtml = showSenderName 
-            ? `<p class="text-xs font-medium ${isOwn ? 'text-primary-200' : 'text-gray-600'} mb-1">${escapeHtml(message.sender_name)}</p>` 
+            ? `<p class="text-xs font-semibold ${isOwn ? ownTextColor : senderNameColor} mb-1">${escapeHtml(message.sender_name)}</p>` 
             : '';
         
+        const bubbleClass = isOwn 
+            ? `${ownBgColor} text-white rounded-2xl rounded-br-md` 
+            : 'bg-white text-gray-900 rounded-2xl rounded-bl-md shadow-sm border border-gray-100';
+        
         messageDiv.innerHTML = `
-            <div class="max-w-[70%] ${isOwn ? 'bg-primary-600 text-white' : 'bg-gray-100 text-gray-900'} rounded-lg px-4 py-2">
+            <div class="max-w-[75%] ${bubbleClass} px-4 py-3">
                 ${senderNameHtml}
-                <p class="text-sm">${escapeHtml(message.message)}</p>
-                <p class="text-xs ${isOwn ? 'text-primary-200' : 'text-gray-500'} mt-1">
+                <p class="text-sm leading-relaxed">${escapeHtml(message.message)}</p>
+                <p class="text-xs ${isOwn ? ownTextColor : 'text-gray-400'} mt-2 text-right">
                     ${message.formatted_time}
                 </p>
             </div>

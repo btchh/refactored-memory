@@ -3,10 +3,19 @@
 
     <div class="space-y-6">
         <!-- Header -->
-        <div class="card p-6">
-            <h1 class="text-3xl font-bold text-gray-900">Booking Management</h1>
-            <p class="text-gray-600 mt-1">Update laundry booking status</p>
-        </div>
+        <x-modules.page-header
+            title="Booking Management"
+            subtitle="Update laundry booking status"
+            icon="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"
+            gradient="blue"
+        >
+            <x-slot name="stats">
+                <div class="bg-white/10 backdrop-blur rounded-xl px-4 py-2">
+                    <p class="text-white/70 text-xs">Total Bookings</p>
+                    <p class="text-xl font-bold">{{ $stats['all'] }}</p>
+                </div>
+            </x-slot>
+        </x-modules.page-header>
 
         <!-- Stats -->
         <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
@@ -38,29 +47,94 @@
         </div>
 
         <!-- Search & Filters -->
+        @php
+            $hasDateFilter = $startDate || $endDate;
+            $isCustomRequest = request('custom') == '1';
+            $isToday = $startDate == now()->format('Y-m-d') && $endDate == now()->format('Y-m-d');
+            $isTomorrow = $startDate == now()->addDay()->format('Y-m-d') && $endDate == now()->addDay()->format('Y-m-d');
+            $isWeek = $startDate == now()->startOfWeek()->format('Y-m-d') && $endDate == now()->endOfWeek()->format('Y-m-d');
+            $isMonth = $startDate == now()->startOfMonth()->format('Y-m-d') && $endDate == now()->endOfMonth()->format('Y-m-d');
+            
+            if ($isCustomRequest) {
+                $currentDateFilter = 'custom';
+            } elseif (!$hasDateFilter) {
+                $currentDateFilter = 'all';
+            } elseif ($isToday) {
+                $currentDateFilter = 'today';
+            } elseif ($isTomorrow) {
+                $currentDateFilter = 'tomorrow';
+            } elseif ($isWeek) {
+                $currentDateFilter = 'week';
+            } elseif ($isMonth) {
+                $currentDateFilter = 'month';
+            } else {
+                $currentDateFilter = 'custom';
+            }
+        @endphp
         <x-modules.filter-panel
             :action="route('admin.bookings.manage')"
-            :quick-filters="[
-                ['label' => 'Today', 'url' => route('admin.bookings.manage', ['status' => $status, 'start_date' => now()->format('Y-m-d'), 'end_date' => now()->format('Y-m-d')]), 'active' => $startDate == now()->format('Y-m-d') && $endDate == now()->format('Y-m-d')],
-                ['label' => 'Tomorrow', 'url' => route('admin.bookings.manage', ['status' => $status, 'start_date' => now()->addDay()->format('Y-m-d'), 'end_date' => now()->addDay()->format('Y-m-d')])],
-                ['label' => 'This Week', 'url' => route('admin.bookings.manage', ['status' => $status, 'start_date' => now()->startOfWeek()->format('Y-m-d'), 'end_date' => now()->endOfWeek()->format('Y-m-d')])],
-                ['label' => 'This Month', 'url' => route('admin.bookings.manage', ['status' => $status, 'start_date' => now()->startOfMonth()->format('Y-m-d'), 'end_date' => now()->endOfMonth()->format('Y-m-d')])],
-                ['label' => 'All', 'url' => route('admin.bookings.manage', ['status' => $status]), 'active' => !$startDate && !$endDate],
+            :status-filters="[
+                ['key' => 'all', 'label' => 'All Dates', 'color' => 'primary', 'icon' => 'list'],
+                ['key' => 'today', 'label' => 'Today', 'color' => 'blue'],
+                ['key' => 'tomorrow', 'label' => 'Tomorrow', 'color' => 'green'],
+                ['key' => 'week', 'label' => 'This Week', 'color' => 'yellow'],
+                ['key' => 'month', 'label' => 'This Month', 'color' => 'purple'],
+                ['key' => 'custom', 'label' => 'Custom Range', 'color' => 'red'],
             ]"
+            :current-status="$currentDateFilter"
             :show-search="true"
             search-placeholder="Search by customer name or email..."
             :search-value="$search"
             :show-date-range="true"
+            :show-custom-date-filter="true"
             :start-date-value="$startDate"
             :end-date-value="$endDate"
             :clear-url="route('admin.bookings.manage', ['status' => $status])"
             :show-clear="$search || $startDate || $endDate"
-            grid-cols="lg:grid-cols-5"
+            grid-cols="lg:grid-cols-4"
         >
             <x-slot name="hidden">
                 <input type="hidden" name="status" value="{{ $status }}">
             </x-slot>
         </x-modules.filter-panel>
+
+        @push('scripts')
+        <script>
+            document.querySelectorAll('.filter-btn[data-filter]').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const filter = this.dataset.filter;
+                    const status = '{{ $status }}';
+                    let url = '{{ route("admin.bookings.manage") }}?status=' + status;
+                    
+                    const today = new Date();
+                    const formatDate = (d) => d.toISOString().split('T')[0];
+                    
+                    if (filter === 'custom') {
+                        url += '&custom=1';
+                    } else if (filter === 'today') {
+                        url += `&start_date=${formatDate(today)}&end_date=${formatDate(today)}`;
+                    } else if (filter === 'tomorrow') {
+                        const tomorrow = new Date(today);
+                        tomorrow.setDate(tomorrow.getDate() + 1);
+                        url += `&start_date=${formatDate(tomorrow)}&end_date=${formatDate(tomorrow)}`;
+                    } else if (filter === 'week') {
+                        const startOfWeek = new Date(today);
+                        startOfWeek.setDate(today.getDate() - today.getDay());
+                        const endOfWeek = new Date(startOfWeek);
+                        endOfWeek.setDate(startOfWeek.getDate() + 6);
+                        url += `&start_date=${formatDate(startOfWeek)}&end_date=${formatDate(endOfWeek)}`;
+                    } else if (filter === 'month') {
+                        const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+                        const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+                        url += `&start_date=${formatDate(startOfMonth)}&end_date=${formatDate(endOfMonth)}`;
+                    }
+                    // 'all' goes without date params
+                    
+                    window.location.href = url;
+                });
+            });
+        </script>
+        @endpush
 
         <!-- Alert Container -->
         <div id="alert-container"></div>
