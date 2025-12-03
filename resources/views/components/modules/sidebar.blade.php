@@ -45,14 +45,14 @@
             <span class="text-sm font-medium">Location</span>
         </a>
 
-        <!-- History Booking -->
+        <!-- History -->
         <a href="{{ route('user.history') }}"
            class="sidebar-link {{ $isActive('user.history') ? 'active' : '' }}"
            aria-label="History Booking">
             <svg class="sidebar-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
             </svg>
-            <span class="text-sm font-medium">History Booking</span>
+            <span class="text-sm font-medium">History</span>
         </a>
 
         <!-- Messages -->

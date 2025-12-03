@@ -155,8 +155,63 @@
                         </div>
                     </div>
 
-                    <!-- Customer Selection -->
+                    <!-- Booking Type Selection -->
                     <div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+                        <h2 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                            <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                            </svg>
+                            Booking Type
+                        </h2>
+                        <div class="grid grid-cols-2 gap-4">
+                            <label class="cursor-pointer group">
+                                <input type="radio" name="booking_type" value="online" class="hidden" checked>
+                                <div class="relative border-2 border-gray-200 rounded-xl p-4 transition-all hover:border-blue-300 group-has-[:checked]:border-blue-500 group-has-[:checked]:bg-blue-50">
+                                    <div class="absolute top-3 right-3 w-5 h-5 rounded-full border-2 border-gray-300 flex items-center justify-center group-has-[:checked]:border-blue-500 group-has-[:checked]:bg-blue-500">
+                                        <svg class="w-3 h-3 text-white hidden group-has-[:checked]:block" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                        </svg>
+                                    </div>
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center group-has-[:checked]:bg-blue-200">
+                                            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/>
+                            </svg>
+                                        </div>
+                                        <div>
+                                            <h3 class="font-bold text-gray-900">Online Booking</h3>
+                                            <p class="text-xs text-gray-500">Registered customer</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </label>
+
+                            <label class="cursor-pointer group">
+                                <input type="radio" name="booking_type" value="walkin" class="hidden" id="walkin-radio">
+                                <div class="relative border-2 border-gray-200 rounded-xl p-4 transition-all hover:border-purple-300 group-has-[:checked]:border-purple-500 group-has-[:checked]:bg-purple-50">
+                                    <div class="absolute top-3 right-3 w-5 h-5 rounded-full border-2 border-gray-300 flex items-center justify-center group-has-[:checked]:border-purple-500 group-has-[:checked]:bg-purple-500">
+                                        <svg class="w-3 h-3 text-white hidden group-has-[:checked]:block" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                        </svg>
+                                    </div>
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center group-has-[:checked]:bg-purple-200">
+                                            <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <h3 class="font-bold text-gray-900">Walk-in</h3>
+                                            <p class="text-xs text-gray-500">Guest customer</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Customer Selection -->
+                    <div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm" id="customer-selection-section">
                         <h2 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
                             <svg class="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />

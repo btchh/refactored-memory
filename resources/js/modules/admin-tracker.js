@@ -90,7 +90,8 @@ export class AdminTracker {
         admins.forEach(admin => {
             const popupContent = `
                 <div class="p-2">
-                    <h3 class="font-bold">${admin.name}</h3>
+                    <h3 class="font-bold">${admin.branch_name || admin.name}</h3>
+                    <p class="text-xs text-gray-500">${admin.name}</p>
                     <p class="text-sm text-gray-600">${admin.phone}</p>
                     ${admin.distance_km !== undefined ? `
                         <div class="mt-2 text-xs">
@@ -150,7 +151,8 @@ export class AdminTracker {
                         </svg>
                     </div>
                     <div class="flex-1 min-w-0">
-                        <h3 class="font-bold text-gray-800 truncate">${admin.name}</h3>
+                        <h3 class="font-bold text-gray-800 truncate">${admin.branch_name || admin.name}</h3>
+                        <p class="text-xs text-gray-500 truncate">${admin.name}</p>
                         <p class="text-sm text-gray-600 truncate">${admin.phone}</p>
                         ${admin.distance_km !== undefined ? `
                             <div class="mt-2 flex gap-2 text-xs">
@@ -252,7 +254,7 @@ export class AdminTracker {
         document.getElementById('distance').textContent = admin.distance_km ? `${admin.distance_km} km` : '-';
         document.getElementById('travel-time').textContent = admin.eta_minutes ? `${admin.eta_minutes} min` : '-';
         document.getElementById('eta').textContent = admin.eta || '-';
-        document.getElementById('shop-name').textContent = admin.name || admin.branch_name || '-';
+        document.getElementById('shop-name').textContent = admin.branch_name || admin.name || '-';
         document.getElementById('shop-address').textContent = admin.address || '-';
         document.getElementById('shop-phone').textContent = admin.phone || '-';
 

@@ -506,6 +506,57 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize service type UI
     updateServiceTypeUI();
 
+    // Booking type toggle (online vs walkin)
+    const bookingTypeRadios = document.querySelectorAll('input[name="booking_type"]');
+    const customerSelectionSection = document.getElementById('customer-selection-section');
+    const userIdInput = document.getElementById('user_id');
+
+    function updateBookingTypeUI() {
+        const selectedType = document.querySelector('input[name="booking_type"]:checked')?.value;
+        
+        if (customerSelectionSection && userIdInput) {
+            if (selectedType === 'walkin') {
+                // Hide customer selection for walk-in
+                customerSelectionSection.classList.add('hidden');
+                userIdInput.removeAttribute('required');
+                userIdInput.value = ''; // Clear user selection
+                
+                // Hide pickup address section for walk-in (they're already at the branch)
+                if (pickupAddressSection) {
+                    pickupAddressSection.classList.add('hidden');
+                    if (pickupAddressInput) pickupAddressInput.removeAttribute('required');
+                }
+                
+                // Force dropoff service type for walk-in
+                const dropoffRadio = document.querySelector('input[name="service_type"][value="dropoff"]');
+                if (dropoffRadio) {
+                    dropoffRadio.checked = true;
+                    dropoffRadio.closest('.bg-white').classList.add('hidden'); // Hide service type selection
+                }
+            } else {
+                // Show customer selection for online booking
+                customerSelectionSection.classList.remove('hidden');
+                userIdInput.setAttribute('required', 'required');
+                
+                // Show service type selection
+                const serviceTypeSection = document.querySelector('input[name="service_type"]')?.closest('.bg-white');
+                if (serviceTypeSection) {
+                    serviceTypeSection.classList.remove('hidden');
+                }
+                
+                // Update service type UI based on selection
+                updateServiceTypeUI();
+            }
+        }
+    }
+
+    bookingTypeRadios.forEach(radio => {
+        radio.addEventListener('change', updateBookingTypeUI);
+    });
+
+    // Initialize booking type UI
+    updateBookingTypeUI();
+
     // Clear form button
     const clearBtn = document.getElementById('clear-form');
     if (clearBtn) {

@@ -54,68 +54,87 @@ class LocationController extends Controller
             }
             
             // Get ALL available admins/branches so users can see all options
-            // This helps users choose the optimal branch based on location
-            $admins = Admin::query()
+            // Group by branch_address to avoid duplicate markers for same location
+            $allAdmins = Admin::query()
                 ->whereNotNull('address')
-                ->get()
-                ->map(function ($admin) use ($user) {
-                    // Geocode admin address if needed
-                    if ((!$admin->latitude || !$admin->longitude) && $admin->address) {
-                        try {
-                            $coordinates = $this->geocodeService->geocodeAddress($admin->address);
-                            if ($coordinates) {
+                ->get();
+            
+            // Group admins by branch address
+            $branchGroups = $allAdmins->groupBy('branch_address');
+            
+            $branches = collect();
+            
+            foreach ($branchGroups as $branchAddress => $adminsInBranch) {
+                // Use the first admin for this branch location
+                $representativeAdmin = $adminsInBranch->first();
+                
+                // Geocode admin address if needed
+                if ((!$representativeAdmin->latitude || !$representativeAdmin->longitude) && $representativeAdmin->address) {
+                    try {
+                        $coordinates = $this->geocodeService->geocodeAddress($representativeAdmin->address);
+                        if ($coordinates) {
+                            // Update all admins at this branch with the same coordinates
+                            foreach ($adminsInBranch as $admin) {
                                 $admin->update([
                                     'latitude' => $coordinates['latitude'],
                                     'longitude' => $coordinates['longitude'],
                                     'location_updated_at' => now()
                                 ]);
-                                $admin->latitude = $coordinates['latitude'];
-                                $admin->longitude = $coordinates['longitude'];
-                            } else {
-                                return null;
                             }
-                        } catch (\Exception $e) {
-                            \Log::error('Failed to geocode admin address: ' . $e->getMessage());
-                            return null;
+                            $representativeAdmin->latitude = $coordinates['latitude'];
+                            $representativeAdmin->longitude = $coordinates['longitude'];
+                        } else {
+                            continue;
                         }
+                    } catch (\Exception $e) {
+                        \Log::error('Failed to geocode branch address: ' . $e->getMessage());
+                        continue;
                     }
+                }
+                
+                // Get all admin names and phones for this branch
+                $adminNames = $adminsInBranch->map(fn($a) => $a->fname . ' ' . $a->lname)->implode(', ');
+                $adminPhones = $adminsInBranch->pluck('phone')->unique()->implode(', ');
+                
+                $branchData = [
+                    'id' => $representativeAdmin->id,
+                    'admin_ids' => $adminsInBranch->pluck('id')->toArray(), // All admin IDs at this branch
+                    'name' => $adminNames, // All admin names
+                    'branch_name' => $representativeAdmin->admin_name,
+                    'branch_address' => $branchAddress,
+                    'phone' => $adminPhones, // All phone numbers
+                    'address' => $representativeAdmin->address,
+                    'latitude' => (float) $representativeAdmin->latitude,
+                    'longitude' => (float) $representativeAdmin->longitude,
+                    'admin_count' => $adminsInBranch->count(),
+                    'updated_at' => $representativeAdmin->location_updated_at 
+                        ? $representativeAdmin->location_updated_at->format('M d, h:i A') 
+                        : 'N/A'
+                ];
 
-                    $adminData = [
-                        'id' => $admin->id,
-                        'name' => $admin->fname . ' ' . $admin->lname,
-                        'branch_name' => $admin->admin_name,
-                        'phone' => $admin->phone,
-                        'address' => $admin->address,
-                        'latitude' => (float) $admin->latitude,
-                        'longitude' => (float) $admin->longitude,
-                        'updated_at' => $admin->location_updated_at 
-                            ? $admin->location_updated_at->format('M d, h:i A') 
-                            : 'N/A'
-                    ];
+                // Calculate distance and ETA if user has coordinates
+                if ($user->latitude && $user->longitude) {
+                    $distance = $this->calculateDistance(
+                        $user->latitude,
+                        $user->longitude,
+                        $representativeAdmin->latitude,
+                        $representativeAdmin->longitude
+                    );
+                    
+                    $roadFactor = 1.4;
+                    $actualDistance = $distance * $roadFactor;
+                    $averageSpeed = 30;
+                    $travelTimeMinutes = ($actualDistance / $averageSpeed) * 60;
+                    
+                    $branchData['distance_km'] = round($actualDistance, 2);
+                    $branchData['eta_minutes'] = round($travelTimeMinutes, 1);
+                    $branchData['eta'] = now('Asia/Manila')->addMinutes($travelTimeMinutes)->format('h:i A');
+                }
 
-                    // Calculate distance and ETA if user has coordinates
-                    if ($user->latitude && $user->longitude) {
-                        $distance = $this->calculateDistance(
-                            $user->latitude,
-                            $user->longitude,
-                            $admin->latitude,
-                            $admin->longitude
-                        );
-                        
-                        $roadFactor = 1.4;
-                        $actualDistance = $distance * $roadFactor;
-                        $averageSpeed = 30;
-                        $travelTimeMinutes = ($actualDistance / $averageSpeed) * 60;
-                        
-                        $adminData['distance_km'] = round($actualDistance, 2);
-                        $adminData['eta_minutes'] = round($travelTimeMinutes, 1);
-                        $adminData['eta'] = now('Asia/Manila')->addMinutes($travelTimeMinutes)->format('h:i A');
-                    }
-
-                    return $adminData;
-                })
-                ->filter()
-                ->values();
+                $branches->push($branchData);
+            }
+            
+            $admins = $branches->values();
 
             return response()->json([
                 'success' => true,

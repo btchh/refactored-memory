@@ -32,11 +32,11 @@ class BookingService
         try {
             // Create transaction with booking fields
             $transaction = Transaction::create([
-                'user_id' => $data['user_id'],
+                'user_id' => $data['user_id'] ?? null, // Can be null for walk-in
                 'admin_id' => $data['admin_id'] ?? null,
                 'booking_date' => $data['booking_date'],
                 'booking_time' => $data['booking_time'],
-                'service_type' => $data['service_type'] ?? 'pickup',
+                'service_type' => $data['service_type'] ?? 'dropoff', // Default to dropoff for walk-in
                 'pickup_address' => $data['pickup_address'] ?? null,
                 'latitude' => $data['latitude'] ?? null,
                 'longitude' => $data['longitude'] ?? null,
@@ -45,6 +45,7 @@ class BookingService
                 'weight' => $data['weight'] ?? null,
                 'total_price' => 0, // Will be calculated
                 'status' => 'pending',
+                'booking_type' => $data['booking_type'] ?? 'online',
             ]);
 
             // Attach services

@@ -29,6 +29,7 @@ class Transaction extends Model
         'weight',
         'total_price',
         'status',
+        'booking_type',
     ];
 
     protected $casts = [
