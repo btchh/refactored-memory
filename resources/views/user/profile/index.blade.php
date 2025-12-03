@@ -1,67 +1,106 @@
 <x-layout>
-    <x-slot:title>User Profile</x-slot:title>
+    <x-slot:title>My Profile</x-slot:title>
 
-    <div class="flex items-center justify-center min-h-full py-8">
-        <div class="w-full max-w-2xl px-4">
-            <!-- Header -->
-            <div class="text-center mb-8">
-                <div class="inline-flex items-center justify-center w-20 h-20 bg-primary-50 rounded-full mb-4">
-                    <svg class="w-10 h-10 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <div class="max-w-2xl mx-auto py-8 px-4">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center justify-center w-20 h-20 bg-primary-100 rounded-full mb-4">
+                <svg class="w-10 h-10 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+            </div>
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">My Profile</h1>
+            <p class="text-gray-600">Manage your account information</p>
+        </div>
+
+        <!-- Success Message -->
+        @if(session('success'))
+            <x-modules.alert type="success" dismissible class="mb-6">
+                {{ session('success') }}
+            </x-modules.alert>
+        @endif
+
+        <!-- Validation Errors -->
+        @if($errors->any())
+            <x-modules.alert type="error" dismissible class="mb-6">
+                <ul class="list-disc list-inside">
+                    @foreach($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </x-modules.alert>
+        @endif
+
+        <form action="{{ route('user.update-profile') }}" method="POST" class="space-y-6">
+            @csrf
+
+            <!-- Account Information -->
+            <x-modules.card class="p-6">
+                <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                    <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                     </svg>
+                    Account Information
+                </h2>
+
+                <div class="space-y-4">
+                    <x-modules.input 
+                        type="text" 
+                        name="username" 
+                        label="Username"
+                        value="{{ old('username', Auth::user()->username) }}" 
+                        required 
+                    />
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <x-modules.input 
+                            type="text" 
+                            name="fname" 
+                            label="First Name"
+                            value="{{ old('fname', Auth::user()->fname) }}" 
+                            required 
+                        />
+
+                        <x-modules.input 
+                            type="text" 
+                            name="lname" 
+                            label="Last Name"
+                            value="{{ old('lname', Auth::user()->lname) }}" 
+                            required 
+                        />
+                    </div>
+
+                    <x-modules.input 
+                        type="email" 
+                        name="email" 
+                        label="Email Address"
+                        value="{{ old('email', Auth::user()->email) }}" 
+                        required 
+                    />
+
+                    <x-modules.input 
+                        type="tel" 
+                        name="phone" 
+                        label="Phone Number"
+                        value="{{ old('phone', Auth::user()->phone) }}" 
+                        required 
+                    />
+
+                    <x-modules.input 
+                        type="text" 
+                        name="address" 
+                        label="Address"
+                        value="{{ old('address', Auth::user()->address) }}" 
+                        placeholder="Enter your address"
+                        required 
+                    />
                 </div>
-                <h1 class="text-4xl font-bold text-gray-900 mb-2">
-                    Update Profile
-                </h1>
-                <p class="text-gray-600">Manage your account information</p>
-            </div>
+            </x-modules.card>
 
-            <x-modules.card class="p-6 md:p-8">
-                    <!-- Validation Errors -->
-                    @if (isset($errors) && $errors->any())
-                        <x-modules.alert type="error" dismissible class="mb-4">
-                            <ul class="list-disc list-inside">
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                        </x-modules.alert>
-                    @endif
-
-                    <!-- Profile Form -->
-                    <form action="{{ route('user.update-profile') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
-                        @csrf
-
-                        <!-- Username -->
-                        <x-modules.input type="text" name="username" label="Username"
-                            value="{{ Auth::user()->username }}" required />
-
-                        <!-- First Name -->
-                        <x-modules.input type="text" name="fname" label="First Name"
-                            value="{{ Auth::user()->fname }}" required />
-
-                        <!-- Last Name -->
-                        <x-modules.input type="text" name="lname" label="Last Name"
-                            value="{{ Auth::user()->lname }}" required />
-
-                        <!-- Email -->
-                        <x-modules.input type="email" name="email" label="Email"
-                            value="{{ Auth::user()->email }}" required />
-
-                        <!-- Phone -->
-                        <x-modules.input type="text" name="phone" label="Phone Number"
-                            value="{{ Auth::user()->phone }}" required />
-
-                        <!-- Address -->
-                        <x-modules.input type="text" name="address" label="Address"
-                            value="{{ Auth::user()->address }}" required />
-
-                        <!-- Submit Button -->
-                        <x-modules.button type="submit" variant="primary" fullWidth size="md">
-                            Update Profile
-                        </x-modules.button>
-                    </form>
-                </x-modules.card>
-        </div>
+            <!-- Submit Button -->
+            <x-modules.button type="submit" variant="primary" fullWidth size="lg">
+                Save Changes
+            </x-modules.button>
+        </form>
     </div>
 </x-layout>

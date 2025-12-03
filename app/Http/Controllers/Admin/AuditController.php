@@ -30,6 +30,11 @@ class AuditController extends Controller
             $query->byModel($request->model);
         }
 
+        // Search by description
+        if ($request->filled('search')) {
+            $query->where('description', 'like', '%' . $request->search . '%');
+        }
+
         // Filter by date range
         if ($request->filled('from')) {
             $query->whereDate('created_at', '>=', $request->from);

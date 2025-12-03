@@ -9,15 +9,57 @@
                     <h1 class="text-2xl font-bold text-gray-900">Audit Log</h1>
                     <p class="text-gray-600">Track all actions performed in your branch</p>
                 </div>
+                <div class="flex items-center gap-2 text-sm text-gray-500">
+                    <span class="font-medium">{{ $logs->total() }}</span> total records
+                </div>
             </div>
         </x-modules.card>
 
+        <!-- Quick Stats -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            @php
+                $actionCounts = $logs->getCollection()->groupBy('action')->map->count();
+            @endphp
+            <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                <p class="text-xs text-green-600 font-medium">Created</p>
+                <p class="text-2xl font-bold text-green-700">{{ $actionCounts->get('created', 0) }}</p>
+            </div>
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <p class="text-xs text-blue-600 font-medium">Updated</p>
+                <p class="text-2xl font-bold text-blue-700">{{ $actionCounts->get('updated', 0) }}</p>
+            </div>
+            <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                <p class="text-xs text-yellow-600 font-medium">Status Changed</p>
+                <p class="text-2xl font-bold text-yellow-700">{{ $actionCounts->get('status_changed', 0) }}</p>
+            </div>
+            <div class="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                <p class="text-xs text-purple-600 font-medium">Logins</p>
+                <p class="text-2xl font-bold text-purple-700">{{ $actionCounts->get('login', 0) }}</p>
+            </div>
+        </div>
+
         <!-- Filters -->
-        <x-modules.card class="p-6">
-            <form method="GET" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Action</label>
-                    <select name="action" class="form-select rounded-lg w-full">
+        <x-modules.filter-panel
+            :quick-filters="[
+                ['label' => 'Today', 'url' => route('admin.audit', ['from' => now()->format('Y-m-d'), 'to' => now()->format('Y-m-d')]), 'active' => request('from') == now()->format('Y-m-d') && request('to') == now()->format('Y-m-d')],
+                ['label' => 'Last 7 days', 'url' => route('admin.audit', ['from' => now()->subDays(7)->format('Y-m-d'), 'to' => now()->format('Y-m-d')])],
+                ['label' => 'Last 30 days', 'url' => route('admin.audit', ['from' => now()->subDays(30)->format('Y-m-d'), 'to' => now()->format('Y-m-d')])],
+                ['label' => 'This month', 'url' => route('admin.audit', ['from' => now()->startOfMonth()->format('Y-m-d'), 'to' => now()->format('Y-m-d')])],
+            ]"
+            :show-search="true"
+            search-placeholder="Search description..."
+            :show-date-range="true"
+            start-date-name="from"
+            end-date-name="to"
+            start-date-label="From"
+            end-date-label="To"
+            :clear-url="route('admin.audit')"
+            grid-cols="lg:grid-cols-6"
+        >
+            <x-slot name="fields">
+                <div class="form-group">
+                    <label class="form-label">Action</label>
+                    <select name="action" class="form-select w-full">
                         <option value="">All Actions</option>
                         @foreach($actions as $action)
                             <option value="{{ $action }}" {{ request('action') == $action ? 'selected' : '' }}>
@@ -26,9 +68,9 @@
                         @endforeach
                     </select>
                 </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Model</label>
-                    <select name="model" class="form-select rounded-lg w-full">
+                <div class="form-group">
+                    <label class="form-label">Model</label>
+                    <select name="model" class="form-select w-full">
                         <option value="">All Models</option>
                         @foreach($models as $model)
                             <option value="{{ $model }}" {{ request('model') == $model ? 'selected' : '' }}>
@@ -37,20 +79,8 @@
                         @endforeach
                     </select>
                 </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">From</label>
-                    <input type="date" name="from" value="{{ request('from') }}" class="form-input rounded-lg w-full">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">To</label>
-                    <input type="date" name="to" value="{{ request('to') }}" class="form-input rounded-lg w-full">
-                </div>
-                <div class="flex items-end gap-2">
-                    <button type="submit" class="btn btn-primary flex-1">Filter</button>
-                    <a href="{{ route('admin.audit') }}" class="btn btn-outline">Clear</a>
-                </div>
-            </form>
-        </x-modules.card>
+            </x-slot>
+        </x-modules.filter-panel>
 
         <!-- Audit Log Table -->
         <x-modules.card class="overflow-hidden">

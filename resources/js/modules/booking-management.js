@@ -135,9 +135,19 @@ export class BookingManagement {
     openRescheduleModal(id) {
         const modal = document.getElementById('reschedule-modal');
         const bookingIdInput = document.getElementById('reschedule-booking-id');
+        const dateInput = document.getElementById('reschedule-date');
+        const timeSelect = document.getElementById('reschedule-time');
         
         if (bookingIdInput) {
             bookingIdInput.value = id;
+        }
+        
+        // Reset date and time inputs
+        if (dateInput) {
+            dateInput.value = '';
+        }
+        if (timeSelect) {
+            timeSelect.innerHTML = '<option value="">Select a date first</option>';
         }
         
         if (modal && modal.showModal) {
@@ -173,6 +183,14 @@ export class BookingManagement {
         const form = document.getElementById('reschedule-form');
         if (!form) return;
 
+        // Load time slots when date changes
+        const dateInput = document.getElementById('reschedule-date');
+        if (dateInput) {
+            dateInput.addEventListener('change', async (e) => {
+                await this.loadTimeSlots(e.target.value);
+            });
+        }
+
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
             
@@ -184,6 +202,33 @@ export class BookingManagement {
                 await this.submitReschedule(id, date, time);
             }
         });
+    }
+
+    async loadTimeSlots(date) {
+        const timeSelect = document.getElementById('reschedule-time');
+        if (!timeSelect) return;
+
+        if (!date) {
+            timeSelect.innerHTML = '<option value="">Select a date first</option>';
+            return;
+        }
+
+        timeSelect.innerHTML = '<option value="">Loading...</option>';
+
+        try {
+            const slotsUrl = window.bookingData?.routes?.slots || '/admin/api/calendar/slots';
+            const data = await api.get(`${slotsUrl}?date=${date}`);
+
+            if (data.success && data.slots && data.slots.length > 0) {
+                timeSelect.innerHTML = '<option value="">Select time slot</option>' + 
+                    data.slots.map(slot => `<option value="${slot.time}">${slot.display}</option>`).join('');
+            } else {
+                timeSelect.innerHTML = '<option value="">No available slots</option>';
+            }
+        } catch (error) {
+            console.error('Error loading time slots:', error);
+            timeSelect.innerHTML = '<option value="">Error loading slots</option>';
+        }
     }
 
     init() {

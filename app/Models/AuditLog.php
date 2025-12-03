@@ -60,6 +60,10 @@ class AuditLog extends Model
      */
     public function scopeByModel($query, $modelType)
     {
+        // Handle both full class name and short class name
+        if (!str_contains($modelType, '\\')) {
+            return $query->where('model_type', 'like', '%\\' . $modelType);
+        }
         return $query->where('model_type', $modelType);
     }
 }

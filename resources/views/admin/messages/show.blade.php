@@ -26,6 +26,11 @@
                 @forelse($messages as $message)
                     <div class="flex {{ $message->sender_type === 'admin' ? 'justify-end' : 'justify-start' }}">
                         <div class="max-w-[70%] {{ $message->sender_type === 'admin' ? 'bg-primary-600 text-white' : 'bg-gray-100 text-gray-900' }} rounded-lg px-4 py-2">
+                            @if($message->sender_type === 'admin')
+                                <p class="text-xs font-medium text-primary-200 mb-1">
+                                    {{ $message->sender_name }}
+                                </p>
+                            @endif
                             <p class="text-sm">{{ $message->message }}</p>
                             <p class="text-xs {{ $message->sender_type === 'admin' ? 'text-primary-200' : 'text-gray-500' }} mt-1">
                                 {{ $message->created_at->format('g:i A') }}

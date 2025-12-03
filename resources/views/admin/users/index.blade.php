@@ -66,33 +66,27 @@
         </div>
 
         <!-- Filters & Search -->
-        <x-modules.card class="p-6">
-            <form method="GET" class="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center">
-                <div class="flex-1 min-w-0">
-                    <input type="text" 
-                           name="search" 
-                           value="{{ $search }}" 
-                           placeholder="Search by name, email, username, or phone..." 
-                           class="form-input w-full">
-                </div>
-                <div class="flex gap-4 flex-shrink-0">
-                    <select name="status" class="form-select w-full sm:w-48">
+        <x-modules.filter-panel
+            :action="route('admin.users.index')"
+            :show-search="true"
+            search-placeholder="Search by name, email, username, or phone..."
+            :search-value="$search"
+            :clear-url="route('admin.users.index')"
+            :show-clear="$search || $status"
+            submit-text="Search"
+            grid-cols="lg:grid-cols-4"
+        >
+            <x-slot name="fields">
+                <div class="form-group">
+                    <label class="form-label">Status</label>
+                    <select name="status" class="form-select w-full">
                         <option value="">All Status</option>
                         <option value="active" {{ $status === 'active' ? 'selected' : '' }}>Active</option>
                         <option value="disabled" {{ $status === 'disabled' ? 'selected' : '' }}>Disabled</option>
                     </select>
-                    <x-modules.button type="submit" variant="primary">
-                        <svg class="w-4 h-4 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                        </svg>
-                        <span class="hidden sm:inline">Search</span>
-                    </x-modules.button>
-                    @if($search || $status)
-                        <a href="{{ route('admin.users.index') }}" class="btn btn-outline whitespace-nowrap">Clear</a>
-                    @endif
                 </div>
-            </form>
-        </x-modules.card>
+            </x-slot>
+        </x-modules.filter-panel>
 
         <!-- Users Table -->
         <x-modules.card :padding="false">

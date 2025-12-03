@@ -11,10 +11,21 @@ class UserManagementController extends Controller
 {
     public function index(Request $request)
     {
+        $admin = auth()->guard('admin')->user();
+        // Get all admin IDs for this branch
+        $branchAdminIds = \App\Models\Admin::where('branch_address', $admin->branch_address)->pluck('id');
+        
         $search = $request->get('search');
         $status = $request->get('status');
         
-        $query = User::query()->withCount('transactions');
+        // Only show users who have booked with this branch
+        $query = User::query()
+            ->whereHas('transactions', function ($q) use ($branchAdminIds) {
+                $q->whereIn('admin_id', $branchAdminIds);
+            })
+            ->withCount(['transactions' => function ($q) use ($branchAdminIds) {
+                $q->whereIn('admin_id', $branchAdminIds);
+            }]);
         
         if ($search) {
             $query->where(function($q) use ($search) {
@@ -32,10 +43,15 @@ class UserManagementController extends Controller
         
         $users = $query->orderBy('created_at', 'desc')->paginate(15);
         
+        // Stats for users who have booked with this branch
+        $userIds = User::whereHas('transactions', function ($q) use ($branchAdminIds) {
+            $q->whereIn('admin_id', $branchAdminIds);
+        })->pluck('id');
+        
         $stats = [
-            'total' => User::count(),
-            'active' => User::where('status', 'active')->count(),
-            'disabled' => User::where('status', 'disabled')->count(),
+            'total' => $userIds->count(),
+            'active' => User::whereIn('id', $userIds)->where('status', 'active')->count(),
+            'disabled' => User::whereIn('id', $userIds)->where('status', 'disabled')->count(),
         ];
         
         return view('admin.users.index', compact('users', 'stats', 'search', 'status'));
@@ -43,16 +59,26 @@ class UserManagementController extends Controller
 
     public function show($id)
     {
-        $user = User::with(['transactions' => function($query) {
-            $query->orderBy('created_at', 'desc')->limit(10);
+        $admin = auth()->guard('admin')->user();
+        // Get all admin IDs for this branch
+        $branchAdminIds = \App\Models\Admin::where('branch_address', $admin->branch_address)->pluck('id');
+        
+        // Only show user if they have booked with this branch
+        $user = User::whereHas('transactions', function ($q) use ($branchAdminIds) {
+            $q->whereIn('admin_id', $branchAdminIds);
+        })->with(['transactions' => function($query) use ($branchAdminIds) {
+            $query->whereIn('admin_id', $branchAdminIds)
+                  ->orderBy('created_at', 'desc')
+                  ->limit(10);
         }])->findOrFail($id);
         
+        // Stats only for this branch's transactions
         $bookingStats = [
-            'total' => $user->transactions()->count(),
-            'completed' => $user->transactions()->where('status', 'completed')->count(),
-            'pending' => $user->transactions()->where('status', 'pending')->count(),
-            'cancelled' => $user->transactions()->where('status', 'cancelled')->count(),
-            'total_spent' => $user->transactions()->where('status', '!=', 'cancelled')->sum('total_price'),
+            'total' => $user->transactions()->whereIn('admin_id', $branchAdminIds)->count(),
+            'completed' => $user->transactions()->whereIn('admin_id', $branchAdminIds)->where('status', 'completed')->count(),
+            'pending' => $user->transactions()->whereIn('admin_id', $branchAdminIds)->where('status', 'pending')->count(),
+            'cancelled' => $user->transactions()->whereIn('admin_id', $branchAdminIds)->where('status', 'cancelled')->count(),
+            'total_spent' => $user->transactions()->whereIn('admin_id', $branchAdminIds)->where('status', '!=', 'cancelled')->sum('total_price'),
         ];
         
         return view('admin.users.show', compact('user', 'bookingStats'));

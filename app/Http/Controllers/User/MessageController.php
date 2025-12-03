@@ -23,43 +23,52 @@ class MessageController extends Controller
         $user = Auth::guard('web')->user();
         $conversations = $this->messagingService->getUserConversations($user->id);
         
-        // Get admins the user has booked with (for starting new conversations)
-        $bookedAdminIds = $user->transactions()->distinct()->pluck('admin_id');
-        $availableAdmins = Admin::whereIn('id', $bookedAdminIds)
-            ->whereNotIn('id', $conversations->pluck('admin_id'))
-            ->get();
+        // Get branches the user has booked with (for starting new conversations)
+        $bookedBranches = $this->messagingService->getUserBookedBranches($user->id);
+        $existingBranches = $conversations->pluck('branch_address');
+        $availableBranches = $bookedBranches->diff($existingBranches);
 
-        return view('user.messages.index', compact('conversations', 'availableAdmins'));
+        return view('user.messages.index', compact('conversations', 'availableBranches'));
     }
 
     /**
-     * Show conversation with specific admin
+     * Show conversation with specific branch
      */
-    public function show($adminId)
+    public function show($branchAddress)
     {
+        $branchAddress = urldecode($branchAddress);
         $user = Auth::guard('web')->user();
-        $admin = Admin::findOrFail($adminId);
         
-        $conversation = $this->messagingService->getOrCreateConversation($user->id, $adminId);
+        // Get branch info (first admin of this branch)
+        $branchAdmin = Admin::where('branch_address', $branchAddress)->first();
+        if (!$branchAdmin) {
+            abort(404, 'Branch not found');
+        }
+        
+        $conversation = $this->messagingService->getOrCreateConversation($user->id, $branchAddress);
         $messages = $this->messagingService->getMessages($conversation->id);
         
         // Mark messages as read
         $this->messagingService->markAsRead($conversation->id, 'user');
 
-        return view('user.messages.show', compact('conversation', 'messages', 'admin'));
+        // Get all branches for dropdown
+        $allBranches = $this->messagingService->getUserBookedBranches($user->id);
+
+        return view('user.messages.show', compact('conversation', 'messages', 'branchAddress', 'branchAdmin', 'allBranches'));
     }
 
     /**
      * Send a message
      */
-    public function send(Request $request, $adminId)
+    public function send(Request $request, $branchAddress)
     {
+        $branchAddress = urldecode($branchAddress);
         $request->validate([
             'message' => 'required|string|max:1000',
         ]);
 
         $user = Auth::guard('web')->user();
-        $conversation = $this->messagingService->getOrCreateConversation($user->id, $adminId);
+        $conversation = $this->messagingService->getOrCreateConversation($user->id, $branchAddress);
         
         $message = $this->messagingService->sendMessage(
             $conversation->id,
@@ -84,11 +93,12 @@ class MessageController extends Controller
     /**
      * Get messages (AJAX polling fallback)
      */
-    public function getMessages($adminId)
+    public function getMessages($branchAddress)
     {
+        $branchAddress = urldecode($branchAddress);
         $user = Auth::guard('web')->user();
         $conversation = Conversation::where('user_id', $user->id)
-            ->where('admin_id', $adminId)
+            ->where('branch_address', $branchAddress)
             ->first();
 
         if (!$conversation) {

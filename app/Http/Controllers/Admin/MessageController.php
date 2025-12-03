@@ -34,7 +34,7 @@ class MessageController extends Controller
         $admin = Auth::guard('admin')->user();
         $user = User::findOrFail($userId);
         
-        $conversation = $this->messagingService->getOrCreateConversation($userId, $admin->id);
+        $conversation = $this->messagingService->getOrCreateConversation($userId, $admin->branch_address);
         $messages = $this->messagingService->getMessages($conversation->id);
         
         // Mark messages as read
@@ -53,7 +53,7 @@ class MessageController extends Controller
         ]);
 
         $admin = Auth::guard('admin')->user();
-        $conversation = $this->messagingService->getOrCreateConversation($userId, $admin->id);
+        $conversation = $this->messagingService->getOrCreateConversation($userId, $admin->branch_address);
         
         $message = $this->messagingService->sendMessage(
             $conversation->id,
@@ -82,7 +82,7 @@ class MessageController extends Controller
     {
         $admin = Auth::guard('admin')->user();
         $conversation = Conversation::where('user_id', $userId)
-            ->where('admin_id', $admin->id)
+            ->where('branch_address', $admin->branch_address)
             ->first();
 
         if (!$conversation) {

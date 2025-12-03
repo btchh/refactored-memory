@@ -17,54 +17,57 @@ class DashboardController extends Controller
     {
         $admin = Auth::guard('admin')->user();
         
-        // Customer stats
-        $totalCustomers = User::whereHas('transactions', function ($q) use ($admin) {
-            $q->where('admin_id', $admin->id);
+        // Get all admin IDs for this branch
+        $branchAdminIds = \App\Models\Admin::where('branch_address', $admin->branch_address)->pluck('id');
+        
+        // Customer stats - users who booked at this branch
+        $totalCustomers = User::whereHas('transactions', function ($q) use ($branchAdminIds) {
+            $q->whereIn('admin_id', $branchAdminIds);
         })->count();
         
-        // Booking stats
-        $pendingBookings = Transaction::where('admin_id', $admin->id)
+        // Booking stats for this branch
+        $pendingBookings = Transaction::whereIn('admin_id', $branchAdminIds)
             ->where('status', 'pending')
             ->count();
             
-        $inProgressBookings = Transaction::where('admin_id', $admin->id)
+        $inProgressBookings = Transaction::whereIn('admin_id', $branchAdminIds)
             ->where('status', 'in_progress')
             ->count();
             
-        $completedBookings = Transaction::where('admin_id', $admin->id)
+        $completedBookings = Transaction::whereIn('admin_id', $branchAdminIds)
             ->where('status', 'completed')
             ->count();
             
-        $todayBookings = Transaction::where('admin_id', $admin->id)
+        $todayBookings = Transaction::whereIn('admin_id', $branchAdminIds)
             ->whereDate('booking_date', now()->toDateString())
             ->count();
         
-        // Revenue stats
-        $todayRevenue = Transaction::where('admin_id', $admin->id)
+        // Revenue stats for this branch
+        $todayRevenue = Transaction::whereIn('admin_id', $branchAdminIds)
             ->where('status', 'completed')
             ->whereDate('updated_at', now()->toDateString())
             ->sum('total_price');
             
-        $weekRevenue = Transaction::where('admin_id', $admin->id)
+        $weekRevenue = Transaction::whereIn('admin_id', $branchAdminIds)
             ->where('status', 'completed')
             ->whereBetween('updated_at', [now()->startOfWeek(), now()->endOfWeek()])
             ->sum('total_price');
             
-        $monthRevenue = Transaction::where('admin_id', $admin->id)
+        $monthRevenue = Transaction::whereIn('admin_id', $branchAdminIds)
             ->where('status', 'completed')
             ->whereMonth('updated_at', now()->month)
             ->whereYear('updated_at', now()->year)
             ->sum('total_price');
         
-        // Recent bookings (last 5)
-        $recentBookings = Transaction::where('admin_id', $admin->id)
+        // Recent bookings for this branch (last 5)
+        $recentBookings = Transaction::whereIn('admin_id', $branchAdminIds)
             ->with(['user', 'services'])
             ->orderBy('created_at', 'desc')
             ->take(5)
             ->get();
             
-        // Today's schedule
-        $todaySchedule = Transaction::where('admin_id', $admin->id)
+        // Today's schedule for this branch
+        $todaySchedule = Transaction::whereIn('admin_id', $branchAdminIds)
             ->whereDate('booking_date', now()->toDateString())
             ->with(['user', 'services'])
             ->orderBy('booking_time')

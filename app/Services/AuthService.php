@@ -9,6 +9,13 @@ use Illuminate\Support\Facades\Hash;
 
 class AuthService
 {
+    protected $auditService;
+
+    public function __construct(AuditService $auditService)
+    {
+        $this->auditService = $auditService;
+    }
+
     //attempt user login
     public function loginUser(
         string $loginField,
@@ -42,6 +49,10 @@ class AuthService
 
         if (Auth::guard('admin')->attempt([$feildType => $loginField, 'password' => $password], $remember)) {
             $admin = Auth::guard('admin')->user();
+            
+            // Log the login action
+            $this->auditService->logLogin();
+            
             return [
                 'success' => true,
                 'message' => 'Login Success',
@@ -77,6 +88,9 @@ class AuthService
     {
         /** @var \App\Models\Admin @admin */
         $admin = Auth::guard('admin')->user();
+
+        // Log the logout action before logging out
+        $this->auditService->logLogout();
 
         if ($admin && !empty($admin->remember_token)) {
             $admin->remember_token = null;

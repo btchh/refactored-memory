@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Events\MessageSent;
+use App\Models\Admin;
 use App\Models\Conversation;
 use App\Models\Message;
 use Illuminate\Support\Collection;
@@ -10,11 +11,11 @@ use Illuminate\Support\Collection;
 class MessagingService
 {
     /**
-     * Get or create a conversation between user and admin
+     * Get or create a conversation between user and branch
      */
-    public function getOrCreateConversation(int $userId, int $adminId): Conversation
+    public function getOrCreateConversation(int $userId, string $branchAddress): Conversation
     {
-        return Conversation::findOrCreateBetween($userId, $adminId);
+        return Conversation::findOrCreateForBranch($userId, $branchAddress);
     }
 
     /**
@@ -75,7 +76,7 @@ class MessagingService
     public function getUserConversations(int $userId): Collection
     {
         return Conversation::where('user_id', $userId)
-            ->with(['admin', 'latestMessage'])
+            ->with(['latestMessage'])
             ->withCount(['messages as unread_count' => function ($query) {
                 $query->where('sender_type', 'admin')->where('is_read', false);
             }])
@@ -84,11 +85,16 @@ class MessagingService
     }
 
     /**
-     * Get conversations for an admin
+     * Get conversations for an admin (by branch)
      */
     public function getAdminConversations(int $adminId): Collection
     {
-        return Conversation::where('admin_id', $adminId)
+        $admin = Admin::find($adminId);
+        if (!$admin) {
+            return collect();
+        }
+
+        return Conversation::where('branch_address', $admin->branch_address)
             ->with(['user', 'latestMessage'])
             ->withCount(['messages as unread_count' => function ($query) {
                 $query->where('sender_type', 'user')->where('is_read', false);
@@ -111,15 +117,47 @@ class MessagingService
     }
 
     /**
-     * Get total unread count for admin
+     * Get total unread count for admin (by branch)
      */
     public function getUnreadCountForAdmin(int $adminId): int
     {
-        return Message::whereHas('conversation', function ($query) use ($adminId) {
-            $query->where('admin_id', $adminId);
+        $admin = Admin::find($adminId);
+        if (!$admin) {
+            return 0;
+        }
+
+        return Message::whereHas('conversation', function ($query) use ($admin) {
+            $query->where('branch_address', $admin->branch_address);
         })
             ->where('sender_type', 'user')
             ->where('is_read', false)
             ->count();
+    }
+
+    /**
+     * Get all unique branches that a user has booked with
+     */
+    public function getUserBookedBranches(int $userId): Collection
+    {
+        return Admin::whereIn('id', function ($query) use ($userId) {
+            $query->select('admin_id')
+                ->from('transactions')
+                ->where('user_id', $userId)
+                ->distinct();
+        })
+            ->select('branch_address')
+            ->distinct()
+            ->pluck('branch_address');
+    }
+
+    /**
+     * Get all branches for dropdown
+     */
+    public function getAllBranches(): Collection
+    {
+        return Admin::select('branch_address')
+            ->distinct()
+            ->whereNotNull('branch_address')
+            ->pluck('branch_address');
     }
 }

@@ -4,16 +4,31 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Transaction;
+use App\Services\AuditService;
 use Illuminate\Http\Request;
 
 class BookingManagementController extends Controller
 {
+    protected $auditService;
+
+    public function __construct(AuditService $auditService)
+    {
+        $this->auditService = $auditService;
+    }
     public function index(Request $request)
     {
+        $admin = auth()->guard('admin')->user();
         $status = $request->get('status', 'all');
         $search = $request->get('search');
+        $startDate = $request->get('start_date');
+        $endDate = $request->get('end_date');
 
-        $query = Transaction::with(['user', 'services', 'products'])
+        // Get all admin IDs for this branch
+        $branchAdminIds = \App\Models\Admin::where('branch_address', $admin->branch_address)->pluck('id');
+
+        // Only show bookings for this branch (all admins at this branch)
+        $query = Transaction::with(['user', 'services', 'products', 'admin'])
+            ->whereIn('admin_id', $branchAdminIds)
             ->orderBy('booking_date', 'desc')
             ->orderBy('booking_time', 'desc');
 
@@ -29,28 +44,60 @@ class BookingManagementController extends Controller
             });
         }
 
+        // Date range filtering
+        if ($startDate) {
+            $query->whereDate('booking_date', '>=', $startDate);
+        }
+        if ($endDate) {
+            $query->whereDate('booking_date', '<=', $endDate);
+        }
+
         $bookings = $query->paginate(20);
 
+        // Build stats query with same filters - for this branch's bookings
+        $statsQuery = Transaction::whereIn('admin_id', $branchAdminIds);
+        if ($startDate) {
+            $statsQuery->whereDate('booking_date', '>=', $startDate);
+        }
+        if ($endDate) {
+            $statsQuery->whereDate('booking_date', '<=', $endDate);
+        }
+
         $stats = [
-            'all' => Transaction::count(),
-            'pending' => Transaction::where('status', 'pending')->count(),
-            'in_progress' => Transaction::where('status', 'in_progress')->count(),
-            'completed' => Transaction::where('status', 'completed')->count(),
-            'cancelled' => Transaction::where('status', 'cancelled')->count(),
+            'all' => (clone $statsQuery)->count(),
+            'pending' => (clone $statsQuery)->where('status', 'pending')->count(),
+            'in_progress' => (clone $statsQuery)->where('status', 'in_progress')->count(),
+            'completed' => (clone $statsQuery)->where('status', 'completed')->count(),
+            'cancelled' => (clone $statsQuery)->where('status', 'cancelled')->count(),
         ];
 
-        return view('admin.bookings.manage', compact('bookings', 'stats', 'status', 'search'));
+        return view('admin.bookings.manage', compact('bookings', 'stats', 'status', 'search', 'startDate', 'endDate'));
     }
 
     public function updateStatus(Request $request, $id)
     {
+        $admin = auth()->guard('admin')->user();
+        $branchAdminIds = \App\Models\Admin::where('branch_address', $admin->branch_address)->pluck('id');
+        
         $validated = $request->validate([
             'status' => 'required|in:pending,in_progress,completed,cancelled',
         ]);
 
-        $booking = Transaction::findOrFail($id);
+        // Only allow updating bookings for this branch
+        $booking = Transaction::whereIn('admin_id', $branchAdminIds)->findOrFail($id);
+        $oldStatus = $booking->status;
         $booking->status = $validated['status'];
         $booking->save();
+
+        // Log the status change
+        $customerName = $booking->user ? $booking->user->fname . ' ' . $booking->user->lname : 'Unknown';
+        $this->auditService->logStatusChange(
+            Transaction::class,
+            $booking,
+            $oldStatus,
+            $validated['status'],
+            "Changed booking #{$booking->id} status from {$oldStatus} to {$validated['status']} (Customer: {$customerName})"
+        );
 
         return response()->json([
             'success' => true,
@@ -61,7 +108,13 @@ class BookingManagementController extends Controller
 
     public function show($id)
     {
-        $booking = Transaction::with(['user', 'services', 'products'])->findOrFail($id);
+        $admin = auth()->guard('admin')->user();
+        $branchAdminIds = \App\Models\Admin::where('branch_address', $admin->branch_address)->pluck('id');
+        
+        // Only allow viewing bookings for this branch
+        $booking = Transaction::with(['user', 'services', 'products', 'admin'])
+            ->whereIn('admin_id', $branchAdminIds)
+            ->findOrFail($id);
 
         return response()->json([
             'success' => true,
@@ -104,8 +157,18 @@ class BookingManagementController extends Controller
         ]);
 
         $booking = Transaction::findOrFail($id);
+        $oldWeight = $booking->weight;
         $booking->weight = $validated['weight'];
         $booking->save();
+
+        // Log the weight update
+        $customerName = $booking->user ? $booking->user->fname . ' ' . $booking->user->lname : 'Unknown';
+        $this->auditService->logUpdate(
+            Transaction::class,
+            $booking,
+            ['weight' => $oldWeight],
+            "Updated booking #{$booking->id} weight from {$oldWeight}kg to {$validated['weight']}kg (Customer: {$customerName})"
+        );
 
         return response()->json([
             'success' => true,

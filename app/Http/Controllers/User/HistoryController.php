@@ -13,7 +13,7 @@ class HistoryController extends Controller
     public function history()
     {
         $transactions = Transaction::where('user_id', auth()->id())
-            ->with(['services', 'products'])
+            ->with(['services', 'products', 'admin'])
             ->latest()
             ->get();
 
@@ -23,20 +23,23 @@ class HistoryController extends Controller
                 'id' => $transaction->id,
                 'date' => $transaction->formatted_date,
                 'time' => $transaction->formatted_time,
-                'total' => number_format($transaction->total_price, 2),
+                'total' => $transaction->total_price,
                 'status' => $transaction->status,
                 'item_type' => $transaction->item_type,
+                'service_type' => $transaction->service_type,
                 'pickup_address' => $transaction->pickup_address,
+                'branch_name' => $transaction->admin?->admin_name,
+                'branch_address' => $transaction->admin?->branch_address,
                 'services' => $transaction->services->map(function ($service) {
                     return [
                         'name' => $service->service_name,
-                        'price' => number_format($service->pivot->price_at_purchase, 2)
+                        'price' => $service->pivot->price_at_purchase
                     ];
                 }),
                 'products' => $transaction->products->map(function ($product) {
                     return [
                         'name' => $product->product_name,
-                        'price' => number_format($product->pivot->price_at_purchase, 2)
+                        'price' => $product->pivot->price_at_purchase
                     ];
                 }),
                 'is_upcoming' => $transaction->isUpcoming(),
@@ -53,7 +56,7 @@ class HistoryController extends Controller
     public function showStatus()
     {
         $transactions = Transaction::where('user_id', auth()->id())
-            ->with(['services', 'products'])
+            ->with(['services', 'products', 'admin'])
             ->latest()
             ->get();
 
@@ -64,20 +67,23 @@ class HistoryController extends Controller
                 'date' => $transaction->formatted_date,
                 'time' => $transaction->formatted_time,
                 'datetime' => $transaction->formatted_date_time,
-                'total' => number_format($transaction->total_price, 2),
+                'total' => $transaction->total_price,
                 'status' => $transaction->status,
                 'item_type' => $transaction->item_type,
+                'service_type' => $transaction->service_type,
                 'pickup_address' => $transaction->pickup_address,
+                'branch_name' => $transaction->admin?->admin_name,
+                'branch_address' => $transaction->admin?->branch_address,
                 'services' => $transaction->services->map(function ($service) {
                     return [
                         'name' => $service->service_name,
-                        'price' => number_format($service->pivot->price_at_purchase, 2)
+                        'price' => $service->pivot->price_at_purchase
                     ];
                 }),
                 'products' => $transaction->products->map(function ($product) {
                     return [
                         'name' => $product->product_name,
-                        'price' => number_format($product->pivot->price_at_purchase, 2)
+                        'price' => $product->pivot->price_at_purchase
                     ];
                 }),
                 'is_upcoming' => $transaction->isUpcoming(),

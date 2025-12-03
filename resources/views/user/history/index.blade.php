@@ -44,43 +44,31 @@
         </div>
 
         <!-- Search and Filter -->
-        <div class="bg-white rounded-xl border border-gray-200 p-4">
-            <div class="flex flex-col lg:flex-row gap-4">
-                <!-- Search -->
-                <div class="flex-1">
-                    <div class="relative">
-                        <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                        </svg>
-                        <input 
-                            type="text" 
-                            id="search-input"
-                            placeholder="Search orders..." 
-                            class="w-full pl-12 pr-4 py-3 bg-gray-50 border-0 rounded-xl focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all"
-                        >
-                    </div>
-                </div>
+        <x-modules.card class="p-6 print:hidden">
+            {{-- Quick Filters --}}
+            <div class="flex flex-wrap items-center gap-2 mb-4">
+                <span class="text-xs font-medium text-gray-600">Quick:</span>
+                <button data-filter="all" class="filter-btn px-2 py-1 text-xs rounded transition-colors bg-primary-100 text-primary-700">All</button>
+                <button data-filter="pending" class="filter-btn px-2 py-1 text-xs rounded transition-colors bg-gray-100 hover:bg-gray-200 text-gray-700">Pending</button>
+                <button data-filter="in_progress" class="filter-btn px-2 py-1 text-xs rounded transition-colors bg-gray-100 hover:bg-gray-200 text-gray-700">In Progress</button>
+                <button data-filter="completed" class="filter-btn px-2 py-1 text-xs rounded transition-colors bg-gray-100 hover:bg-gray-200 text-gray-700">Completed</button>
+                <button data-filter="cancelled" class="filter-btn px-2 py-1 text-xs rounded transition-colors bg-gray-100 hover:bg-gray-200 text-gray-700">Cancelled</button>
+            </div>
 
-                <!-- Status Filter Pills -->
-                <div class="flex flex-wrap gap-2">
-                    <button data-filter="all" class="filter-btn px-4 py-2.5 bg-primary-600 text-white rounded-xl font-medium text-sm transition-all">
-                        All
-                    </button>
-                    <button data-filter="pending" class="filter-btn px-4 py-2.5 bg-gray-100 text-gray-600 rounded-xl font-medium text-sm hover:bg-yellow-50 hover:text-yellow-700 transition-all">
-                        <span class="w-2 h-2 bg-yellow-500 rounded-full inline-block mr-2"></span>Pending
-                    </button>
-                    <button data-filter="in_progress" class="filter-btn px-4 py-2.5 bg-gray-100 text-gray-600 rounded-xl font-medium text-sm hover:bg-blue-50 hover:text-blue-700 transition-all">
-                        <span class="w-2 h-2 bg-blue-500 rounded-full inline-block mr-2"></span>In Progress
-                    </button>
-                    <button data-filter="completed" class="filter-btn px-4 py-2.5 bg-gray-100 text-gray-600 rounded-xl font-medium text-sm hover:bg-green-50 hover:text-green-700 transition-all">
-                        <span class="w-2 h-2 bg-green-500 rounded-full inline-block mr-2"></span>Completed
-                    </button>
-                    <button data-filter="cancelled" class="filter-btn px-4 py-2.5 bg-gray-100 text-gray-600 rounded-xl font-medium text-sm hover:bg-red-50 hover:text-red-700 transition-all">
-                        <span class="w-2 h-2 bg-red-500 rounded-full inline-block mr-2"></span>Cancelled
-                    </button>
+            {{-- Search --}}
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="form-group md:col-span-2 lg:col-span-3">
+                    <label class="form-label">Search</label>
+                    <input type="text" 
+                           id="search-input"
+                           placeholder="Search orders..." 
+                           class="form-input w-full">
+                </div>
+                <div class="form-group flex items-end">
+                    <button type="button" id="clear-filters" class="btn btn-outline w-full">Clear</button>
                 </div>
             </div>
-        </div>
+        </x-modules.card>
 
         <!-- Bookings List -->
         <div id="bookings-container" class="space-y-4">
@@ -151,6 +139,20 @@
                                             @endif
                                         </div>
                                         
+                                        <!-- Branch Info -->
+                                        @if(isset($booking['branch_name']))
+                                        <div class="flex items-center gap-2 mt-2 text-sm">
+                                            <svg class="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                                            </svg>
+                                            <span class="text-purple-600 font-medium">{{ $booking['branch_name'] }}</span>
+                                            @if(isset($booking['branch_address']))
+                                                <span class="text-gray-400">•</span>
+                                                <span class="text-gray-500 truncate max-w-xs" title="{{ $booking['branch_address'] }}">{{ Str::limit($booking['branch_address'], 30) }}</span>
+                                            @endif
+                                        </div>
+                                        @endif
+                                        
                                         <!-- Services Tags -->
                                         <div class="flex flex-wrap gap-2 mt-4">
                                             @foreach($booking['services'] as $service)
@@ -168,16 +170,18 @@
                             <div class="flex lg:flex-col items-center lg:items-end justify-between lg:justify-start gap-4 pt-4 lg:pt-0 border-t lg:border-t-0 border-gray-100">
                                 <div class="text-right">
                                     <p class="text-xs text-gray-400 uppercase tracking-wide mb-1">Total</p>
-                                    <p class="text-2xl font-bold text-gray-900">₱{{ number_format($booking['total'] ?? 0, 2) }}</p>
+                                    <p class="text-2xl font-bold text-gray-900">₱{{ number_format($booking['total'], 2) }}</p>
                                 </div>
                                 
                                 @if($booking['status'] === 'completed')
-                                <a href="{{ route('user.booking.receipt', $booking['id']) }}" class="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm font-medium transition-colors">
+                                <button type="button" 
+                                        onclick="openReceiptModal({{ $booking['id'] }})"
+                                        class="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm font-medium transition-colors">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                     </svg>
-                                    Receipt
-                                </a>
+                                    View Receipt
+                                </button>
                                 @endif
                             </div>
                         </div>
@@ -211,23 +215,212 @@
         </div>
     </div>
 
+    <!-- Receipt Modal -->
+    <div id="receipt-modal" class="fixed inset-0 z-50 hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0">
+            <!-- Backdrop -->
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" onclick="closeReceiptModal()"></div>
+
+            <!-- Modal Content -->
+            <div class="relative bg-white rounded-2xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:max-w-2xl sm:w-full">
+                <!-- Close Button -->
+                <button onclick="closeReceiptModal()" class="absolute top-4 right-4 z-10 p-2 bg-white/80 hover:bg-white rounded-full shadow-lg transition-colors">
+                    <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+
+                <!-- Receipt Content Container -->
+                <div id="receipt-content">
+                    <!-- Loading State -->
+                    <div id="receipt-loading" class="p-12 text-center">
+                        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto"></div>
+                        <p class="mt-4 text-gray-500">Loading receipt...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
+        // Booking data for receipts
+        const bookingsData = @json($bookings);
+
+        function openReceiptModal(bookingId) {
+            const modal = document.getElementById('receipt-modal');
+            const content = document.getElementById('receipt-content');
+            const loading = document.getElementById('receipt-loading');
+            
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+            
+            // Find booking data
+            const booking = bookingsData.find(b => b.id === bookingId);
+            
+            if (booking) {
+                content.innerHTML = generateReceiptHTML(booking);
+            } else {
+                content.innerHTML = '<div class="p-12 text-center text-red-500">Receipt not found</div>';
+            }
+        }
+
+        function closeReceiptModal() {
+            const modal = document.getElementById('receipt-modal');
+            modal.classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+
+        // Close on escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeReceiptModal();
+        });
+
+        function generateReceiptHTML(booking) {
+            const statusClasses = {
+                'completed': 'bg-green-100 text-green-700',
+                'in_progress': 'bg-blue-100 text-blue-700',
+                'cancelled': 'bg-red-100 text-red-700',
+                'pending': 'bg-yellow-100 text-yellow-700'
+            };
+            const statusClass = statusClasses[booking.status] || 'bg-gray-100 text-gray-700';
+            const statusText = booking.status.replace('_', ' ');
+
+            let servicesHTML = '';
+            if (booking.services && booking.services.length > 0) {
+                servicesHTML = `
+                    <div>
+                        <h3 class="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                            <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            Services
+                        </h3>
+                        <div class="bg-gray-50 rounded-lg p-3 space-y-2">
+                            ${booking.services.map(s => `
+                                <div class="flex justify-between text-sm">
+                                    <span class="text-gray-700">${s.name}</span>
+                                    <span class="font-medium">₱${parseFloat(s.price).toFixed(2)}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            let productsHTML = '';
+            if (booking.products && booking.products.length > 0) {
+                productsHTML = `
+                    <div>
+                        <h3 class="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                            <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                            </svg>
+                            Products
+                        </h3>
+                        <div class="bg-gray-50 rounded-lg p-3 space-y-2">
+                            ${booking.products.map(p => `
+                                <div class="flex justify-between text-sm">
+                                    <span class="text-gray-700">${p.name}</span>
+                                    <span class="font-medium">₱${parseFloat(p.price).toFixed(2)}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            return `
+                <!-- Header -->
+                <div class="bg-primary-600 text-white p-6 text-center">
+                    <div class="inline-flex items-center justify-center w-12 h-12 bg-white/20 rounded-full mb-3">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                    </div>
+                    <h2 class="text-xl font-bold mb-1">Booking Receipt</h2>
+                    <p class="text-primary-100 text-sm">Order #${String(booking.id).padStart(6, '0')}</p>
+                </div>
+
+                <!-- Content -->
+                <div class="p-6 space-y-5 max-h-[60vh] overflow-y-auto">
+                    <!-- Status -->
+                    <div class="flex items-center justify-between pb-4 border-b border-dashed">
+                        <span class="text-sm text-gray-500">Status</span>
+                        <span class="px-3 py-1 ${statusClass} rounded-full text-xs font-semibold uppercase tracking-wide">
+                            ${statusText}
+                        </span>
+                    </div>
+
+                    <!-- Booking Details -->
+                    <div>
+                        <h3 class="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                            <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                            Booking Details
+                        </h3>
+                        <div class="bg-gray-50 rounded-lg p-3 space-y-2 text-sm">
+                            <div class="flex justify-between">
+                                <span class="text-gray-500">Date</span>
+                                <span class="font-medium">${booking.date}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-500">Time</span>
+                                <span class="font-medium">${booking.time}</span>
+                            </div>
+                            ${booking.service_type ? `
+                            <div class="flex justify-between">
+                                <span class="text-gray-500">Service Type</span>
+                                <span class="font-medium">${booking.service_type === 'pickup' ? 'Home Pickup' : 'Self Drop-off'}</span>
+                            </div>
+                            ` : ''}
+                            ${booking.branch_name ? `
+                            <div class="flex justify-between">
+                                <span class="text-gray-500">Branch</span>
+                                <span class="font-medium">${booking.branch_name}</span>
+                            </div>
+                            ` : ''}
+                        </div>
+                    </div>
+
+                    ${servicesHTML}
+                    ${productsHTML}
+
+                    <!-- Total -->
+                    <div class="pt-4 border-t border-dashed">
+                        <div class="bg-green-50 rounded-lg p-4 border border-green-200">
+                            <div class="flex justify-between items-center">
+                                <span class="text-lg font-semibold text-gray-700">Total Amount</span>
+                                <span class="text-2xl font-bold text-green-600">₱${parseFloat(booking.total || 0).toFixed(2)}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <div class="px-6 pb-6">
+                    <button onclick="closeReceiptModal()" class="w-full btn btn-outline">Close</button>
+                </div>
+            `;
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             const searchInput = document.getElementById('search-input');
             const filterBtns = document.querySelectorAll('.filter-btn');
             const bookingCards = document.querySelectorAll('.booking-card');
             const noResults = document.getElementById('no-results');
+            const clearFiltersBtn = document.getElementById('clear-filters');
             
             let currentFilter = 'all';
 
             filterBtns.forEach(btn => {
                 btn.addEventListener('click', function() {
                     filterBtns.forEach(b => {
-                        b.classList.remove('bg-primary-600', 'text-white');
-                        b.classList.add('bg-gray-100', 'text-gray-600');
+                        b.classList.remove('bg-primary-100', 'text-primary-700');
+                        b.classList.add('bg-gray-100', 'text-gray-700');
                     });
-                    this.classList.remove('bg-gray-100', 'text-gray-600');
-                    this.classList.add('bg-primary-600', 'text-white');
+                    this.classList.remove('bg-gray-100', 'text-gray-700');
+                    this.classList.add('bg-primary-100', 'text-primary-700');
                     
                     currentFilter = this.dataset.filter;
                     filterBookings();
@@ -235,6 +428,18 @@
             });
 
             searchInput.addEventListener('input', filterBookings);
+
+            clearFiltersBtn.addEventListener('click', function() {
+                searchInput.value = '';
+                filterBtns.forEach(b => {
+                    b.classList.remove('bg-primary-100', 'text-primary-700');
+                    b.classList.add('bg-gray-100', 'text-gray-700');
+                });
+                filterBtns[0].classList.remove('bg-gray-100', 'text-gray-700');
+                filterBtns[0].classList.add('bg-primary-100', 'text-primary-700');
+                currentFilter = 'all';
+                filterBookings();
+            });
 
             function filterBookings() {
                 const searchTerm = searchInput.value.toLowerCase();

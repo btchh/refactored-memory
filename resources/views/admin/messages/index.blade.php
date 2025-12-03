@@ -4,7 +4,7 @@
     <div class="max-w-4xl mx-auto">
         <div class="mb-6">
             <h1 class="text-2xl font-bold text-gray-900">Messages</h1>
-            <p class="text-gray-600">Chat with your customers</p>
+            <p class="text-gray-600">Chat with customers at your branch: {{ Auth::guard('admin')->user()->branch_address }}</p>
         </div>
 
         @if($conversations->isEmpty())

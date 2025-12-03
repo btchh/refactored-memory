@@ -27,8 +27,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const messageDiv = document.createElement('div');
         messageDiv.className = `flex ${isOwn ? 'justify-end' : 'justify-start'}`;
         messageDiv.setAttribute('data-message-id', message.id);
+        
+        // Show sender name for admin messages (since multiple admins can respond from same branch)
+        const showSenderName = message.sender_type === 'admin' && message.sender_name;
+        const senderNameHtml = showSenderName 
+            ? `<p class="text-xs font-medium ${isOwn ? 'text-primary-200' : 'text-gray-600'} mb-1">${escapeHtml(message.sender_name)}</p>` 
+            : '';
+        
         messageDiv.innerHTML = `
             <div class="max-w-[70%] ${isOwn ? 'bg-primary-600 text-white' : 'bg-gray-100 text-gray-900'} rounded-lg px-4 py-2">
+                ${senderNameHtml}
                 <p class="text-sm">${escapeHtml(message.message)}</p>
                 <p class="text-xs ${isOwn ? 'text-primary-200' : 'text-gray-500'} mt-1">
                     ${message.formatted_time}

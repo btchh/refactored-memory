@@ -170,18 +170,6 @@ class BookingController extends Controller
     }
 
     /**
-     * View booking receipt
-     */
-    public function viewReceipt($id)
-    {
-        $transaction = Transaction::with(['user', 'services', 'products'])
-            ->where('user_id', auth()->id())
-            ->findOrFail($id);
-
-        return view('user.bookings.receipt', compact('transaction'));
-    }
-
-    /**
      * Calculate total price (AJAX)
      */
     public function calculateTotal(Request $request)

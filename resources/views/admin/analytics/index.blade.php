@@ -2,27 +2,33 @@
     <x-slot name="title">Analytics</x-slot>
 
     <div class="space-y-6">
-        <!-- Header with Filters -->
-        <div class="card p-6">
-            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-                <div>
-                    <h1 class="text-2xl font-bold text-gray-900 mb-1">Analytics</h1>
-                    <p class="text-gray-600">Business insights and performance metrics</p>
-                </div>
-                <div class="flex flex-wrap items-center gap-3">
-                    <div class="flex bg-gray-100 rounded-lg p-1">
-                        <button type="button" onclick="setPeriod('day')" class="px-3 py-1.5 text-sm font-medium rounded-md {{ $period === 'day' ? 'bg-white shadow text-gray-900' : 'text-gray-600 hover:text-gray-900' }}">Day</button>
-                        <button type="button" onclick="setPeriod('week')" class="px-3 py-1.5 text-sm font-medium rounded-md {{ $period === 'week' ? 'bg-white shadow text-gray-900' : 'text-gray-600 hover:text-gray-900' }}">Week</button>
-                        <button type="button" onclick="setPeriod('month')" class="px-3 py-1.5 text-sm font-medium rounded-md {{ $period === 'month' ? 'bg-white shadow text-gray-900' : 'text-gray-600 hover:text-gray-900' }}">Month</button>
-                        <button type="button" onclick="setPeriod('year')" class="px-3 py-1.5 text-sm font-medium rounded-md {{ $period === 'year' ? 'bg-white shadow text-gray-900' : 'text-gray-600 hover:text-gray-900' }}">Year</button>
-                    </div>
-                    <input type="date" id="date-picker" value="{{ $date }}" onchange="updateDate(this.value)" class="form-input text-sm">
-                </div>
-            </div>
-        </div>
+        <!-- Header -->
+        <x-modules.card class="p-6">
+            <h1 class="text-2xl font-bold text-gray-900 mb-1">Analytics</h1>
+            <p class="text-gray-600">Business insights and performance metrics</p>
+        </x-modules.card>
+
+        <!-- Filters -->
+        <x-modules.filter-panel
+            :action="route('admin.analytics.index')"
+            :quick-filters="[
+                ['label' => 'Today', 'url' => route('admin.analytics.index', ['period' => 'day']), 'active' => $period === 'day' && !$allTime && !$useCustomRange],
+                ['label' => 'This Week', 'url' => route('admin.analytics.index', ['period' => 'week']), 'active' => $period === 'week' && !$allTime && !$useCustomRange],
+                ['label' => 'This Month', 'url' => route('admin.analytics.index', ['period' => 'month']), 'active' => $period === 'month' && !$allTime && !$useCustomRange],
+                ['label' => 'This Year', 'url' => route('admin.analytics.index', ['period' => 'year']), 'active' => $period === 'year' && !$allTime && !$useCustomRange],
+                ['label' => 'All Time', 'url' => route('admin.analytics.index', ['all_time' => 'true']), 'active' => $allTime],
+            ]"
+            :show-date-range="true"
+            :start-date-value="$startDate"
+            :end-date-value="$endDate"
+            :clear-url="route('admin.analytics.index')"
+            :show-clear="$useCustomRange || $allTime"
+            submit-text="Apply"
+            grid-cols="lg:grid-cols-4"
+        />
 
         <!-- Key Metrics -->
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
             @php
                 $revenueChange = $metrics['previous_revenue'] > 0 
                     ? (($metrics['current_revenue'] - $metrics['previous_revenue']) / $metrics['previous_revenue']) * 100 
@@ -30,32 +36,53 @@
                 $completionRate = $metrics['period_bookings'] > 0 
                     ? ($metrics['completed_bookings'] / $metrics['period_bookings']) * 100 
                     : 0;
+                $cancellationRate = $metrics['period_bookings'] > 0 
+                    ? ($metrics['cancelled_bookings'] / $metrics['period_bookings']) * 100 
+                    : 0;
             @endphp
             
             <div class="bg-white rounded-lg border border-gray-200 p-5">
                 <p class="text-sm text-gray-500 mb-1">Revenue</p>
-                <p class="text-2xl font-bold text-gray-900">₱{{ number_format($metrics['current_revenue'], 2) }}</p>
+                <p class="text-2xl font-bold text-green-600">₱{{ number_format($metrics['current_revenue'], 2) }}</p>
+                @if(!$allTime && !$useCustomRange)
                 <p class="text-xs mt-1 {{ $revenueChange >= 0 ? 'text-green-600' : 'text-red-600' }}">
                     {{ $revenueChange >= 0 ? '↑' : '↓' }} {{ abs(number_format($revenueChange, 1)) }}% vs last {{ $period }}
                 </p>
+                @elseif($useCustomRange)
+                <p class="text-xs mt-1 text-gray-500">Custom range</p>
+                @else
+                <p class="text-xs mt-1 text-gray-500">All time total</p>
+                @endif
             </div>
 
             <div class="bg-white rounded-lg border border-gray-200 p-5">
-                <p class="text-sm text-gray-500 mb-1">Bookings</p>
+                <p class="text-sm text-gray-500 mb-1">Avg Order Value</p>
+                <p class="text-2xl font-bold text-gray-900">₱{{ number_format($metrics['average_order_value'], 2) }}</p>
+                <p class="text-xs text-gray-500 mt-1">Per completed booking</p>
+            </div>
+
+            <div class="bg-white rounded-lg border border-gray-200 p-5">
+                <p class="text-sm text-gray-500 mb-1">Total Bookings</p>
                 <p class="text-2xl font-bold text-gray-900">{{ number_format($metrics['period_bookings']) }}</p>
-                <p class="text-xs text-gray-500 mt-1">This {{ $period }}</p>
+                <p class="text-xs text-gray-500 mt-1">{{ $useCustomRange ? 'Custom range' : ($allTime ? 'All time' : 'This ' . $period) }}</p>
             </div>
 
             <div class="bg-white rounded-lg border border-gray-200 p-5">
                 <p class="text-sm text-gray-500 mb-1">Completed</p>
-                <p class="text-2xl font-bold text-gray-900">{{ number_format($metrics['completed_bookings']) }}</p>
+                <p class="text-2xl font-bold text-green-600">{{ number_format($metrics['completed_bookings']) }}</p>
                 <p class="text-xs text-green-600 mt-1">{{ number_format($completionRate, 0) }}% completion</p>
             </div>
 
             <div class="bg-white rounded-lg border border-gray-200 p-5">
                 <p class="text-sm text-gray-500 mb-1">Pending</p>
-                <p class="text-2xl font-bold text-gray-900">{{ $metrics['pending_bookings'] }}</p>
+                <p class="text-2xl font-bold text-yellow-600">{{ $metrics['pending_bookings'] }}</p>
                 <p class="text-xs text-yellow-600 mt-1">Needs attention</p>
+            </div>
+
+            <div class="bg-white rounded-lg border border-gray-200 p-5">
+                <p class="text-sm text-gray-500 mb-1">Cancelled</p>
+                <p class="text-2xl font-bold text-red-600">{{ $metrics['cancelled_bookings'] }}</p>
+                <p class="text-xs text-red-600 mt-1">{{ number_format($cancellationRate, 0) }}% cancellation</p>
             </div>
         </div>
 
@@ -142,18 +169,6 @@
             period: '{{ $period }}',
             date: '{{ $date }}'
         };
-
-        function setPeriod(period) {
-            const url = new URL(window.location.href);
-            url.searchParams.set('period', period);
-            window.location.href = url.toString();
-        }
-
-        function updateDate(date) {
-            const url = new URL(window.location.href);
-            url.searchParams.set('date', date);
-            window.location.href = url.toString();
-        }
     </script>
     @vite(['resources/js/pages/admin-analytics.js'])
     @endpush

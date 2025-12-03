@@ -111,7 +111,11 @@ class BookingController extends Controller
             return response()->json(['error' => 'Date is required'], 400);
         }
 
-        $bookings = $this->bookingService->getBookingsByDate($date);
+        // Get all admin IDs for this branch
+        $admin = Auth::guard('admin')->user();
+        $branchAdminIds = \App\Models\Admin::where('branch_address', $admin->branch_address)->pluck('id')->toArray();
+
+        $bookings = $this->bookingService->getBookingsByDate($date, $branchAdminIds);
 
         return response()->json([
             'success' => true,
@@ -157,7 +161,11 @@ class BookingController extends Controller
             return response()->json(['error' => 'Month and year are required'], 400);
         }
 
-        $counts = $this->bookingService->getBookingCountsByMonth($year, $month);
+        // Get all admin IDs for this branch
+        $admin = Auth::guard('admin')->user();
+        $branchAdminIds = \App\Models\Admin::where('branch_address', $admin->branch_address)->pluck('id')->toArray();
+
+        $counts = $this->bookingService->getBookingCountsByMonth($year, $month, $branchAdminIds);
 
         return response()->json([
             'success' => true,

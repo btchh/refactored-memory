@@ -10,7 +10,7 @@ class Conversation extends Model
 {
     protected $fillable = [
         'user_id',
-        'admin_id',
+        'branch_address',
         'last_message_at',
     ];
 
@@ -23,9 +23,20 @@ class Conversation extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function admin(): BelongsTo
+    /**
+     * Get all admins for this branch
+     */
+    public function branchAdmins()
     {
-        return $this->belongsTo(Admin::class);
+        return Admin::where('branch_address', $this->branch_address)->get();
+    }
+
+    /**
+     * Get the first admin for this branch (for display purposes)
+     */
+    public function getFirstBranchAdminAttribute()
+    {
+        return Admin::where('branch_address', $this->branch_address)->first();
     }
 
     public function messages(): HasMany
@@ -54,10 +65,18 @@ class Conversation extends Model
             ->count();
     }
 
-    public static function findOrCreateBetween(int $userId, int $adminId): self
+    public static function findOrCreateForBranch(int $userId, string $branchAddress): self
     {
         return self::firstOrCreate(
-            ['user_id' => $userId, 'admin_id' => $adminId]
+            ['user_id' => $userId, 'branch_address' => $branchAddress]
         );
+    }
+
+    /**
+     * Get all unique branch addresses
+     */
+    public static function getAllBranches(): array
+    {
+        return Admin::distinct()->pluck('branch_address')->filter()->toArray();
     }
 }

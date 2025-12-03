@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('admin_id')->constrained('admins')->onDelete('cascade');
             $table->string('action'); // created, updated, deleted, status_changed, etc.
-            $table->string('model_type'); // Transaction, Service, Product, User, etc.
+            $table->string('model_type')->nullable(); // Transaction, Service, Product, User, etc.
             $table->unsignedBigInteger('model_id')->nullable();
             $table->string('description');
             $table->json('old_values')->nullable();

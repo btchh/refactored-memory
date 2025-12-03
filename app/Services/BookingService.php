@@ -344,26 +344,35 @@ class BookingService
     }
 
     /**
-     * Get bookings for a specific date
+     * Get bookings for a specific date (optionally filtered by branch)
      */
-    public function getBookingsByDate($date)
+    public function getBookingsByDate($date, $branchAdminIds = null)
     {
-        return Transaction::with(['services', 'products', 'admin', 'user'])
-            ->whereDate('booking_date', $date)
-            ->orderBy('booking_time', 'asc')
-            ->get();
+        $query = Transaction::with(['services', 'products', 'admin', 'user'])
+            ->whereDate('booking_date', $date);
+        
+        if ($branchAdminIds) {
+            $query->whereIn('admin_id', $branchAdminIds);
+        }
+        
+        return $query->orderBy('booking_time', 'asc')->get();
     }
 
     /**
-     * Get booking counts by month for calendar badges
+     * Get booking counts by month for calendar badges (optionally filtered by branch)
      */
-    public function getBookingCountsByMonth($year, $month)
+    public function getBookingCountsByMonth($year, $month, $branchAdminIds = null)
     {
         $startDate = sprintf('%04d-%02d-01', $year, $month);
         $endDate = date('Y-m-t', strtotime($startDate));
 
-        $bookings = Transaction::whereBetween('booking_date', [$startDate, $endDate])
-            ->selectRaw('DATE(booking_date) as date, COUNT(*) as count')
+        $query = Transaction::whereBetween('booking_date', [$startDate, $endDate]);
+        
+        if ($branchAdminIds) {
+            $query->whereIn('admin_id', $branchAdminIds);
+        }
+        
+        $bookings = $query->selectRaw('DATE(booking_date) as date, COUNT(*) as count')
             ->groupBy('date')
             ->get()
             ->pluck('count', 'date')

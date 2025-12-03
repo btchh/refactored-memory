@@ -37,19 +37,30 @@
             </a>
         </div>
 
-        <!-- Search -->
-        <div class="card p-6">
-            <form method="GET" action="{{ route('admin.bookings.manage') }}" class="flex gap-4">
+        <!-- Search & Filters -->
+        <x-modules.filter-panel
+            :action="route('admin.bookings.manage')"
+            :quick-filters="[
+                ['label' => 'Today', 'url' => route('admin.bookings.manage', ['status' => $status, 'start_date' => now()->format('Y-m-d'), 'end_date' => now()->format('Y-m-d')]), 'active' => $startDate == now()->format('Y-m-d') && $endDate == now()->format('Y-m-d')],
+                ['label' => 'Tomorrow', 'url' => route('admin.bookings.manage', ['status' => $status, 'start_date' => now()->addDay()->format('Y-m-d'), 'end_date' => now()->addDay()->format('Y-m-d')])],
+                ['label' => 'This Week', 'url' => route('admin.bookings.manage', ['status' => $status, 'start_date' => now()->startOfWeek()->format('Y-m-d'), 'end_date' => now()->endOfWeek()->format('Y-m-d')])],
+                ['label' => 'This Month', 'url' => route('admin.bookings.manage', ['status' => $status, 'start_date' => now()->startOfMonth()->format('Y-m-d'), 'end_date' => now()->endOfMonth()->format('Y-m-d')])],
+                ['label' => 'All', 'url' => route('admin.bookings.manage', ['status' => $status]), 'active' => !$startDate && !$endDate],
+            ]"
+            :show-search="true"
+            search-placeholder="Search by customer name or email..."
+            :search-value="$search"
+            :show-date-range="true"
+            :start-date-value="$startDate"
+            :end-date-value="$endDate"
+            :clear-url="route('admin.bookings.manage', ['status' => $status])"
+            :show-clear="$search || $startDate || $endDate"
+            grid-cols="lg:grid-cols-5"
+        >
+            <x-slot name="hidden">
                 <input type="hidden" name="status" value="{{ $status }}">
-                <input type="text" name="search" value="{{ $search }}" 
-                       placeholder="Search by customer name or email..." 
-                       class="form-input flex-1">
-                <button type="submit" class="btn btn-primary">Search</button>
-                @if($search)
-                    <a href="{{ route('admin.bookings.manage', ['status' => $status]) }}" class="btn btn-outline">Clear</a>
-                @endif
-            </form>
-        </div>
+            </x-slot>
+        </x-modules.filter-panel>
 
         <!-- Alert Container -->
         <div id="alert-container"></div>
@@ -94,13 +105,31 @@
                                     </select>
                                 </td>
                                 <td class="px-6 py-4 text-right">
-                                    <button onclick="viewDetails({{ $booking->id }})" class="btn btn-sm btn-info">
-                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                        </svg>
-                                        View Details
-                                    </button>
+                                    <div class="flex flex-wrap justify-end gap-2">
+                                        <button onclick="viewDetails({{ $booking->id }})" class="btn btn-sm btn-info" title="View Details">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                            </svg>
+                                        </button>
+                                        @if($booking->status !== 'completed' && $booking->status !== 'cancelled')
+                                        <button onclick="openRescheduleModal({{ $booking->id }})" class="btn btn-sm btn-primary" title="Reschedule">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                            </svg>
+                                        </button>
+                                        <button onclick="openWeightModal({{ $booking->id }}, '{{ $booking->weight ?? '' }}')" class="btn btn-sm btn-warning" title="Update Weight">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" />
+                                            </svg>
+                                        </button>
+                                        <button onclick="cancelBooking({{ $booking->id }})" class="btn btn-sm btn-error" title="Cancel Booking">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                            </svg>
+                                        </button>
+                                        @endif
+                                    </div>
                                 </td>
                             </tr>
                         @empty
@@ -163,12 +192,48 @@
         </div>
     </dialog>
 
+    <!-- Reschedule Modal -->
+    <dialog id="reschedule-modal" class="modal">
+        <div class="modal-box bg-white rounded-lg shadow-xl max-w-md w-full">
+            <form method="dialog" class="absolute top-4 right-4">
+                <button type="submit" class="text-gray-400 hover:text-gray-600">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </form>
+            
+            <h3 class="text-xl font-semibold text-gray-900 mb-6">Reschedule Booking</h3>
+            
+            <form id="reschedule-form" class="space-y-4">
+                <input type="hidden" id="reschedule-booking-id">
+                <div class="form-group">
+                    <label class="form-label" for="reschedule-date">New Date</label>
+                    <input type="date" id="reschedule-date" class="form-input" required min="{{ date('Y-m-d') }}">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="reschedule-time">New Time</label>
+                    <select id="reschedule-time" class="form-select" required>
+                        <option value="">Loading time slots...</option>
+                    </select>
+                </div>
+                <div class="flex justify-end gap-3">
+                    <button type="button" class="btn btn-outline" onclick="document.getElementById('reschedule-modal').close()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Reschedule</button>
+                </div>
+            </form>
+        </div>
+    </dialog>
+
     @push('scripts')
     <script>
         window.bookingRoutes = {
             updateStatus: '{{ route('admin.bookings.updateStatus', ['id' => '__ID__']) }}',
             updateWeight: '{{ route('admin.bookings.updateWeight', ['id' => '__ID__']) }}',
             details: '{{ route('admin.bookings.details', ['id' => '__ID__']) }}',
+            reschedule: '{{ route('admin.bookings.reschedule', ['id' => '__ID__']) }}',
+            cancel: '{{ route('admin.bookings.cancel', ['id' => '__ID__']) }}',
+            slots: '{{ route('admin.api.calendar.slots') }}',
             csrf: '{{ csrf_token() }}'
         };
 
@@ -177,6 +242,113 @@
             document.getElementById('edit-weight-booking-id').value = bookingId;
             document.getElementById('edit-booking-weight').value = currentWeight.replace(' kg', '') || '';
             document.getElementById('edit-weight-modal').showModal();
+        }
+
+        function openWeightModal(bookingId, currentWeight) {
+            document.getElementById('edit-weight-booking-id').value = bookingId;
+            document.getElementById('edit-booking-weight').value = currentWeight || '';
+            document.getElementById('edit-weight-modal').showModal();
+        }
+
+        function openRescheduleModal(bookingId) {
+            document.getElementById('reschedule-booking-id').value = bookingId;
+            document.getElementById('reschedule-date').value = '';
+            document.getElementById('reschedule-time').innerHTML = '<option value="">Select a date first</option>';
+            document.getElementById('reschedule-modal').showModal();
+        }
+
+        // Load time slots when date changes
+        document.getElementById('reschedule-date').addEventListener('change', async function() {
+            const date = this.value;
+            const timeSelect = document.getElementById('reschedule-time');
+            
+            if (!date) {
+                timeSelect.innerHTML = '<option value="">Select a date first</option>';
+                return;
+            }
+
+            timeSelect.innerHTML = '<option value="">Loading...</option>';
+
+            try {
+                const response = await fetch(`${window.bookingRoutes.slots}?date=${date}`);
+                const result = await response.json();
+
+                if (result.success && result.slots.length > 0) {
+                    timeSelect.innerHTML = '<option value="">Select time slot</option>' + 
+                        result.slots.map(slot => `<option value="${slot.time}">${slot.display}</option>`).join('');
+                } else {
+                    timeSelect.innerHTML = '<option value="">No available slots</option>';
+                }
+            } catch (error) {
+                console.error('Error loading slots:', error);
+                timeSelect.innerHTML = '<option value="">Error loading slots</option>';
+            }
+        });
+
+        // Handle reschedule form submission
+        document.getElementById('reschedule-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const bookingId = document.getElementById('reschedule-booking-id').value;
+            const date = document.getElementById('reschedule-date').value;
+            const time = document.getElementById('reschedule-time').value;
+
+            if (!date || !time) {
+                showAlert('error', 'Please select both date and time');
+                return;
+            }
+
+            try {
+                const response = await fetch(window.bookingRoutes.reschedule.replace('__ID__', bookingId), {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': window.bookingRoutes.csrf
+                    },
+                    body: JSON.stringify({ booking_date: date, booking_time: time })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showAlert('success', result.message || 'Booking rescheduled successfully');
+                    document.getElementById('reschedule-modal').close();
+                    setTimeout(() => window.location.reload(), 1000);
+                } else {
+                    showAlert('error', result.message || 'Failed to reschedule booking');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showAlert('error', 'Failed to reschedule booking');
+            }
+        });
+
+        async function cancelBooking(bookingId) {
+            if (!confirm('Are you sure you want to cancel this booking?')) return;
+
+            const reason = prompt('Cancellation reason (optional):');
+
+            try {
+                const response = await fetch(window.bookingRoutes.cancel.replace('__ID__', bookingId), {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': window.bookingRoutes.csrf
+                    },
+                    body: JSON.stringify({ reason: reason })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showAlert('success', result.message || 'Booking cancelled successfully');
+                    setTimeout(() => window.location.reload(), 1000);
+                } else {
+                    showAlert('error', result.message || 'Failed to cancel booking');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showAlert('error', 'Failed to cancel booking');
+            }
         }
 
         document.getElementById('edit-weight-form').addEventListener('submit', async (e) => {
@@ -306,13 +478,31 @@
                             <div class="col-span-2">
                                 <p class="text-xs text-gray-500">Created: ${booking.created_at}</p>
                             </div>
-                            <div class="col-span-2 pt-4 border-t">
-                                <button onclick="editWeightFromView(${booking.id}, '${booking.weight}')" class="btn btn-warning w-full">
+                            <div class="col-span-2 pt-4 border-t space-y-2">
+                                <div class="grid grid-cols-2 gap-2">
+                                    <button onclick="editWeightFromView(${booking.id}, '${booking.weight}')" class="btn btn-warning">
+                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" />
+                                        </svg>
+                                        Update Weight
+                                    </button>
+                                    ${booking.status !== 'Completed' && booking.status !== 'Cancelled' ? `
+                                    <button onclick="document.getElementById('details-modal').close(); openRescheduleModal(${booking.id})" class="btn btn-primary">
+                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                        </svg>
+                                        Reschedule
+                                    </button>
+                                    ` : ''}
+                                </div>
+                                ${booking.status !== 'Completed' && booking.status !== 'Cancelled' ? `
+                                <button onclick="document.getElementById('details-modal').close(); cancelBooking(${booking.id})" class="btn btn-error w-full">
                                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                                     </svg>
-                                    Update Weight
+                                    Cancel Booking
                                 </button>
+                                ` : ''}
                             </div>
                         </div>
                     `;
