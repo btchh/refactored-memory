@@ -51,8 +51,10 @@ class RouteController extends Controller
                 }
             }
             
-            // Get distinct users who have bookings with this admin's branch
+            // Get distinct users who have ACTIVE bookings with this admin's branch
+            // Only show users with pending or in_progress bookings (not completed or cancelled)
             $userIds = \App\Models\Transaction::where('admin_id', $admin->id)
+                ->whereIn('status', ['pending', 'in_progress'])
                 ->distinct()
                 ->pluck('user_id');
             

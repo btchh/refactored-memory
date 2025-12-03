@@ -10,22 +10,18 @@
             gradient="primary"
         >
             <!-- Quick Stats -->
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
-                <div class="bg-white/10 backdrop-blur rounded-xl p-4">
-                    <p class="text-white/70 text-sm">Active Orders</p>
-                    <p class="text-2xl font-bold">{{ $activeOrders }}</p>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6">
+                <div class="bg-white/10 backdrop-blur rounded-xl p-5 text-center">
+                    <p class="text-white/70 text-sm mb-2">Active Orders</p>
+                    <p class="text-3xl font-bold">{{ $activeOrders }}</p>
                 </div>
-                <div class="bg-white/10 backdrop-blur rounded-xl p-4">
-                    <p class="text-white/70 text-sm">Completed</p>
-                    <p class="text-2xl font-bold">{{ $completedOrders }}</p>
+                <div class="bg-white/10 backdrop-blur rounded-xl p-5 text-center">
+                    <p class="text-white/70 text-sm mb-2">Completed</p>
+                    <p class="text-3xl font-bold">{{ $completedOrders }}</p>
                 </div>
-                <div class="bg-white/10 backdrop-blur rounded-xl p-4">
-                    <p class="text-white/70 text-sm">Next Pickup</p>
-                    <p class="text-2xl font-bold">{{ $nextBooking ? $nextBooking->booking_date->format('M d') : 'None' }}</p>
-                </div>
-                <div class="bg-white/10 backdrop-blur rounded-xl p-4">
-                    <p class="text-white/70 text-sm">Total Spent</p>
-                    <p class="text-2xl font-bold">₱{{ number_format($recentBookings->sum('total_price'), 0) }}</p>
+                <div class="bg-white/10 backdrop-blur rounded-xl p-5 text-center">
+                    <p class="text-white/70 text-sm mb-2">Next Pickup</p>
+                    <p class="text-3xl font-bold">{{ $nextBooking ? $nextBooking->booking_date->format('M d') : 'None' }}</p>
                 </div>
             </div>
         </x-modules.page-header>

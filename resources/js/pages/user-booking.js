@@ -230,7 +230,34 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // Branch selection handler
+    // Branch card selection handler
+    const branchCards = document.querySelectorAll('.branch-card');
+    branchCards.forEach(card => {
+        card.addEventListener('click', function() {
+            // Remove selected state from all cards
+            branchCards.forEach(c => {
+                c.classList.remove('border-purple-600', 'bg-purple-50');
+                c.classList.add('border-gray-200');
+                c.querySelector('.branch-check')?.classList.add('hidden');
+            });
+            
+            // Add selected state to clicked card
+            this.classList.remove('border-gray-200');
+            this.classList.add('border-purple-600', 'bg-purple-50');
+            this.querySelector('.branch-check')?.classList.remove('hidden');
+            
+            // Update hidden select
+            const branchId = this.dataset.branchId;
+            const adminSelect = document.getElementById('admin_id');
+            if (adminSelect) {
+                adminSelect.value = branchId;
+                // Trigger change event to load pricing
+                adminSelect.dispatchEvent(new Event('change'));
+            }
+        });
+    });
+
+    // Branch selection handler (for hidden select)
     const adminSelect = document.getElementById('admin_id');
     if (adminSelect) {
         adminSelect.addEventListener('change', async function() {

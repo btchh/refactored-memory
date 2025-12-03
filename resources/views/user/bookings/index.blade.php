@@ -165,10 +165,12 @@
                             </div>
                             <div>
                                 <h2 class="text-lg font-bold text-gray-900">Select Branch</h2>
-                                <p class="text-sm text-gray-500">Choose your preferred laundry branch</p>
+                                <p class="text-sm text-gray-500">Choose your preferred laundry branch ({{ count($branches) }} available)</p>
                             </div>
                         </div>
-                        <select name="admin_id" id="admin_id" class="form-select bg-gray-50 border-gray-200 focus:border-purple-400 focus:ring-purple-400 rounded-xl" required>
+                        
+                        <!-- Hidden select for form submission -->
+                        <select name="admin_id" id="admin_id" class="hidden" required>
                             <option value="">Choose your preferred branch</option>
                             @foreach($branches as $branch)
                                 <option value="{{ $branch['id'] }}" data-address="{{ $branch['address'] }}" data-phone="{{ $branch['phone'] }}">
@@ -176,6 +178,49 @@
                                 </option>
                             @endforeach
                         </select>
+                        
+                        <!-- Branch Cards -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            @foreach($branches as $branch)
+                                <div class="branch-card cursor-pointer border-2 border-gray-200 rounded-xl p-4 hover:border-purple-400 hover:bg-purple-50/50 transition-all duration-200" 
+                                     data-branch-id="{{ $branch['id'] }}"
+                                     data-address="{{ $branch['address'] }}"
+                                     data-phone="{{ $branch['phone'] }}">
+                                    <div class="flex items-start gap-3">
+                                        <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                            <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                                            </svg>
+                                        </div>
+                                        <div class="flex-1 min-w-0">
+                                            <h3 class="font-bold text-gray-900 mb-1">{{ $branch['branch_name'] }}</h3>
+                                            <p class="text-sm text-gray-600 mb-2">{{ $branch['name'] }}</p>
+                                            <div class="space-y-1">
+                                                <div class="flex items-start gap-2 text-xs text-gray-500">
+                                                    <svg class="w-4 h-4 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                                    </svg>
+                                                    <span class="flex-1">{{ $branch['address'] }}</span>
+                                                </div>
+                                                <div class="flex items-center gap-2 text-xs text-gray-500">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
+                                                    </svg>
+                                                    <span>{{ $branch['phone'] }}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="branch-check hidden">
+                                            <svg class="w-6 h-6 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                            </svg>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                        
                         <div id="branch-info" class="mt-4 p-4 bg-gradient-to-r from-purple-50 to-purple-100/50 border border-purple-200 rounded-xl hidden">
                             <div class="flex items-start gap-3">
                                 <div class="w-8 h-8 bg-purple-200 rounded-lg flex items-center justify-center flex-shrink-0">

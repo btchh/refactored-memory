@@ -76,7 +76,7 @@
                             </a>
                         </li>
                         <li class="border-t border-gray-200">
-                            <form action="{{ route('admin.logout') }}" method="POST" class="block">
+                            <form action="{{ route('admin.logout') }}" method="POST" class="block" data-no-protection>
                                 @csrf
                                 <button type="submit" class="flex items-center gap-3 px-4 py-3 hover:bg-red-50 transition-colors w-full text-left touch-target">
                                     <!-- Logout Icon -->
@@ -107,7 +107,7 @@
                             </a>
                         </li>
                         <li class="border-t border-gray-200">
-                            <form action="{{ route('user.logout') }}" method="POST" class="block">
+                            <form action="{{ route('user.logout') }}" method="POST" class="block" data-no-protection>
                                 @csrf
                                 <button type="submit" class="flex items-center gap-3 px-4 py-3 hover:bg-red-50 transition-colors w-full text-left touch-target">
                                     <!-- Logout Icon -->

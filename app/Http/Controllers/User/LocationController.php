@@ -53,26 +53,9 @@ class LocationController extends Controller
                 }
             }
             
-            // Get distinct admins who have handled bookings for this user
-            $adminIds = Transaction::where('user_id', $user->id)
-                ->distinct()
-                ->pluck('admin_id');
-            
-            if ($adminIds->isEmpty()) {
-                return response()->json([
-                    'success' => true,
-                    'admins' => [],
-                    'user_location' => $user->latitude && $user->longitude ? [
-                        'latitude' => (float) $user->latitude,
-                        'longitude' => (float) $user->longitude,
-                        'name' => $user->fname . ' ' . $user->lname
-                    ] : null,
-                    'message' => 'No shops have handled your bookings yet'
-                ]);
-            }
-
-            // Get admins with addresses
-            $admins = Admin::whereIn('id', $adminIds)
+            // Get ALL available admins/branches so users can see all options
+            // This helps users choose the optimal branch based on location
+            $admins = Admin::query()
                 ->whereNotNull('address')
                 ->get()
                 ->map(function ($admin) use ($user) {
