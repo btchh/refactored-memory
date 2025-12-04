@@ -5,24 +5,38 @@ use App\Http\Controllers\User\Auth\LoginController;
 use App\Http\Controllers\User\Auth\RegisterController;
 use App\Http\Controllers\User\Auth\PasswordResetController;
 
-// Public routes (Authentication) with rate limiting
-Route::middleware(['guest:web', 'throttle:5,1'])->group(function () {
-    // Login
+// Public routes (Authentication) with progressive rate limiting
+Route::middleware(['guest:web'])->group(function () {
+    // Login - Progressive rate limiting (5 attempts, then 5min, 10min, 15min...)
     Route::get('login', [LoginController::class, 'showLogin'])->name('login');
-    Route::post('login', [LoginController::class, 'login'])->name('login.submit');
+    Route::post('login', [LoginController::class, 'login'])
+        ->middleware('rate.limit.progressive:login')
+        ->name('login.submit');
     
-    // Registration
+    // Registration - Progressive rate limiting (3 attempts for OTP, 3 for registration)
     Route::get('register', [RegisterController::class, 'showRegister'])->name('register');
-    Route::post('send-registration-otp', [RegisterController::class, 'sendRegistrationOtp'])->name('send-registration-otp');
-    Route::post('verify-otp', [RegisterController::class, 'verifyRegistrationOtp'])->name('verify-otp');
-    Route::post('register', [RegisterController::class, 'register'])->name('register.submit');
+    Route::post('send-registration-otp', [RegisterController::class, 'sendRegistrationOtp'])
+        ->middleware('rate.limit.progressive:otp')
+        ->name('send-registration-otp');
+    Route::post('verify-otp', [RegisterController::class, 'verifyRegistrationOtp'])
+        ->middleware('rate.limit.progressive:otp')
+        ->name('verify-otp');
+    Route::post('register', [RegisterController::class, 'register'])
+        ->middleware('rate.limit.progressive:register')
+        ->name('register.submit');
     
-    // Password Reset
+    // Password Reset - Progressive rate limiting (3 attempts for OTP)
     Route::get('forgot-password', [PasswordResetController::class, 'showForgotPassword'])->name('forgot-password');
-    Route::post('send-password-reset-otp', [PasswordResetController::class, 'sendPasswordResetOtp'])->name('send-password-reset-otp');
-    Route::post('verify-password-reset-otp', [PasswordResetController::class, 'verifyPasswordResetOtp'])->name('verify-password-reset-otp');
+    Route::post('send-password-reset-otp', [PasswordResetController::class, 'sendPasswordResetOtp'])
+        ->middleware('rate.limit.progressive:otp')
+        ->name('send-password-reset-otp');
+    Route::post('verify-password-reset-otp', [PasswordResetController::class, 'verifyPasswordResetOtp'])
+        ->middleware('rate.limit.progressive:otp')
+        ->name('verify-password-reset-otp');
     Route::get('reset-password/{phone}', [PasswordResetController::class, 'showResetPassword'])->name('reset-password');
-    Route::post('reset-password', [PasswordResetController::class, 'resetPassword'])->name('reset-password.submit');
+    Route::post('reset-password', [PasswordResetController::class, 'resetPassword'])
+        ->middleware('rate.limit.progressive:login')
+        ->name('reset-password.submit');
 });
 
 // Protected routes

@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('transactions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('cascade');
             $table->foreignId('admin_id')->nullable()->constrained('admins')->onDelete('set null');
             
             // Booking/Scheduling fields
@@ -33,6 +33,7 @@ return new class extends Migration
             $table->decimal('weight', 10, 2)->nullable()->comment('For documentation only');
             $table->decimal('total_price', 10, 2);
             $table->enum('status', ['pending', 'in_progress', 'completed', 'cancelled'])->default('pending');
+            $table->enum('booking_type', ['online', 'walkin'])->default('online');
             
             $table->timestamps();
 

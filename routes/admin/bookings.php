@@ -11,9 +11,11 @@ Route::middleware(['auth:admin', 'prevent.back'])->group(function () {
     Route::post('bookings/{id}/update-status', [BookingManagementController::class, 'updateStatus'])->name('bookings.updateStatus');
     Route::post('bookings/{id}/update-weight', [BookingManagementController::class, 'updateWeight'])->name('bookings.updateWeight');
     
-    // Booking Management (Calendar/Creation)
+    // Booking Management (Calendar/Creation) - Progressive rate limiting (10 attempts)
     Route::get('bookings', [BookingController::class, 'index'])->name('bookings.index');
-    Route::post('bookings', [BookingController::class, 'store'])->name('bookings.store');
+    Route::post('bookings', [BookingController::class, 'store'])
+        ->middleware('rate.limit.progressive:booking')
+        ->name('bookings.store');
     Route::put('bookings/{id}', [BookingController::class, 'update'])->name('bookings.update');
     Route::post('bookings/{id}/reschedule', [BookingController::class, 'reschedule'])->name('bookings.reschedule');
     Route::delete('bookings/{id}', [BookingController::class, 'cancel'])->name('bookings.cancel');

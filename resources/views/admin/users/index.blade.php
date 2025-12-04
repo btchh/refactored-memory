@@ -173,13 +173,18 @@
                                     </div>
                                 </td>
                                 <td class="px-6 py-4">
-                                    <div class="flex items-center gap-2">
-                                        <div class="w-8 h-8 rounded-lg bg-violet-100 flex items-center justify-center">
-                                            <svg class="w-4 h-4 text-violet-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-                                            </svg>
+                                    <div class="space-y-1">
+                                        <div class="flex items-center gap-2">
+                                            <div class="w-8 h-8 rounded-lg bg-violet-100 flex items-center justify-center">
+                                                <svg class="w-4 h-4 text-violet-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                                                </svg>
+                                            </div>
+                                            <span class="text-sm font-bold text-gray-900">{{ $user->total_transactions_count }}</span>
                                         </div>
-                                        <span class="text-sm font-bold text-gray-900">{{ $user->transactions_count }}</span>
+                                        @if($user->transactions_count > 0)
+                                            <p class="text-xs text-gray-500 ml-10">{{ $user->transactions_count }} at your branch</p>
+                                        @endif
                                     </div>
                                 </td>
                                 <td class="px-6 py-4">

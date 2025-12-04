@@ -66,9 +66,18 @@
                     <h2 class="card-title">Booking Statistics</h2>
                 </div>
                 <div class="card-body space-y-4">
-                    <div class="flex justify-between items-center">
-                        <span class="text-sm font-medium text-gray-600">Total Bookings</span>
-                        <span class="text-lg font-bold text-gray-900">{{ $bookingStats['total'] }}</span>
+                    <div class="border-b border-gray-200 pb-3 mb-3">
+                        <p class="text-xs font-semibold text-gray-500 uppercase mb-2">All Branches</p>
+                        <div class="space-y-2">
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm font-medium text-gray-600">Total Bookings</span>
+                                <span class="text-lg font-bold text-gray-900">{{ $bookingStats['total'] }}</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm font-medium text-gray-600">Total Spent</span>
+                                <span class="text-lg font-bold text-gray-900">₱{{ number_format($bookingStats['total_spent'], 2) }}</span>
+                            </div>
+                        </div>
                     </div>
                     <div class="flex justify-between items-center">
                         <span class="text-sm font-medium text-gray-600">Completed</span>
@@ -82,6 +91,21 @@
                         <span class="text-sm font-medium text-gray-600">Cancelled</span>
                         <span class="text-lg font-bold text-error">{{ $bookingStats['cancelled'] }}</span>
                     </div>
+                    @if($bookingStats['branch_bookings'] > 0)
+                        <div class="border-t border-gray-200 pt-3 mt-3">
+                            <p class="text-xs font-semibold text-primary-600 uppercase mb-2">Your Branch</p>
+                            <div class="space-y-2">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-sm font-medium text-gray-600">Bookings</span>
+                                    <span class="text-lg font-bold text-primary-600">{{ $bookingStats['branch_bookings'] }}</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-sm font-medium text-gray-600">Revenue</span>
+                                    <span class="text-lg font-bold text-primary-600">₱{{ number_format($bookingStats['branch_spent'], 2) }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>
@@ -89,13 +113,14 @@
         <!-- Recent Bookings -->
         <div class="card">
             <div class="card-header">
-                <h2 class="card-title">Recent Bookings</h2>
+                <h2 class="card-title">Recent Bookings (All Branches)</h2>
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full">
                     <thead class="bg-gray-50">
                         <tr>
                             <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Date & Time</th>
+                            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Branch</th>
                             <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Item Type</th>
                             <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Total</th>
                             <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Status</th>
@@ -107,6 +132,14 @@
                                 <td class="px-6 py-4">
                                     <p class="text-sm font-medium text-gray-900">{{ $transaction->booking_date->format('M d, Y') }}</p>
                                     <p class="text-xs text-gray-500">{{ \Carbon\Carbon::parse($transaction->booking_time)->format('g:i A') }}</p>
+                                </td>
+                                <td class="px-6 py-4">
+                                    @if($transaction->admin)
+                                        <p class="text-sm text-gray-900">{{ $transaction->admin->admin_name }}</p>
+                                        <p class="text-xs text-gray-500">{{ $transaction->admin->branch_address ?? 'N/A' }}</p>
+                                    @else
+                                        <span class="text-xs text-gray-400">Unassigned</span>
+                                    @endif
                                 </td>
                                 <td class="px-6 py-4">
                                     <span class="text-sm text-gray-900">{{ ucfirst($transaction->item_type) }}</span>
@@ -122,7 +155,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="4" class="px-6 py-8 text-center text-gray-500">
+                                <td colspan="5" class="px-6 py-8 text-center text-gray-500">
                                     No bookings yet
                                 </td>
                             </tr>

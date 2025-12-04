@@ -28,14 +28,12 @@ class UserManagementController extends Controller
         $status = $request->get('status');
         $showDeleted = $request->get('deleted') === 'true';
         
-        // Only show users who have booked with this branch
+        // Show all users globally with transaction counts for this branch
         $query = User::query()
-            ->whereHas('transactions', function ($q) use ($branchAdminIds) {
-                $q->whereIn('admin_id', $branchAdminIds);
-            })
             ->withCount(['transactions' => function ($q) use ($branchAdminIds) {
                 $q->whereIn('admin_id', $branchAdminIds);
-            }]);
+            }])
+            ->withCount('transactions as total_transactions_count');
         
         // Show deleted or active users
         if ($showDeleted) {
@@ -58,16 +56,12 @@ class UserManagementController extends Controller
         
         $users = $query->orderBy('created_at', 'desc')->paginate(15);
         
-        // Stats for users who have booked with this branch
-        $userIds = User::whereHas('transactions', function ($q) use ($branchAdminIds) {
-            $q->whereIn('admin_id', $branchAdminIds);
-        })->pluck('id');
-        
+        // Global stats for all users
         $stats = [
-            'total' => $userIds->count(),
-            'active' => User::whereIn('id', $userIds)->where('status', 'active')->count(),
-            'disabled' => User::whereIn('id', $userIds)->where('status', 'disabled')->count(),
-            'archived' => User::whereIn('id', $userIds)->onlyTrashed()->count(),
+            'total' => User::count(),
+            'active' => User::where('status', 'active')->count(),
+            'disabled' => User::where('status', 'disabled')->count(),
+            'archived' => User::onlyTrashed()->count(),
         ];
         
         return view('admin.users.index', compact('users', 'stats', 'search', 'status', 'showDeleted'));
@@ -79,22 +73,23 @@ class UserManagementController extends Controller
         // Get all admin IDs for this branch
         $branchAdminIds = \App\Models\Admin::where('branch_address', $admin->branch_address)->pluck('id');
         
-        // Only show user if they have booked with this branch
-        $user = User::whereHas('transactions', function ($q) use ($branchAdminIds) {
-            $q->whereIn('admin_id', $branchAdminIds);
-        })->with(['transactions' => function($query) use ($branchAdminIds) {
-            $query->whereIn('admin_id', $branchAdminIds)
+        // Show any user globally with all their transactions
+        $user = User::with(['transactions' => function($query) {
+            $query->with('admin')
                   ->orderBy('created_at', 'desc')
-                  ->limit(10);
+                  ->limit(20);
         }])->findOrFail($id);
         
-        // Stats only for this branch's transactions
+        // Global stats for all user's transactions
         $bookingStats = [
-            'total' => $user->transactions()->whereIn('admin_id', $branchAdminIds)->count(),
-            'completed' => $user->transactions()->whereIn('admin_id', $branchAdminIds)->where('status', 'completed')->count(),
-            'pending' => $user->transactions()->whereIn('admin_id', $branchAdminIds)->where('status', 'pending')->count(),
-            'cancelled' => $user->transactions()->whereIn('admin_id', $branchAdminIds)->where('status', 'cancelled')->count(),
-            'total_spent' => $user->transactions()->whereIn('admin_id', $branchAdminIds)->where('status', '!=', 'cancelled')->sum('total_price'),
+            'total' => $user->transactions()->count(),
+            'completed' => $user->transactions()->where('status', 'completed')->count(),
+            'pending' => $user->transactions()->where('status', 'pending')->count(),
+            'cancelled' => $user->transactions()->where('status', 'cancelled')->count(),
+            'total_spent' => $user->transactions()->where('status', '!=', 'cancelled')->sum('total_price'),
+            // Branch-specific stats
+            'branch_bookings' => $user->transactions()->whereIn('admin_id', $branchAdminIds)->count(),
+            'branch_spent' => $user->transactions()->whereIn('admin_id', $branchAdminIds)->where('status', '!=', 'cancelled')->sum('total_price'),
         ];
         
         return view('admin.users.show', compact('user', 'bookingStats'));
