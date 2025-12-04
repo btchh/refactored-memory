@@ -2,40 +2,17 @@
     <x-slot name="title">Audit Log</x-slot>
 
     @php
-        $actionCounts = $logs->getCollection()->groupBy('action')->map->count();
-        $filteredTotal = $logs->total();
-        $createdCount = $actionCounts->get('created', 0);
-        $updatedCount = $actionCounts->get('updated', 0);
-        $statusChangedCount = $actionCounts->get('status_changed', 0);
-        $loginCount = $actionCounts->get('login', 0);
-        $deletedCount = $actionCounts->get('deleted', 0);
+        // Get current admin
+        $adminId = Auth::guard('admin')->id();
         
-        // Get actual total count (without date filters) for "All Time" display
-        $allTimeTotal = \App\Models\AuditLog::forAdmin(Auth::guard('admin')->id())->count();
-        
-        $hasDateFilter = request('from') || request('to');
-        $isCustomRequest = request('custom') == '1';
-        $isToday = request('from') == now()->format('Y-m-d') && request('to') == now()->format('Y-m-d');
-        $is7Days = request('from') == now()->subDays(7)->format('Y-m-d') && request('to') == now()->format('Y-m-d');
-        $is30Days = request('from') == now()->subDays(30)->format('Y-m-d') && request('to') == now()->format('Y-m-d');
-        $isThisMonth = request('from') == now()->startOfMonth()->format('Y-m-d') && request('to') == now()->format('Y-m-d');
-        
-        // Determine current period - if dates don't match any preset, it's custom
-        if ($isCustomRequest) {
-            $currentPeriod = 'custom';
-        } elseif (!$hasDateFilter) {
-            $currentPeriod = 'all';
-        } elseif ($isToday) {
-            $currentPeriod = 'today';
-        } elseif ($is7Days) {
-            $currentPeriod = '7days';
-        } elseif ($is30Days) {
-            $currentPeriod = '30days';
-        } elseif ($isThisMonth) {
-            $currentPeriod = 'month';
-        } else {
-            $currentPeriod = 'custom';
-        }
+        // Get counts for each action type (from database, not paginated collection)
+        $baseQuery = \App\Models\AuditLog::forAdmin($adminId);
+        $allTimeTotal = $baseQuery->count();
+        $createdCount = (clone $baseQuery)->where('action', 'created')->count();
+        $updatedCount = (clone $baseQuery)->where('action', 'updated')->count();
+        $statusChangedCount = (clone $baseQuery)->where('action', 'status_changed')->count();
+        $loginCount = (clone $baseQuery)->where('action', 'login')->count();
+        $deletedCount = (clone $baseQuery)->where('action', 'deleted')->count();
     @endphp
 
     <div class="space-y-6">
@@ -126,24 +103,18 @@
         <!-- Filters -->
         <x-modules.filter-panel
             :status-filters="[
-                ['key' => 'all', 'label' => 'All Time', 'count' => $allTimeTotal, 'color' => 'primary', 'icon' => 'list'],
-                ['key' => 'today', 'label' => 'Today', 'color' => 'blue'],
-                ['key' => '7days', 'label' => 'Last 7 Days', 'color' => 'green'],
-                ['key' => '30days', 'label' => 'Last 30 Days', 'color' => 'yellow'],
-                ['key' => 'month', 'label' => 'This Month', 'color' => 'purple'],
-                ['key' => 'custom', 'label' => 'Custom Range', 'color' => 'red'],
+                ['key' => '', 'label' => 'All Actions', 'count' => $allTimeTotal, 'color' => 'primary', 'icon' => 'list'],
+                ['key' => 'created', 'label' => 'Created', 'count' => $createdCount, 'color' => 'green'],
+                ['key' => 'updated', 'label' => 'Updated', 'count' => $updatedCount, 'color' => 'blue'],
+                ['key' => 'status_changed', 'label' => 'Status Changed', 'count' => $statusChangedCount, 'color' => 'yellow'],
+                ['key' => 'login', 'label' => 'Logins', 'count' => $loginCount, 'color' => 'purple'],
+                ['key' => 'deleted', 'label' => 'Deleted', 'count' => $deletedCount, 'color' => 'red'],
             ]"
-            :current-status="$currentPeriod"
+            :current-status="request('action', '')"
             :show-search="true"
             search-placeholder="Search description..."
-            :show-date-range="true"
-            :show-custom-date-filter="true"
-            start-date-name="from"
-            end-date-name="to"
-            start-date-label="From"
-            end-date-label="To"
             :clear-url="route('admin.audit')"
-            grid-cols="lg:grid-cols-4"
+            grid-cols="lg:grid-cols-6"
         />
 
         <!-- Audit Log Table -->
@@ -256,29 +227,41 @@
         document.querySelectorAll('.filter-btn[data-filter]').forEach(btn => {
             btn.addEventListener('click', function() {
                 const filter = this.dataset.filter;
-                const today = new Date().toISOString().split('T')[0];
+                const search = document.querySelector('input[name="search"]')?.value || '';
                 let url = '{{ route("admin.audit") }}';
+                const params = new URLSearchParams();
                 
-                if (filter === 'custom') {
-                    // Show the date range section - reload with custom param to show inputs
-                    url += '?custom=1';
-                } else if (filter === 'today') {
-                    url += `?from=${today}&to=${today}`;
-                } else if (filter === '7days') {
-                    const from = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-                    url += `?from=${from}&to=${today}`;
-                } else if (filter === '30days') {
-                    const from = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-                    url += `?from=${from}&to=${today}`;
-                } else if (filter === 'month') {
-                    const date = new Date();
-                    const from = new Date(date.getFullYear(), date.getMonth(), 1).toISOString().split('T')[0];
-                    url += `?from=${from}&to=${today}`;
+                // Add action filter if not empty
+                if (filter && filter !== '') {
+                    params.set('action', filter);
                 }
-                // 'all' goes to base URL without params
+                
+                // Preserve search
+                if (search) {
+                    params.set('search', search);
+                }
+                
+                if (params.toString()) {
+                    url += '?' + params.toString();
+                }
                 
                 window.location.href = url;
             });
+        });
+
+        // Handle search on Enter key
+        document.querySelector('input[name="search"]')?.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const search = this.value;
+                const currentUrl = new URL(window.location.href);
+                if (search) {
+                    currentUrl.searchParams.set('search', search);
+                } else {
+                    currentUrl.searchParams.delete('search');
+                }
+                window.location.href = currentUrl.toString();
+            }
         });
     </script>
     @endpush
