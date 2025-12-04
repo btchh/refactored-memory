@@ -61,76 +61,134 @@
                 <form action="{{ route('user.booking.submit') }}" method="POST" id="booking-form" class="hidden space-y-6">
                     @csrf
 
-                    <!-- Service Type Selection - Intuitive Cards -->
+                    <!-- Service Type Selection - Four Options -->
                     <div class="bg-white rounded-lg border border-gray-200 p-6">
-                        <h2 class="text-lg font-bold text-gray-900 mb-2">How would you like to proceed?</h2>
-                        <p class="text-sm text-gray-500 mb-4">Choose how you want your laundry handled</p>
+                        <h2 class="text-lg font-bold text-gray-900 mb-2">Choose Your Service</h2>
+                        <p class="text-sm text-gray-500 mb-4">Select how you want your laundry picked up and delivered</p>
+                        
+                        <input type="hidden" name="pickup_method" id="pickup_method" value="branch_pickup">
+                        <input type="hidden" name="delivery_method" id="delivery_method" value="branch_delivery">
                         
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <!-- Pickup Option -->
-                            <label class="service-type-card cursor-pointer group">
-                                <input type="radio" name="service_type" value="pickup" class="hidden" checked>
-                                <div class="relative border-2 border-gray-200 rounded-xl p-5 transition-all duration-200 hover:border-blue-300 hover:shadow-md group-has-[:checked]:border-blue-500 group-has-[:checked]:bg-blue-50 group-has-[:checked]:shadow-lg">
-                                    <!-- Selected indicator -->
-                                    <div class="absolute top-3 right-3 w-6 h-6 rounded-full border-2 border-gray-300 flex items-center justify-center group-has-[:checked]:border-blue-500 group-has-[:checked]:bg-blue-500">
-                                        <svg class="w-4 h-4 text-white hidden group-has-[:checked]:block" fill="currentColor" viewBox="0 0 20 20">
+                            <!-- Full Service -->
+                            <label class="service-option-card cursor-pointer group" data-pickup="branch_pickup" data-delivery="branch_delivery">
+                                <input type="radio" name="service_option" value="full_service" class="hidden" checked>
+                                <div class="relative border-2 border-gray-200 rounded-xl p-4 transition-all duration-200 hover:border-blue-300 hover:shadow-md group-has-[:checked]:border-blue-500 group-has-[:checked]:bg-blue-50 group-has-[:checked]:shadow-lg">
+                                    <div class="absolute top-3 right-3 w-5 h-5 rounded-full border-2 border-gray-300 flex items-center justify-center group-has-[:checked]:border-blue-500 group-has-[:checked]:bg-blue-500">
+                                        <svg class="w-3 h-3 text-white hidden group-has-[:checked]:block" fill="currentColor" viewBox="0 0 20 20">
                                             <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
                                         </svg>
                                     </div>
-                                    
-                                    <div class="flex items-start gap-4">
-                                        <div class="w-14 h-14 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0 group-has-[:checked]:bg-blue-200">
-                                            <svg class="w-7 h-7 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
+                                    <div class="flex items-start gap-3">
+                                        <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0 group-has-[:checked]:bg-blue-200">
+                                            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>
                                             </svg>
                                         </div>
                                         <div class="flex-1">
-                                            <h3 class="font-bold text-gray-900 text-lg mb-1">Home Pickup</h3>
-                                            <p class="text-sm text-gray-500 leading-relaxed">We'll come to your location to collect your laundry</p>
-                                            <div class="mt-3 flex items-center gap-2 text-xs text-blue-600 font-medium">
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                                </svg>
-                                                <span>Convenient doorstep service</span>
-                                            </div>
+                                            <h3 class="font-bold text-gray-900 mb-1">Full Service</h3>
+                                            <p class="text-xs text-gray-500 mb-2">We pick up & deliver</p>
+                                            <span class="inline-block px-2 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded">Most Convenient</span>
                                         </div>
                                     </div>
                                 </div>
                             </label>
 
-                            <!-- Drop-off Option -->
-                            <label class="service-type-card cursor-pointer group">
-                                <input type="radio" name="service_type" value="dropoff" class="hidden">
-                                <div class="relative border-2 border-gray-200 rounded-xl p-5 transition-all duration-200 hover:border-green-300 hover:shadow-md group-has-[:checked]:border-green-500 group-has-[:checked]:bg-green-50 group-has-[:checked]:shadow-lg">
-                                    <!-- Selected indicator -->
-                                    <div class="absolute top-3 right-3 w-6 h-6 rounded-full border-2 border-gray-300 flex items-center justify-center group-has-[:checked]:border-green-500 group-has-[:checked]:bg-green-500">
-                                        <svg class="w-4 h-4 text-white hidden group-has-[:checked]:block" fill="currentColor" viewBox="0 0 20 20">
+                            <!-- Self Drop-off -->
+                            <label class="service-option-card cursor-pointer group" data-pickup="customer_dropoff" data-delivery="branch_delivery">
+                                <input type="radio" name="service_option" value="self_dropoff" class="hidden">
+                                <div class="relative border-2 border-gray-200 rounded-xl p-4 transition-all duration-200 hover:border-green-300 hover:shadow-md group-has-[:checked]:border-green-500 group-has-[:checked]:bg-green-50 group-has-[:checked]:shadow-lg">
+                                    <div class="absolute top-3 right-3 w-5 h-5 rounded-full border-2 border-gray-300 flex items-center justify-center group-has-[:checked]:border-green-500 group-has-[:checked]:bg-green-500">
+                                        <svg class="w-3 h-3 text-white hidden group-has-[:checked]:block" fill="currentColor" viewBox="0 0 20 20">
                                             <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
                                         </svg>
                                     </div>
-                                    
-                                    <div class="flex items-start gap-4">
-                                        <div class="w-14 h-14 bg-green-100 rounded-xl flex items-center justify-center flex-shrink-0 group-has-[:checked]:bg-green-200">
-                                            <svg class="w-7 h-7 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                                    <div class="flex items-start gap-3">
+                                        <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0 group-has-[:checked]:bg-green-200">
+                                            <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
                                             </svg>
                                         </div>
                                         <div class="flex-1">
-                                            <h3 class="font-bold text-gray-900 text-lg mb-1">Self Drop-off</h3>
-                                            <p class="text-sm text-gray-500 leading-relaxed">Bring your laundry directly to our branch</p>
-                                            <div class="mt-3 flex items-center gap-2 text-xs text-green-600 font-medium">
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                                </svg>
-                                                <span>Faster processing time</span>
-                                            </div>
+                                            <h3 class="font-bold text-gray-900 mb-1">Self Drop-off</h3>
+                                            <p class="text-xs text-gray-500 mb-2">You drop off, we deliver</p>
+                                            <span class="inline-block px-2 py-1 bg-green-100 text-green-700 text-xs font-medium rounded">Save on Pickup</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </label>
+
+                            <!-- Self Pickup -->
+                            <label class="service-option-card cursor-pointer group" data-pickup="branch_pickup" data-delivery="customer_pickup">
+                                <input type="radio" name="service_option" value="self_pickup" class="hidden">
+                                <div class="relative border-2 border-gray-200 rounded-xl p-4 transition-all duration-200 hover:border-purple-300 hover:shadow-md group-has-[:checked]:border-purple-500 group-has-[:checked]:bg-purple-50 group-has-[:checked]:shadow-lg">
+                                    <div class="absolute top-3 right-3 w-5 h-5 rounded-full border-2 border-gray-300 flex items-center justify-center group-has-[:checked]:border-purple-500 group-has-[:checked]:bg-purple-500">
+                                        <svg class="w-3 h-3 text-white hidden group-has-[:checked]:block" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                        </svg>
+                                    </div>
+                                    <div class="flex items-start gap-3">
+                                        <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0 group-has-[:checked]:bg-purple-200">
+                                            <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16l-4-4m0 0l4-4m-4 4h18"/>
+                                            </svg>
+                                        </div>
+                                        <div class="flex-1">
+                                            <h3 class="font-bold text-gray-900 mb-1">Self Pickup</h3>
+                                            <p class="text-xs text-gray-500 mb-2">We pick up, you collect</p>
+                                            <span class="inline-block px-2 py-1 bg-purple-100 text-purple-700 text-xs font-medium rounded">Save on Delivery</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </label>
+
+                            <!-- Self Service -->
+                            <label class="service-option-card cursor-pointer group" data-pickup="customer_dropoff" data-delivery="customer_pickup">
+                                <input type="radio" name="service_option" value="self_service" class="hidden">
+                                <div class="relative border-2 border-gray-200 rounded-xl p-4 transition-all duration-200 hover:border-orange-300 hover:shadow-md group-has-[:checked]:border-orange-500 group-has-[:checked]:bg-orange-50 group-has-[:checked]:shadow-lg">
+                                    <div class="absolute top-3 right-3 w-5 h-5 rounded-full border-2 border-gray-300 flex items-center justify-center group-has-[:checked]:border-orange-500 group-has-[:checked]:bg-orange-500">
+                                        <svg class="w-3 h-3 text-white hidden group-has-[:checked]:block" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                        </svg>
+                                    </div>
+                                    <div class="flex items-start gap-3">
+                                        <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center flex-shrink-0 group-has-[:checked]:bg-orange-200">
+                                            <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                            </svg>
+                                        </div>
+                                        <div class="flex-1">
+                                            <h3 class="font-bold text-gray-900 mb-1">Self Service</h3>
+                                            <p class="text-xs text-gray-500 mb-2">You drop off & collect</p>
+                                            <span class="inline-block px-2 py-1 bg-orange-100 text-orange-700 text-xs font-medium rounded">Best Price</span>
                                         </div>
                                     </div>
                                 </div>
                             </label>
                         </div>
                     </div>
+                    
+                    <script>
+                        // Update hidden fields when service option changes
+                        document.querySelectorAll('.service-option-card').forEach(card => {
+                            card.addEventListener('click', function() {
+                                const pickup = this.dataset.pickup;
+                                const delivery = this.dataset.delivery;
+                                document.getElementById('pickup_method').value = pickup;
+                                document.getElementById('delivery_method').value = delivery;
+                                
+                                // Show/hide pickup address based on pickup method
+                                const pickupAddressField = document.getElementById('pickup-address-field');
+                                if (pickupAddressField) {
+                                    if (pickup === 'branch_pickup') {
+                                        pickupAddressField.classList.remove('hidden');
+                                    } else {
+                                        pickupAddressField.classList.add('hidden');
+                                    }
+                                }
+                            });
+                        });
+                    </script>
 
                     <!-- Your Information -->
                     <div class="bg-white rounded-lg border border-gray-200 p-6">
@@ -236,8 +294,8 @@
                         </div>
                     </div>
 
-                    <!-- Pickup Address (Only shown for pickup service type) -->
-                    <div id="pickup-address-section" class="bg-gradient-to-r from-blue-50 to-blue-100/50 rounded-xl border border-blue-200 p-6">
+                    <!-- Pickup Address (Only shown for branch pickup) -->
+                    <div id="pickup-address-field" class="bg-gradient-to-r from-blue-50 to-blue-100/50 rounded-xl border border-blue-200 p-6">
                         <div class="flex items-center gap-3 mb-4">
                             <div class="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center shadow-lg shadow-blue-200">
                                 <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">

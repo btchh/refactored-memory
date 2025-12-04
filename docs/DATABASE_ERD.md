@@ -141,7 +141,8 @@ The WashHour system uses a relational database with 11 core tables managing user
 | latitude | DECIMAL(10,8) | NULLABLE | Pickup latitude |
 | longitude | DECIMAL(11,8) | NULLABLE | Pickup longitude |
 | item_type | ENUM | NOT NULL | clothes, comforter, shoes |
-| service_type | ENUM | DEFAULT 'pickup' | pickup, dropoff |
+| pickup_method | ENUM | DEFAULT 'branch_pickup' | branch_pickup, customer_dropoff |
+| delivery_method | ENUM | DEFAULT 'branch_delivery' | branch_delivery, customer_pickup |
 | notes | TEXT | NULLABLE | Special instructions |
 | calapi_event_id | VARCHAR(255) | NULLABLE | Calendar event ID |
 | weight | DECIMAL(10,2) | NULLABLE | Laundry weight (kg) |
@@ -367,6 +368,19 @@ The WashHour system uses a relational database with 11 core tables managing user
 - Maintains data for guest transactions
 - Walk-in bookings don't require user registration
 
+### 3.1. **Clear Pickup & Delivery Methods**
+- `pickup_method` defines how laundry arrives at branch:
+  - `branch_pickup`: Branch picks up from customer location
+  - `customer_dropoff`: Customer drops off at branch
+- `delivery_method` defines how laundry returns to customer:
+  - `branch_delivery`: Branch delivers to customer location
+  - `customer_pickup`: Customer picks up from branch
+- Four service combinations:
+  1. **Full Service**: branch_pickup + branch_delivery (most convenient)
+  2. **Self Drop-off**: customer_dropoff + branch_delivery (save on pickup fee)
+  3. **Self Pickup**: branch_pickup + customer_pickup (save on delivery fee)
+  4. **Self Service**: customer_dropoff + customer_pickup (cheapest option)
+
 ### 4. **Price Snapshots in Pivot Tables**
 - `price_at_purchase` stores historical pricing
 - Protects against price changes affecting past orders
@@ -516,11 +530,17 @@ ORDER BY bookings DESC
 
 ## 📝 Schema Version
 
-**Current Version:** 1.4.0  
+**Current Version:** 1.5.0  
 **Last Updated:** December 4, 2025  
 **Total Tables:** 11 (+ 3 Laravel system tables)
 
-### Recent Changes (v1.4.0)
+### Recent Changes (v1.5.0)
+- Replaced ambiguous `service_type` with clear `pickup_method` and `delivery_method` fields
+- Four distinct service combinations now supported
+- Better pricing flexibility (charge separately for pickup/delivery)
+- Clearer customer communication about service type
+
+### Previous Changes (v1.4.0)
 - Implemented global user management across all branches
 - All branches can now view and manage all users system-wide
 - User status changes affect all branches simultaneously

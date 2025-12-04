@@ -23,7 +23,8 @@ class Transaction extends Model
         'latitude',
         'longitude',
         'item_type',
-        'service_type',
+        'pickup_method',
+        'delivery_method',
         'notes',
         'calapi_event_id',
         'weight',
@@ -156,5 +157,63 @@ class Transaction extends Model
     public function isToday()
     {
         return $this->booking_date->isToday();
+    }
+
+    /**
+     * Check if branch handles pickup
+     */
+    public function isBranchPickup()
+    {
+        return $this->pickup_method === 'branch_pickup';
+    }
+
+    /**
+     * Check if customer drops off
+     */
+    public function isCustomerDropoff()
+    {
+        return $this->pickup_method === 'customer_dropoff';
+    }
+
+    /**
+     * Check if branch handles delivery
+     */
+    public function isBranchDelivery()
+    {
+        return $this->delivery_method === 'branch_delivery';
+    }
+
+    /**
+     * Check if customer picks up
+     */
+    public function isCustomerPickup()
+    {
+        return $this->delivery_method === 'customer_pickup';
+    }
+
+    /**
+     * Get service description
+     */
+    public function getServiceDescriptionAttribute()
+    {
+        $pickup = $this->isBranchPickup() ? 'Pickup' : 'Drop-off';
+        $delivery = $this->isBranchDelivery() ? 'Delivery' : 'Pickup';
+        return "{$pickup} & {$delivery}";
+    }
+
+    /**
+     * Check if full service (branch handles both)
+     */
+    public function isFullService()
+    {
+        return $this->isBranchPickup() && $this->isBranchDelivery();
+    }
+
+    /**
+     * Check if self service (customer handles both)
+     */
+    public function isSelfService()
+    {
+        return $this->isCustomerDropoff() && $this->isCustomerPickup();
     }
 }

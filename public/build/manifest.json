@@ -1,6 +1,6 @@
 {
   "resources/css/app.css": {
-    "file": "assets/app-itRNf5zw.css",
+    "file": "assets/app-CDnyV-1K.css",
     "src": "resources/css/app.css",
     "isEntry": true,
     "name": "app",
@@ -21,7 +21,7 @@
     "isEntry": true
   },
   "resources/js/pages/admin-booking.js": {
-    "file": "assets/admin-booking-CDUq3bBP.js",
+    "file": "assets/admin-booking-BlMUnGpt.js",
     "name": "admin-booking",
     "src": "resources/js/pages/admin-booking.js",
     "isEntry": true

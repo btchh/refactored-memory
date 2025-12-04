@@ -516,10 +516,10 @@ document.addEventListener('DOMContentLoaded', () => {
         
         if (customerSelectionSection && userIdInput) {
             if (selectedType === 'walkin') {
-                // Hide customer selection for walk-in
-                customerSelectionSection.classList.add('hidden');
-                userIdInput.removeAttribute('required');
-                userIdInput.value = ''; // Clear user selection
+                // Keep customer selection visible for walk-in (can link to existing user or leave blank)
+                customerSelectionSection.classList.remove('hidden');
+                userIdInput.removeAttribute('required'); // Make it optional for walk-in
+                // Don't clear user selection - admin might want to link to existing customer
                 
                 // Hide pickup address section for walk-in (they're already at the branch)
                 if (pickupAddressSection) {

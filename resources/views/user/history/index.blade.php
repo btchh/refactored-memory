@@ -102,19 +102,12 @@
                                                 </svg>
                                                 <span>{{ $booking['time'] }}</span>
                                             </div>
-                                            @if(isset($booking['service_type']))
+                                            @if(isset($booking['service_description']))
                                             <div class="flex items-center gap-2">
-                                                @if($booking['service_type'] === 'pickup')
-                                                    <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
-                                                    </svg>
-                                                    <span class="text-blue-600">Home Pickup</span>
-                                                @else
-                                                    <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
-                                                    </svg>
-                                                    <span class="text-green-600">Self Drop-off</span>
-                                                @endif
+                                                <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
+                                                </svg>
+                                                <span class="text-blue-600">{{ $booking['service_description'] }}</span>
                                             </div>
                                             @endif
                                         </div>
@@ -326,10 +319,10 @@
                                 <span class="text-gray-500">Time</span>
                                 <span class="font-medium">${booking.time}</span>
                             </div>
-                            ${booking.service_type ? `
+                            ${booking.service_description ? `
                             <div class="flex justify-between">
                                 <span class="text-gray-500">Service Type</span>
-                                <span class="font-medium">${booking.service_type === 'pickup' ? 'Home Pickup' : 'Self Drop-off'}</span>
+                                <span class="font-medium">${booking.service_description}</span>
                             </div>
                             ` : ''}
                             ${booking.branch_name ? `

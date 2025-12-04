@@ -250,9 +250,9 @@ class CalApiService
             $endDateTime = $startDateTime->copy()->addHour();
 
             // CalAPI.io event payload
-            $serviceType = ucfirst($transaction->service_type ?? 'pickup');
+            $serviceDescription = $transaction->service_description;
             $payload = [
-                'title' => "[{$serviceType}] {$transaction->user->username} - {$transaction->user->fname} {$transaction->user->lname}",
+                'title' => "[{$serviceDescription}] {$transaction->user->username} - {$transaction->user->fname} {$transaction->user->lname}",
                 'description' => $this->buildReceiptDescription($transaction),
                 'start' => [
                     'date_time' => $startDateTime->toIso8601String(),
@@ -322,81 +322,60 @@ class CalApiService
      */
     protected function buildReceiptDescription($transaction)
     {
-        $serviceType = ucfirst($transaction->service_type ?? 'pickup');
+        $serviceDescription = $transaction->service_description;
         $date = $transaction->booking_date->format('F d, Y');
         $time = Carbon::parse($transaction->booking_time)->format('g:i A');
         
-        $receipt = "═══════════════════════════════════\n";
-        $receipt .= "         WASHHOUR BOOKING RECEIPT\n";
-        $receipt .= "═══════════════════════════════════\n\n";
+        // Clean, professional receipt format
+        $receipt = "WASHHOUR LAUNDRY SERVICE\n";
+        $receipt .= "Booking #{$transaction->id}\n";
+        $receipt .= "================================\n\n";
         
-        $receipt .= "📋 BOOKING DETAILS\n";
-        $receipt .= "───────────────────────────────────\n";
-        $receipt .= "Booking #: {$transaction->id}\n";
-        $receipt .= "Date: {$date}\n";
-        $receipt .= "Time: {$time}\n";
-        $receipt .= "Service Type: {$serviceType}\n";
-        $receipt .= "Item Type: " . ucfirst($transaction->item_type) . "\n\n";
-        
-        $receipt .= "👤 CUSTOMER INFO\n";
-        $receipt .= "───────────────────────────────────\n";
-        $receipt .= "Name: {$transaction->user->fname} {$transaction->user->lname}\n";
-        $receipt .= "Username: {$transaction->user->username}\n";
-        $receipt .= "Phone: {$transaction->user->phone}\n";
-        $receipt .= "Email: {$transaction->user->email}\n";
-        
+        // Customer Info
+        $receipt .= "CUSTOMER\n";
+        $receipt .= "{$transaction->user->fname} {$transaction->user->lname}\n";
+        $receipt .= "{$transaction->user->phone}\n";
         if ($transaction->pickup_address) {
-            $receipt .= "Address: {$transaction->pickup_address}\n";
+            $receipt .= "{$transaction->pickup_address}\n";
         }
         $receipt .= "\n";
         
-        // Services section
+        // Booking Details
+        $receipt .= "BOOKING DETAILS\n";
+        $receipt .= "Date: {$date} at {$time}\n";
+        $receipt .= "Service: {$serviceDescription}\n";
+        $receipt .= "Item: " . ucfirst($transaction->item_type) . "\n";
+        $receipt .= "Status: " . strtoupper($transaction->status) . "\n\n";
+        
+        // Services
         if ($transaction->services->count() > 0) {
-            $receipt .= "🧺 SERVICES\n";
-            $receipt .= "───────────────────────────────────\n";
-            $servicesTotal = 0;
+            $receipt .= "SERVICES\n";
             foreach ($transaction->services as $service) {
                 $price = $service->pivot->price_at_purchase ?? $service->price;
-                $servicesTotal += $price;
-                $receipt .= "• {$service->service_name}";
-                $receipt .= str_repeat(' ', max(1, 25 - strlen($service->service_name)));
-                $receipt .= "₱" . number_format($price, 2) . "\n";
+                $receipt .= "  {$service->service_name} - P" . number_format($price, 2) . "\n";
             }
-            $receipt .= "───────────────────────────────────\n";
-            $receipt .= "Services Subtotal:         ₱" . number_format($servicesTotal, 2) . "\n\n";
+            $receipt .= "\n";
         }
         
-        // Products section
+        // Products
         if ($transaction->products->count() > 0) {
-            $receipt .= "🧴 PRODUCTS\n";
-            $receipt .= "───────────────────────────────────\n";
-            $productsTotal = 0;
+            $receipt .= "PRODUCTS\n";
             foreach ($transaction->products as $product) {
                 $price = $product->pivot->price_at_purchase ?? $product->price;
-                $productsTotal += $price;
-                $receipt .= "• {$product->product_name}";
-                $receipt .= str_repeat(' ', max(1, 25 - strlen($product->product_name)));
-                $receipt .= "₱" . number_format($price, 2) . "\n";
+                $receipt .= "  {$product->product_name} - P" . number_format($price, 2) . "\n";
             }
-            $receipt .= "───────────────────────────────────\n";
-            $receipt .= "Products Subtotal:         ₱" . number_format($productsTotal, 2) . "\n\n";
+            $receipt .= "\n";
         }
         
         // Total
-        $receipt .= "═══════════════════════════════════\n";
-        $receipt .= "💰 TOTAL:                  ₱" . number_format($transaction->total_price, 2) . "\n";
-        $receipt .= "═══════════════════════════════════\n\n";
+        $receipt .= "================================\n";
+        $receipt .= "TOTAL: P" . number_format($transaction->total_price, 2) . "\n";
+        $receipt .= "================================\n";
         
         // Notes
         if ($transaction->notes) {
-            $receipt .= "📝 NOTES\n";
-            $receipt .= "───────────────────────────────────\n";
-            $receipt .= "{$transaction->notes}\n\n";
+            $receipt .= "\nNOTES: {$transaction->notes}\n";
         }
-        
-        $receipt .= "Status: " . strtoupper($transaction->status) . "\n";
-        $receipt .= "───────────────────────────────────\n";
-        $receipt .= "Thank you for choosing WashHour!\n";
         
         return $receipt;
     }
@@ -453,9 +432,9 @@ class CalApiService
             $startDateTime = Carbon::parse($transaction->booking_date->format('Y-m-d') . ' ' . $transaction->booking_time);
             $endDateTime = $startDateTime->copy()->addHour();
 
-            $serviceType = ucfirst($transaction->service_type ?? 'pickup');
+            $serviceDescription = $transaction->service_description;
             $payload = [
-                'title' => "[{$serviceType}] {$transaction->user->username} - {$transaction->user->fname} {$transaction->user->lname}",
+                'title' => "[{$serviceDescription}] {$transaction->user->username} - {$transaction->user->fname} {$transaction->user->lname}",
                 'description' => $this->buildReceiptDescription($transaction),
                 'start' => [
                     'date_time' => $startDateTime->toIso8601String(),

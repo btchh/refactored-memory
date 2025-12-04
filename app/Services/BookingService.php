@@ -36,7 +36,8 @@ class BookingService
                 'admin_id' => $data['admin_id'] ?? null,
                 'booking_date' => $data['booking_date'],
                 'booking_time' => $data['booking_time'],
-                'service_type' => $data['service_type'] ?? 'dropoff', // Default to dropoff for walk-in
+                'pickup_method' => $data['pickup_method'] ?? 'customer_dropoff', // Default to customer dropoff for walk-in
+                'delivery_method' => $data['delivery_method'] ?? 'customer_pickup', // Default to customer pickup for walk-in
                 'pickup_address' => $data['pickup_address'] ?? null,
                 'latitude' => $data['latitude'] ?? null,
                 'longitude' => $data['longitude'] ?? null,
@@ -420,7 +421,7 @@ class BookingService
 
             switch ($newStatus) {
                 case 'completed':
-                    $data['action'] = $transaction->service_type === 'delivery' ? 'delivery' : 'pickup';
+                    $data['action'] = $transaction->isBranchDelivery() ? 'delivery' : 'pickup';
                     $this->messageService->sendLaundryCompleted($transaction->user->phone, $data);
                     break;
 
@@ -528,7 +529,7 @@ class BookingService
         try {
             $data = $this->getSmsData($transaction);
 
-            if ($transaction->service_type === 'delivery') {
+            if ($transaction->isBranchDelivery()) {
                 $this->messageService->sendDeliveryReminder($transaction->user->phone, $data);
             } else {
                 $this->messageService->sendPickupReminder($transaction->user->phone, $data);
@@ -555,7 +556,7 @@ class BookingService
             'customer_name' => $transaction->user->fname,
             'booking_id' => $transaction->id,
             'schedule' => date('M j, Y', strtotime($transaction->booking_date)) . ' at ' . date('g:i A', strtotime($transaction->booking_time)),
-            'service_type' => ucfirst($transaction->service_type ?? 'pickup'),
+            'service_description' => $transaction->service_description,
         ];
     }
 }

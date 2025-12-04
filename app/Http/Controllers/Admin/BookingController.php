@@ -31,8 +31,14 @@ class BookingController extends Controller
         
         $services = Service::forAdmin($adminId)->get()->groupBy('item_type');
         $products = Product::forAdmin($adminId)->get()->groupBy('item_type');
+        
+        // Get all users for dropdown
+        $users = User::select('id', 'fname', 'lname', 'email', 'phone')
+            ->orderBy('fname')
+            ->orderBy('lname')
+            ->get();
 
-        return view('admin.bookings.index', compact('services', 'products'));
+        return view('admin.bookings.index', compact('services', 'products', 'users'));
     }
 
     /**
@@ -211,11 +217,13 @@ class BookingController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'user_id' => 'required|exists:users,id',
+            'booking_type' => 'required|in:online,walkin',
+            'user_id' => 'required_if:booking_type,online|nullable|exists:users,id',
             'booking_date' => 'required|date|after_or_equal:today',
             'booking_time' => 'required',
-            'service_type' => 'required|in:pickup,dropoff',
-            'pickup_address' => 'required_if:service_type,pickup|nullable|string',
+            'pickup_method' => 'required|in:branch_pickup,customer_dropoff',
+            'delivery_method' => 'required|in:branch_delivery,customer_pickup',
+            'pickup_address' => 'required_if:pickup_method,branch_pickup|nullable|string',
             'latitude' => 'nullable|numeric',
             'longitude' => 'nullable|numeric',
             'item_type' => 'required|in:clothes,comforter,shoes',

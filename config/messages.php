@@ -19,7 +19,7 @@ return [
     ],
 
     'booking' => [
-        'confirmed' => 'Hi :customer_name! Your :service_type booking #:booking_id for :schedule has been confirmed. Thank you for choosing WashHour!',
+        'confirmed' => 'Hi :customer_name! Your :service_description booking #:booking_id for :schedule has been confirmed. Thank you for choosing WashHour!',
         'laundry_completed' => 'Hi :customer_name! Your laundry for booking #:booking_id is now ready for :action. Thank you for your patience!',
         'out_for_delivery' => 'Hi :customer_name! Your laundry for booking #:booking_id is out for delivery. Estimated arrival: :eta. Please ensure someone is available to receive it.',
         'delivered' => 'Hi :customer_name! Your laundry for booking #:booking_id has been delivered. Thank you for choosing WashHour!',
