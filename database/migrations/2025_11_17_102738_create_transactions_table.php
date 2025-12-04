@@ -35,6 +35,7 @@ return new class extends Migration
             $table->decimal('weight', 10, 2)->nullable()->comment('For documentation only');
             $table->decimal('total_price', 10, 2);
             $table->enum('status', ['pending', 'in_progress', 'completed', 'cancelled'])->default('pending');
+            $table->timestamp('completed_at')->nullable();
             $table->enum('booking_type', ['online', 'walkin'])->default('online');
             
             $table->timestamps();
