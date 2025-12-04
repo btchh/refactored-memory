@@ -38,6 +38,19 @@ class LocationController extends Controller
                 ], 401);
             }
             
+            // Geocode branches without coordinates (only if there are any)
+            $branchesWithoutCoords = Admin::whereNotNull('branch_address')
+                ->where('branch_address', '!=', '')
+                ->where(function($query) {
+                    $query->whereNull('branch_latitude')
+                          ->orWhereNull('branch_longitude');
+                })
+                ->count();
+            
+            if ($branchesWithoutCoords > 0) {
+                $this->geocodeService->geocodeAllBranches();
+            }
+            
             // Geocode user's address if needed
             if ((!$user->latitude || !$user->longitude) && $user->address) {
                 try {
@@ -56,7 +69,8 @@ class LocationController extends Controller
             // Get ALL available admins/branches so users can see all options
             // Group by branch_address to avoid duplicate markers for same location
             $allAdmins = Admin::query()
-                ->whereNotNull('address')
+                ->whereNotNull('branch_address')
+                ->where('branch_address', '!=', '')
                 ->get();
             
             // Group admins by branch address
@@ -68,28 +82,10 @@ class LocationController extends Controller
                 // Use the first admin for this branch location
                 $representativeAdmin = $adminsInBranch->first();
                 
-                // Geocode admin address if needed
-                if ((!$representativeAdmin->latitude || !$representativeAdmin->longitude) && $representativeAdmin->address) {
-                    try {
-                        $coordinates = $this->geocodeService->geocodeAddress($representativeAdmin->address);
-                        if ($coordinates) {
-                            // Update all admins at this branch with the same coordinates
-                            foreach ($adminsInBranch as $admin) {
-                                $admin->update([
-                                    'latitude' => $coordinates['latitude'],
-                                    'longitude' => $coordinates['longitude'],
-                                    'location_updated_at' => now()
-                                ]);
-                            }
-                            $representativeAdmin->latitude = $coordinates['latitude'];
-                            $representativeAdmin->longitude = $coordinates['longitude'];
-                        } else {
-                            continue;
-                        }
-                    } catch (\Exception $e) {
-                        \Log::error('Failed to geocode branch address: ' . $e->getMessage());
-                        continue;
-                    }
+                // Skip if branch still doesn't have coordinates after geocoding attempt
+                if (!$representativeAdmin->branch_latitude || !$representativeAdmin->branch_longitude) {
+                    \Log::warning('Skipping branch without coordinates: ' . $representativeAdmin->branch_name);
+                    continue;
                 }
                 
                 // Get all admin names and phones for this branch
@@ -100,12 +96,12 @@ class LocationController extends Controller
                     'id' => $representativeAdmin->id,
                     'admin_ids' => $adminsInBranch->pluck('id')->toArray(), // All admin IDs at this branch
                     'name' => $adminNames, // All admin names
-                    'branch_name' => $representativeAdmin->admin_name,
+                    'branch_name' => $representativeAdmin->branch_name,
                     'branch_address' => $branchAddress,
                     'phone' => $adminPhones, // All phone numbers
-                    'address' => $representativeAdmin->address,
-                    'latitude' => (float) $representativeAdmin->latitude,
-                    'longitude' => (float) $representativeAdmin->longitude,
+                    'address' => $representativeAdmin->branch_address,
+                    'latitude' => (float) $representativeAdmin->branch_latitude,
+                    'longitude' => (float) $representativeAdmin->branch_longitude,
                     'admin_count' => $adminsInBranch->count(),
                     'updated_at' => $representativeAdmin->location_updated_at 
                         ? $representativeAdmin->location_updated_at->format('M d, h:i A') 
@@ -117,8 +113,8 @@ class LocationController extends Controller
                     $distance = $this->calculateDistance(
                         $user->latitude,
                         $user->longitude,
-                        $representativeAdmin->latitude,
-                        $representativeAdmin->longitude
+                        $representativeAdmin->branch_latitude,
+                        $representativeAdmin->branch_longitude
                     );
                     
                     $roadFactor = 1.4;

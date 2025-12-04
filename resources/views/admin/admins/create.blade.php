@@ -140,8 +140,8 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <x-modules.input 
                                     type="text" 
-                                    name="admin_name" 
-                                    label="Admin Username" 
+                                    name="username" 
+                                    label="Username" 
                                     placeholder="Enter username"
                                     required 
                                 />
@@ -165,9 +165,24 @@
                                 <x-modules.input 
                                     type="text" 
                                     name="address" 
-                                    label="Address" 
+                                    label="Personal Address" 
                                     placeholder="Full address"
                                     required 
+                                />
+
+                                <x-modules.input 
+                                    type="text" 
+                                    name="branch_name" 
+                                    label="Branch Name" 
+                                    placeholder="e.g., WashHour Main"
+                                    required 
+                                />
+
+                                <x-modules.input 
+                                    type="text" 
+                                    name="branch_address" 
+                                    label="Branch Address" 
+                                    placeholder="Branch location"
                                 />
 
                                 <x-modules.input 

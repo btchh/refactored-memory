@@ -18,18 +18,25 @@ class BookingController extends Controller
     {
         $user = Auth::guard('web')->user();
         
-        // Get all branches/admins for selection
-        $branches = \App\Models\Admin::select('id', 'fname', 'lname', 'admin_name', 'branch_address', 'phone')
+        // Get unique branches (group by branch_address to get one representative admin per branch)
+        $branches = \App\Models\Admin::select('id', 'branch_name', 'branch_address', 'phone')
+            ->whereNotNull('branch_address')
+            ->where('branch_address', '!=', '')
+            ->orderBy('branch_name')
             ->get()
-            ->map(function ($admin) {
+            ->groupBy('branch_address')
+            ->map(function ($adminsInBranch) {
+                // Get the first admin as representative for this branch
+                $representative = $adminsInBranch->first();
                 return [
-                    'id' => $admin->id,
-                    'name' => $admin->fname . ' ' . $admin->lname,
-                    'branch_name' => $admin->admin_name,
-                    'address' => $admin->branch_address,
-                    'phone' => $admin->phone,
+                    'id' => $representative->id, // Use first admin's ID for the branch
+                    'branch_name' => $representative->branch_name,
+                    'address' => $representative->branch_address,
+                    'phone' => $representative->phone,
                 ];
-            });
+            })
+            ->sortBy('branch_name')
+            ->values(); // Reset array keys
         
         // Services and products will be loaded via AJAX when branch is selected
         $services = collect([]);
@@ -75,12 +82,39 @@ class BookingController extends Controller
             'longitude' => 'nullable|numeric',
             'item_type' => 'required|in:clothes,comforter,shoes',
             'services' => 'nullable|array',
-            'services.*' => 'exists:services,id',
+            'services.*' => 'integer|exists:services,id',
             'products' => 'nullable|array',
-            'products.*' => 'exists:products,id',
+            'products.*' => 'integer|exists:products,id',
             'notes' => 'nullable|string',
             'weight' => 'nullable|numeric',
         ]);
+
+        // Additional validation: ensure services and products belong to the selected admin
+        if (!empty($validated['services'])) {
+            $validServices = \App\Models\Service::whereIn('id', $validated['services'])
+                ->where('admin_id', $validated['admin_id'])
+                ->pluck('id')
+                ->toArray();
+            
+            if (count($validServices) !== count($validated['services'])) {
+                return redirect()->back()
+                    ->with('error', 'One or more selected services do not belong to the selected branch')
+                    ->withInput();
+            }
+        }
+
+        if (!empty($validated['products'])) {
+            $validProducts = \App\Models\Product::whereIn('id', $validated['products'])
+                ->where('admin_id', $validated['admin_id'])
+                ->pluck('id')
+                ->toArray();
+            
+            if (count($validProducts) !== count($validated['products'])) {
+                return redirect()->back()
+                    ->with('error', 'One or more selected products do not belong to the selected branch')
+                    ->withInput();
+            }
+        }
 
         // Ensure at least one service or product is selected
         if (empty($validated['services']) && empty($validated['products'])) {

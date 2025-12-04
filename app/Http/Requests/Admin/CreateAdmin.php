@@ -22,7 +22,8 @@ class CreateAdmin extends FormRequest
     public function rules(): array
     {
         return [
-            'admin_name' => 'required|string|unique:admins,admin_name',
+            'username' => 'required|string|unique:admins,username',
+            'branch_name' => 'required|string',
             'fname' => 'required|string',
             'lname' => 'required|string',
             'email' => 'required|email|unique:admins,email',
@@ -35,8 +36,9 @@ class CreateAdmin extends FormRequest
     public function messages(): array
     {
         return [
-            'admin_name.required' => 'Admin name is required',
-            'admin_name.unique' => 'Admin name is already taken',
+            'username.required' => 'Username is required',
+            'username.unique' => 'Username is already taken',
+            'branch_name.required' => 'Branch name is required',
             'fname.required' => 'First name is required',
             'lname.required' => 'Last name is required',
             'email.required' => 'Email is required',

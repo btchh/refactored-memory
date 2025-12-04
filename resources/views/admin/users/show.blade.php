@@ -135,7 +135,7 @@
                                 </td>
                                 <td class="px-6 py-4">
                                     @if($transaction->admin)
-                                        <p class="text-sm text-gray-900">{{ $transaction->admin->admin_name }}</p>
+                                        <p class="text-sm text-gray-900">{{ $transaction->admin->branch_name }}</p>
                                         <p class="text-xs text-gray-500">{{ $transaction->admin->branch_address ?? 'N/A' }}</p>
                                     @else
                                         <span class="text-xs text-gray-400">Unassigned</span>

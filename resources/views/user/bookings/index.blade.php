@@ -232,7 +232,7 @@
                             <option value="">Choose your preferred branch</option>
                             @foreach($branches as $branch)
                                 <option value="{{ $branch['id'] }}" data-address="{{ $branch['address'] }}" data-phone="{{ $branch['phone'] }}">
-                                    {{ $branch['name'] }} - {{ $branch['branch_name'] }}
+                                    {{ $branch['branch_name'] }}
                                 </option>
                             @endforeach
                         </select>
@@ -251,8 +251,7 @@
                                             </svg>
                                         </div>
                                         <div class="flex-1 min-w-0">
-                                            <h3 class="font-bold text-gray-900 mb-1">{{ $branch['branch_name'] }}</h3>
-                                            <p class="text-sm text-gray-600 mb-2">{{ $branch['name'] }}</p>
+                                            <h3 class="font-bold text-gray-900 mb-3">{{ $branch['branch_name'] }}</h3>
                                             <div class="space-y-1">
                                                 <div class="flex items-start gap-2 text-xs text-gray-500">
                                                     <svg class="w-4 h-4 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

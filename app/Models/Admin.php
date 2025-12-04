@@ -13,19 +13,20 @@ class Admin extends Authenticatable
     protected $table = 'admins';
 
     protected $fillable = [
-        'admin_name',
+        'username',
         'fname',
         'lname',
+        'email',
+        'phone',
         'address',
+        'branch_name',
         'branch_address',
         'branch_latitude',
         'branch_longitude',
-        'phone',
-        'email',
-        'password',
         'latitude',
         'longitude',
         'location_updated_at',
+        'password',
     ];
 
     protected $hidden = [

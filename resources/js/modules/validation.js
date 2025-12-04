@@ -79,8 +79,8 @@ class FormValidator {
 
     getFieldLabel(name) {
         const labels = {
-            admin_name: 'Admin Name',
             username: 'Username',
+            branch_name: 'Branch Name',
             email: 'Email Address',
             password: 'Password',
             new_password: 'New Password',

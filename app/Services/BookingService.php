@@ -49,25 +49,39 @@ class BookingService
                 'booking_type' => $data['booking_type'] ?? 'online',
             ]);
 
-            // Attach services
+            // Attach services (validate they belong to the correct admin)
             if (!empty($data['services'])) {
                 foreach ($data['services'] as $serviceId) {
-                    $service = Service::find($serviceId);
+                    $service = Service::where('id', $serviceId)
+                        ->where('admin_id', $data['admin_id'])
+                        ->first();
                     if ($service) {
                         $transaction->services()->attach($serviceId, [
                             'price_at_purchase' => $service->price,
+                        ]);
+                    } else {
+                        Log::warning('Service not found or does not belong to admin', [
+                            'service_id' => $serviceId,
+                            'admin_id' => $data['admin_id'],
                         ]);
                     }
                 }
             }
 
-            // Attach products
+            // Attach products (validate they belong to the correct admin)
             if (!empty($data['products'])) {
                 foreach ($data['products'] as $productId) {
-                    $product = Product::find($productId);
+                    $product = Product::where('id', $productId)
+                        ->where('admin_id', $data['admin_id'])
+                        ->first();
                     if ($product) {
                         $transaction->products()->attach($productId, [
                             'price_at_purchase' => $product->price,
+                        ]);
+                    } else {
+                        Log::warning('Product not found or does not belong to admin', [
+                            'product_id' => $productId,
+                            'admin_id' => $data['admin_id'],
                         ]);
                     }
                 }
@@ -127,27 +141,41 @@ class BookingService
         try {
             $transaction = Transaction::with(['services', 'products'])->findOrFail($transactionId);
 
-            // Update services if provided
+            // Update services if provided (validate they belong to the correct admin)
             if (isset($data['services'])) {
                 $transaction->services()->detach();
                 foreach ($data['services'] as $serviceId) {
-                    $service = Service::find($serviceId);
+                    $service = Service::where('id', $serviceId)
+                        ->where('admin_id', $transaction->admin_id)
+                        ->first();
                     if ($service) {
                         $transaction->services()->attach($serviceId, [
                             'price_at_purchase' => $service->price,
+                        ]);
+                    } else {
+                        Log::warning('Service not found or does not belong to admin', [
+                            'service_id' => $serviceId,
+                            'admin_id' => $transaction->admin_id,
                         ]);
                     }
                 }
             }
 
-            // Update products if provided
+            // Update products if provided (validate they belong to the correct admin)
             if (isset($data['products'])) {
                 $transaction->products()->detach();
                 foreach ($data['products'] as $productId) {
-                    $product = Product::find($productId);
+                    $product = Product::where('id', $productId)
+                        ->where('admin_id', $transaction->admin_id)
+                        ->first();
                     if ($product) {
                         $transaction->products()->attach($productId, [
                             'price_at_purchase' => $product->price,
+                        ]);
+                    } else {
+                        Log::warning('Product not found or does not belong to admin', [
+                            'product_id' => $productId,
+                            'admin_id' => $transaction->admin_id,
                         ]);
                     }
                 }
@@ -306,7 +334,14 @@ class BookingService
         try {
             $transaction = Transaction::with('user')->findOrFail($transactionId);
             $oldStatus = $transaction->status;
-            $transaction->update(['status' => $status]);
+            
+            // Set completed_at timestamp when status changes to completed
+            $updateData = ['status' => $status];
+            if ($status === 'completed' && $oldStatus !== 'completed') {
+                $updateData['completed_at'] = now();
+            }
+            
+            $transaction->update($updateData);
 
             // Send SMS for key status changes
             $this->sendStatusChangeSms($transaction, $status, $oldStatus);

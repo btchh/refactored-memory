@@ -25,10 +25,15 @@ class ProgressiveRateLimiter
             $remainingSeconds = Cache::get($lockoutKey) - now()->timestamp;
             $remainingMinutes = ceil($remainingSeconds / 60);
             
-            return response()->json([
-                'message' => "Too many attempts. Please try again in {$remainingMinutes} minute(s).",
-                'retry_after' => $remainingSeconds,
-            ], 429);
+            // Return appropriate response based on request type
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'message' => "Too many attempts. Please try again in {$remainingMinutes} minute(s).",
+                    'retry_after' => $remainingSeconds,
+                ], 429);
+            }
+            
+            return redirect()->back()->with('error', "Too many attempts. Please try again in {$remainingMinutes} minute(s).");
         }
         
         // Get current attempt count
@@ -51,11 +56,16 @@ class ProgressiveRateLimiter
             // Reset attempts counter
             Cache::forget($attemptsKey);
             
-            return response()->json([
-                'message' => "Too many attempts. Account locked for {$lockoutMinutes} minute(s).",
-                'retry_after' => $lockoutSeconds,
-                'lockout_minutes' => $lockoutMinutes,
-            ], 429);
+            // Return appropriate response based on request type
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'message' => "Too many attempts. Account locked for {$lockoutMinutes} minute(s).",
+                    'retry_after' => $lockoutSeconds,
+                    'lockout_minutes' => $lockoutMinutes,
+                ], 429);
+            }
+            
+            return redirect()->back()->with('error', "Too many attempts. Account locked for {$lockoutMinutes} minute(s).");
         }
         
         // Increment attempt counter

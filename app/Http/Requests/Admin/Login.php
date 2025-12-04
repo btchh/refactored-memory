@@ -22,7 +22,7 @@ class Login extends FormRequest
     public function rules(): array
     {
         return [
-            'admin_name' => 'required|string',
+            'username' => 'required|string',
             'password' => 'required|string'
         ];
     }
@@ -30,7 +30,7 @@ class Login extends FormRequest
     public function messages(): array
     {
         return [
-            'admin_name.required' => 'Admin name is required',
+            'username.required' => 'Username is required',
             'password.required' => 'Password is required',
         ];
     }

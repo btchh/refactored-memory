@@ -6,7 +6,7 @@
         $otherBranches = \App\Models\Admin::where('id', '!=', Auth::guard('admin')->id())
             ->whereNotNull('branch_address')
             ->where('branch_address', '!=', '')
-            ->select('id', 'admin_name', 'branch_address')
+            ->select('id', 'branch_name', 'branch_address')
             ->get();
     @endphp
 
@@ -55,9 +55,17 @@
                 <div class="space-y-4">
                     <x-modules.input 
                         type="text" 
-                        name="admin_name" 
-                        label="Admin/Branch Name" 
-                        value="{{ old('admin_name', Auth::guard('admin')->user()->admin_name) }}" 
+                        name="username" 
+                        label="Username" 
+                        value="{{ old('username', Auth::guard('admin')->user()->username) }}" 
+                        required 
+                    />
+                    
+                    <x-modules.input 
+                        type="text" 
+                        name="branch_name" 
+                        label="Branch Name" 
+                        value="{{ old('branch_name', Auth::guard('admin')->user()->branch_name) }}" 
                         required 
                     />
 
@@ -122,7 +130,7 @@
                             <option value="">View other branches...</option>
                             @foreach($otherBranches as $branch)
                                 <option value="{{ $branch->branch_address }}">
-                                    {{ $branch->admin_name }} - {{ Str::limit($branch->branch_address, 40) }}
+                                    {{ $branch->branch_name }} - {{ Str::limit($branch->branch_address, 40) }}
                                 </option>
                             @endforeach
                         </select>

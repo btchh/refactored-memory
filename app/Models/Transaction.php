@@ -30,6 +30,7 @@ class Transaction extends Model
         'weight',
         'total_price',
         'status',
+        'completed_at',
         'booking_type',
     ];
 
@@ -37,6 +38,7 @@ class Transaction extends Model
         'booking_date' => 'date',
         'latitude' => 'decimal:8',
         'longitude' => 'decimal:8',
+        'completed_at' => 'datetime',
     ];
 
     protected static function boot()
@@ -88,6 +90,20 @@ class Transaction extends Model
     public function admin(): BelongsTo
     {
         return $this->belongsTo(Admin::class);
+    }
+
+    /**
+     * Scope for active bookings (not completed, or completed within last hour)
+     */
+    public function scopeActive($query)
+    {
+        return $query->where(function ($q) {
+            $q->whereIn('status', ['pending', 'in_progress', 'out_for_delivery'])
+              ->orWhere(function ($q2) {
+                  $q2->where('status', 'completed')
+                     ->where('completed_at', '>=', now()->subHour());
+              });
+        });
     }
 
     /**
@@ -192,12 +208,33 @@ class Transaction extends Model
     }
 
     /**
-     * Get service description
+     * Get service description based on pickup and delivery methods
      */
     public function getServiceDescriptionAttribute()
     {
-        $pickup = $this->isBranchPickup() ? 'Pickup' : 'Drop-off';
-        $delivery = $this->isBranchDelivery() ? 'Delivery' : 'Pickup';
+        // Full Service: branch_pickup + branch_delivery
+        if ($this->pickup_method === 'branch_pickup' && $this->delivery_method === 'branch_delivery') {
+            return 'Full Service';
+        }
+        
+        // Self Drop-off: customer_dropoff + branch_delivery
+        if ($this->pickup_method === 'customer_dropoff' && $this->delivery_method === 'branch_delivery') {
+            return 'Self Drop-off';
+        }
+        
+        // Self Pickup: branch_pickup + customer_pickup
+        if ($this->pickup_method === 'branch_pickup' && $this->delivery_method === 'customer_pickup') {
+            return 'Self Pickup';
+        }
+        
+        // Self Service: customer_dropoff + customer_pickup
+        if ($this->pickup_method === 'customer_dropoff' && $this->delivery_method === 'customer_pickup') {
+            return 'Self Service';
+        }
+        
+        // Fallback for any other combination
+        $pickup = $this->isBranchPickup() ? 'Branch Pickup' : 'Customer Drop-off';
+        $delivery = $this->isBranchDelivery() ? 'Branch Delivery' : 'Customer Pickup';
         return "{$pickup} & {$delivery}";
     }
 

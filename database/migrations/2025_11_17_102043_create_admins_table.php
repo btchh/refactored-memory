@@ -13,16 +13,17 @@ return new class extends Migration
     {
         Schema::create('admins', function (Blueprint $table) {
             $table->id();
-            $table->string('admin_name');
-            $table->string('fname');
-            $table->string('lname');
-            $table->string('address');
+            $table->string('username')->unique(); // Username for login
+            $table->string('fname'); // First name
+            $table->string('lname'); // Last name
+            $table->string('email')->unique();
+            $table->string('phone')->unique();
+            $table->string('address'); // Personal address
+            $table->string('branch_name'); // Branch/Shop name (e.g., "WashHour Main")
             $table->string('branch_address')->nullable(); // Branch/Shop location
             $table->decimal('branch_latitude', 10, 8)->nullable();
             $table->decimal('branch_longitude', 11, 8)->nullable();
-            $table->string('email')->unique();
-            $table->string('phone')->unique();
-            $table->decimal('latitude', 10, 8)->nullable();
+            $table->decimal('latitude', 10, 8)->nullable(); // Personal location
             $table->decimal('longitude', 11, 8)->nullable();
             $table->timestamp('location_updated_at')->nullable();
             $table->string('password');

@@ -117,8 +117,8 @@
             grid-cols="lg:grid-cols-6"
         />
 
-        <!-- Audit Log Table -->
-        <div class="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+        <!-- Audit Log Table - Desktop View -->
+        <div class="hidden lg:block bg-white rounded-2xl border border-gray-200 overflow-hidden">
             <div class="overflow-x-auto">
                 <table class="min-w-full">
                     <thead>
@@ -166,7 +166,7 @@
                                     </span>
                                 </td>
                                 <td class="px-6 py-4">
-                                    <p class="text-sm text-gray-900 max-w-xs truncate" title="{{ $log->description }}">
+                                    <p class="text-sm text-gray-900 break-words max-w-md">
                                         {{ $log->description }}
                                     </p>
                                 </td>
@@ -216,6 +216,90 @@
 
             @if($logs->hasPages())
                 <div class="px-6 py-4 border-t border-gray-200 bg-gray-50/50">
+                    {{ $logs->withQueryString()->links() }}
+                </div>
+            @endif
+        </div>
+
+        <!-- Audit Log Cards - Mobile View -->
+        <div class="lg:hidden space-y-4">
+            @forelse($logs as $log)
+                @php
+                    $actionConfig = [
+                        'created' => ['bg' => 'bg-emerald-50', 'text' => 'text-emerald-700', 'border' => 'border-emerald-200', 'icon' => 'M12 6v6m0 0v6m0-6h6m-6 0H6'],
+                        'updated' => ['bg' => 'bg-blue-50', 'text' => 'text-blue-700', 'border' => 'border-blue-200', 'icon' => 'M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z'],
+                        'deleted' => ['bg' => 'bg-rose-50', 'text' => 'text-rose-700', 'border' => 'border-rose-200', 'icon' => 'M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16'],
+                        'status_changed' => ['bg' => 'bg-amber-50', 'text' => 'text-amber-700', 'border' => 'border-amber-200', 'icon' => 'M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15'],
+                        'login' => ['bg' => 'bg-violet-50', 'text' => 'text-violet-700', 'border' => 'border-violet-200', 'icon' => 'M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1'],
+                        'logout' => ['bg' => 'bg-gray-50', 'text' => 'text-gray-700', 'border' => 'border-gray-200', 'icon' => 'M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1'],
+                    ];
+                    $config = $actionConfig[$log->action] ?? ['bg' => 'bg-gray-50', 'text' => 'text-gray-700', 'border' => 'border-gray-200', 'icon' => 'M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z'];
+                @endphp
+                <div class="bg-white rounded-xl border border-gray-200 p-4 hover:shadow-md transition-shadow">
+                    <!-- Header -->
+                    <div class="flex items-start justify-between gap-3 mb-3">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center text-gray-500 flex-shrink-0">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-900">{{ $log->created_at->format('M j, Y') }}</p>
+                                <p class="text-xs text-gray-500">{{ $log->created_at->format('g:i A') }}</p>
+                            </div>
+                        </div>
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 {{ $config['bg'] }} {{ $config['text'] }} border {{ $config['border'] }} rounded-lg text-xs font-semibold flex-shrink-0">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $config['icon'] }}"/>
+                            </svg>
+                            {{ ucfirst(str_replace('_', ' ', $log->action)) }}
+                        </span>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="mb-3">
+                        <p class="text-sm text-gray-900 break-words">
+                            {{ $log->description }}
+                        </p>
+                    </div>
+
+                    <!-- Footer -->
+                    <div class="flex items-center justify-between gap-3 pt-3 border-t border-gray-100">
+                        <div class="flex items-center gap-2">
+                            <div class="w-7 h-7 rounded-full bg-primary-100 flex items-center justify-center flex-shrink-0">
+                                <span class="text-xs font-semibold text-primary-700">
+                                    {{ strtoupper(substr($log->admin->fname, 0, 1)) }}{{ strtoupper(substr($log->admin->lname, 0, 1)) }}
+                                </span>
+                            </div>
+                            <span class="text-xs text-gray-700 truncate">{{ $log->admin->fname }} {{ $log->admin->lname }}</span>
+                        </div>
+                        @if($log->model_type)
+                            <div class="flex items-center gap-1.5 flex-shrink-0">
+                                <span class="px-2 py-0.5 bg-gray-100 text-gray-700 rounded text-xs font-medium">
+                                    {{ class_basename($log->model_type) }}
+                                </span>
+                                @if($log->model_id)
+                                    <span class="text-xs text-gray-400">#{{ $log->model_id }}</span>
+                                @endif
+                            </div>
+                        @endif
+                    </div>
+                </div>
+            @empty
+                <div class="bg-white rounded-xl border-2 border-dashed border-gray-200 p-12 text-center">
+                    <div class="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-4">
+                        <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
+                    </div>
+                    <p class="text-gray-900 font-medium mb-1">No audit logs found</p>
+                    <p class="text-gray-500 text-sm">Try adjusting your filters or date range</p>
+                </div>
+            @endforelse
+
+            @if($logs->hasPages())
+                <div class="mt-4">
                     {{ $logs->withQueryString()->links() }}
                 </div>
             @endif

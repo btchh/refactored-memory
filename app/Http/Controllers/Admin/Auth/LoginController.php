@@ -38,11 +38,11 @@ class LoginController extends Controller
      */
     public function login(Login $request)
     {
-        Log::info('Login attempt', ['admin_name' => $request->admin_name]);
+        Log::info('Login attempt', ['username' => $request->username]);
 
         $remember = $request->boolean('remember', false);
 
-        $result = $this->authService->loginAdmin($request->admin_name, $request->password, $remember);
+        $result = $this->authService->loginAdmin($request->username, $request->password, $remember);
 
         Log::info('Login result', ['success' => $result['success'], 'message' => $result['message']]);
 

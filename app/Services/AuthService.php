@@ -69,7 +69,7 @@ class AuthService
         string $password,
         bool $remember = false
     ): array {
-        $feildType = filter_var($loginField, FILTER_VALIDATE_EMAIL) ? 'email' : 'admin_name';
+        $feildType = filter_var($loginField, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
 
         if (Auth::guard('admin')->attempt([$feildType => $loginField, 'password' => $password], $remember)) {
             $admin = Auth::guard('admin')->user();

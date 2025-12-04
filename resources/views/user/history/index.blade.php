@@ -35,19 +35,57 @@
         </x-modules.page-header>
 
         <!-- Search and Filter -->
+        @php
+            $isCustom = request('custom') == '1' || (request('start_date') && request('end_date'));
+            $currentPeriod = $isCustom ? 'custom' : (request('period') ?? 'all');
+        @endphp
         <x-modules.filter-panel
+            :action="route('user.history')"
             :status-filters="[
-                ['key' => 'all', 'label' => 'All', 'count' => $totalOrders, 'color' => 'primary', 'icon' => 'list'],
-                ['key' => 'pending', 'label' => 'Pending', 'count' => $pendingOrders, 'color' => 'yellow'],
-                ['key' => 'in_progress', 'label' => 'In Progress', 'count' => $inProgressOrders, 'color' => 'blue'],
-                ['key' => 'completed', 'label' => 'Completed', 'count' => $completedOrders, 'color' => 'green'],
-                ['key' => 'cancelled', 'label' => 'Cancelled', 'count' => $cancelledOrders, 'color' => 'red'],
+                ['key' => 'all', 'label' => 'All Time', 'color' => 'primary', 'icon' => 'list'],
+                ['key' => 'today', 'label' => 'Today', 'color' => 'blue'],
+                ['key' => 'week', 'label' => 'This Week', 'color' => 'green'],
+                ['key' => 'month', 'label' => 'This Month', 'color' => 'yellow'],
+                ['key' => 'year', 'label' => 'This Year', 'color' => 'purple'],
+                ['key' => 'custom', 'label' => 'Custom Range', 'color' => 'red'],
             ]"
-            current-status="all"
+            :current-status="$currentPeriod"
             :show-search="true"
             search-id="search-input"
-            search-placeholder="Search by order ID or service name..."
+            search-placeholder="Search by order ID, service name, or branch..."
             :client-side="true"
+            :show-date-range="true"
+            :show-custom-date-filter="true"
+            :start-date-value="$startDate"
+            :end-date-value="$endDate"
+            start-date-label="From Date"
+            end-date-label="To Date"
+            :clear-url="route('user.history')"
+            :show-clear="request()->hasAny(['period', 'start_date', 'end_date', 'custom'])"
+            submit-text="Apply Filter"
+            grid-cols="lg:grid-cols-3"
+        />
+
+        @push('scripts')
+        <script>
+            document.querySelectorAll('.filter-btn[data-filter]').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const filter = this.dataset.filter;
+                    let url = '{{ route("user.history") }}';
+                    
+                    if (filter === 'custom') {
+                        url += '?custom=1';
+                    } else if (filter === 'all') {
+                        // No parameters for all time
+                    } else {
+                        url += `?period=${filter}`;
+                    }
+                    
+                    window.location.href = url;
+                });
+            });
+        </script>
+        @endpush
         />
 
         <!-- Bookings List -->

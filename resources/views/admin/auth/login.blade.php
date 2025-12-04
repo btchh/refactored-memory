@@ -25,8 +25,8 @@
                 <form action="{{ route('admin.login') }}" method="POST" class="space-y-6">
                     @csrf
                     
-                    <x-modules.input type="text" name="admin_name" label="Admin Name or Email" 
-                        placeholder="Enter your admin name or email" required />
+                    <x-modules.input type="text" name="username" label="Username or Email" 
+                        placeholder="Enter your username or email" required />
                     
                     <x-modules.input type="password" name="password" label="Password" 
                         placeholder="Enter your password" required />

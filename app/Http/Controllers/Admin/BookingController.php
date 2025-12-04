@@ -228,14 +228,41 @@ class BookingController extends Controller
             'longitude' => 'nullable|numeric',
             'item_type' => 'required|in:clothes,comforter,shoes',
             'services' => 'nullable|array',
-            'services.*' => 'exists:services,id',
+            'services.*' => 'integer|exists:services,id',
             'products' => 'nullable|array',
-            'products.*' => 'exists:products,id',
+            'products.*' => 'integer|exists:products,id',
             'notes' => 'nullable|string',
             'weight' => 'nullable|numeric',
         ]);
 
         $validated['admin_id'] = Auth::guard('admin')->id();
+
+        // Additional validation: ensure services and products belong to the current admin
+        if (!empty($validated['services'])) {
+            $validServices = Service::whereIn('id', $validated['services'])
+                ->where('admin_id', $validated['admin_id'])
+                ->pluck('id')
+                ->toArray();
+            
+            if (count($validServices) !== count($validated['services'])) {
+                return redirect()->back()
+                    ->with('error', 'One or more selected services do not belong to your branch')
+                    ->withInput();
+            }
+        }
+
+        if (!empty($validated['products'])) {
+            $validProducts = Product::whereIn('id', $validated['products'])
+                ->where('admin_id', $validated['admin_id'])
+                ->pluck('id')
+                ->toArray();
+            
+            if (count($validProducts) !== count($validated['products'])) {
+                return redirect()->back()
+                    ->with('error', 'One or more selected products do not belong to your branch')
+                    ->withInput();
+            }
+        }
 
         $result = $this->bookingService->createBooking($validated);
 
@@ -259,11 +286,44 @@ class BookingController extends Controller
             'longitude' => 'nullable|numeric',
             'item_type' => 'sometimes|in:clothes,comforter,shoes',
             'services' => 'nullable|array',
-            'services.*' => 'exists:services,id',
+            'services.*' => 'integer|exists:services,id',
             'products' => 'nullable|array',
-            'products.*' => 'exists:products,id',
+            'products.*' => 'integer|exists:products,id',
             'notes' => 'nullable|string',
         ]);
+
+        // Get the transaction to verify admin ownership
+        $transaction = \App\Models\Transaction::findOrFail($id);
+        $adminId = $transaction->admin_id;
+
+        // Additional validation: ensure services and products belong to the transaction's admin
+        if (!empty($validated['services'])) {
+            $validServices = Service::whereIn('id', $validated['services'])
+                ->where('admin_id', $adminId)
+                ->pluck('id')
+                ->toArray();
+            
+            if (count($validServices) !== count($validated['services'])) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'One or more selected services do not belong to the booking branch'
+                ], 400);
+            }
+        }
+
+        if (!empty($validated['products'])) {
+            $validProducts = Product::whereIn('id', $validated['products'])
+                ->where('admin_id', $adminId)
+                ->pluck('id')
+                ->toArray();
+            
+            if (count($validProducts) !== count($validated['products'])) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'One or more selected products do not belong to the booking branch'
+                ], 400);
+            }
+        }
 
         $result = $this->bookingService->updateBooking($id, $validated);
 

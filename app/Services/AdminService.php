@@ -17,9 +17,10 @@ class AdminService
     public function createAdmin(array $data): array
     {
         $admin = Admin::create([
-            'admin_name' => $data['admin_name'],
+            'username' => $data['username'],
             'fname' => $data['fname'],
             'lname' => $data['lname'],
+            'branch_name' => $data['branch_name'],
             'address' => $data['address'],
             'branch_address' => $data['branch_address'] ?? null,
             'phone' => $data['phone'],
