@@ -27,9 +27,13 @@ class BookingService
      */
     public function createBooking(array $data)
     {
+        Log::info('BookingService::createBooking called', ['data' => $data]);
+        
         DB::beginTransaction();
 
         try {
+            Log::info('Creating transaction record');
+            
             // Create transaction with booking fields
             $transaction = Transaction::create([
                 'user_id' => $data['user_id'] ?? null, // Can be null for walk-in
@@ -92,19 +96,26 @@ class BookingService
             $transaction->calculateTotalPrice();
             $transaction->save();
 
+            Log::info('Transaction created successfully', ['transaction_id' => $transaction->id]);
+
             // Load relationships needed for CalAPI event
             $transaction->load('user', 'services', 'products');
 
             // Create CalAPI event
+            Log::info('Creating CalAPI event');
             $eventId = $this->calApiService->createEvent($transaction);
             if ($eventId) {
                 $transaction->update(['calapi_event_id' => $eventId]);
+                Log::info('CalAPI event created', ['event_id' => $eventId]);
+            } else {
+                Log::warning('CalAPI event creation returned null');
             }
 
             // Clear cache for this date
             $this->calApiService->clearCache($data['booking_date']);
 
             DB::commit();
+            Log::info('Transaction committed successfully');
 
             // Send booking confirmation SMS
             $this->sendBookingConfirmedSms($transaction->fresh()->load('user'));
@@ -121,6 +132,7 @@ class BookingService
             DB::rollBack();
             Log::error('Booking creation failed', [
                 'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
                 'data' => $data,
             ]);
 

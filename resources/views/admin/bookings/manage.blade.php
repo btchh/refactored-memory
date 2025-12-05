@@ -1,48 +1,97 @@
 <x-layout>
     <x-slot name="title">Booking Management</x-slot>
 
-    <div class="space-y-6">
-        <!-- Header -->
-        <x-modules.page-header
-            title="Booking Management"
-            subtitle="Update laundry booking status"
-            icon="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"
-            gradient="blue"
-        >
-            <x-slot name="stats">
-                <div class="bg-white/10 backdrop-blur rounded-xl px-4 py-2">
-                    <p class="text-white/70 text-xs">Total Bookings</p>
-                    <p class="text-xl font-bold">{{ $stats['all'] }}</p>
-                </div>
-            </x-slot>
-        </x-modules.page-header>
+    <div class="max-w-7xl mx-auto space-y-6">
+        <!-- Hero Header -->
+        <div class="relative bg-gradient-to-br from-wash via-wash-dark to-gray-900 rounded-2xl p-12 overflow-hidden">
+            <!-- Decorative Background -->
+            <div class="absolute inset-0 opacity-10">
+                <div class="absolute top-0 right-0 w-64 h-64 bg-white rounded-full -translate-y-1/2 translate-x-1/2"></div>
+                <div class="absolute bottom-0 left-0 w-48 h-48 bg-white rounded-full translate-y-1/2 -translate-x-1/2"></div>
+            </div>
+            
+            <!-- Content -->
+            <div class="relative">
+                <h1 class="text-5xl font-black text-white mb-3">Booking Management</h1>
+                <p class="text-xl text-white/80">Update laundry booking status</p>
+            </div>
+        </div>
 
-        <!-- Stats -->
+        <!-- Stat Cards Grid -->
         <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+            <!-- All Bookings -->
             <a href="{{ route('admin.bookings.manage', ['status' => 'all']) }}" 
-               class="card p-4 hover:shadow-lg transition {{ $status === 'all' ? 'ring-2 ring-primary' : '' }}">
-                <p class="text-sm text-gray-600">All Bookings</p>
-                <p class="text-2xl font-bold text-gray-900 mt-1">{{ $stats['all'] }}</p>
+               class="group relative bg-white rounded-2xl p-6 border-2 {{ $status === 'all' ? 'border-wash' : 'border-gray-200' }} hover:border-wash transition-all overflow-hidden">
+                <div class="absolute top-0 right-0 w-24 h-24 bg-wash/5 rounded-full -translate-y-1/2 translate-x-1/2 group-hover:scale-150 transition-transform"></div>
+                <div class="relative">
+                    <div class="w-12 h-12 bg-wash/10 rounded-xl flex items-center justify-center mb-3">
+                        <svg class="w-6 h-6 text-wash" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                        </svg>
+                    </div>
+                    <p class="text-xs text-gray-600 font-bold uppercase mb-1">All Bookings</p>
+                    <p class="text-3xl font-black text-gray-900">{{ $stats['all'] }}</p>
+                </div>
             </a>
+
+            <!-- Pending -->
             <a href="{{ route('admin.bookings.manage', ['status' => 'pending']) }}" 
-               class="card p-4 hover:shadow-lg transition {{ $status === 'pending' ? 'ring-2 ring-warning' : '' }}">
-                <p class="text-sm text-gray-600">Pending</p>
-                <p class="text-2xl font-bold text-warning mt-1">{{ $stats['pending'] }}</p>
+               class="group relative bg-white rounded-2xl p-6 border-2 {{ $status === 'pending' ? 'border-warning' : 'border-gray-200' }} hover:border-warning transition-all overflow-hidden">
+                <div class="absolute top-0 right-0 w-24 h-24 bg-warning/5 rounded-full -translate-y-1/2 translate-x-1/2 group-hover:scale-150 transition-transform"></div>
+                <div class="relative">
+                    <div class="w-12 h-12 bg-warning/10 rounded-xl flex items-center justify-center mb-3">
+                        <svg class="w-6 h-6 text-warning" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <p class="text-xs text-gray-600 font-bold uppercase mb-1">Pending</p>
+                    <p class="text-3xl font-black text-gray-900">{{ $stats['pending'] }}</p>
+                </div>
             </a>
+
+            <!-- In Progress -->
             <a href="{{ route('admin.bookings.manage', ['status' => 'in_progress']) }}" 
-               class="card p-4 hover:shadow-lg transition {{ $status === 'in_progress' ? 'ring-2 ring-info' : '' }}">
-                <p class="text-sm text-gray-600">In Progress</p>
-                <p class="text-2xl font-bold text-info mt-1">{{ $stats['in_progress'] }}</p>
+               class="group relative bg-white rounded-2xl p-6 border-2 {{ $status === 'in_progress' ? 'border-info' : 'border-gray-200' }} hover:border-info transition-all overflow-hidden">
+                <div class="absolute top-0 right-0 w-24 h-24 bg-info/5 rounded-full -translate-y-1/2 translate-x-1/2 group-hover:scale-150 transition-transform"></div>
+                <div class="relative">
+                    <div class="w-12 h-12 bg-info/10 rounded-xl flex items-center justify-center mb-3">
+                        <svg class="w-6 h-6 text-info" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                    </div>
+                    <p class="text-xs text-gray-600 font-bold uppercase mb-1">In Progress</p>
+                    <p class="text-3xl font-black text-gray-900">{{ $stats['in_progress'] }}</p>
+                </div>
             </a>
+
+            <!-- Completed -->
             <a href="{{ route('admin.bookings.manage', ['status' => 'completed']) }}" 
-               class="card p-4 hover:shadow-lg transition {{ $status === 'completed' ? 'ring-2 ring-success' : '' }}">
-                <p class="text-sm text-gray-600">Completed</p>
-                <p class="text-2xl font-bold text-success mt-1">{{ $stats['completed'] }}</p>
+               class="group relative bg-white rounded-2xl p-6 border-2 {{ $status === 'completed' ? 'border-success' : 'border-gray-200' }} hover:border-success transition-all overflow-hidden">
+                <div class="absolute top-0 right-0 w-24 h-24 bg-success/5 rounded-full -translate-y-1/2 translate-x-1/2 group-hover:scale-150 transition-transform"></div>
+                <div class="relative">
+                    <div class="w-12 h-12 bg-success/10 rounded-xl flex items-center justify-center mb-3">
+                        <svg class="w-6 h-6 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <p class="text-xs text-gray-600 font-bold uppercase mb-1">Completed</p>
+                    <p class="text-3xl font-black text-gray-900">{{ $stats['completed'] }}</p>
+                </div>
             </a>
+
+            <!-- Cancelled -->
             <a href="{{ route('admin.bookings.manage', ['status' => 'cancelled']) }}" 
-               class="card p-4 hover:shadow-lg transition {{ $status === 'cancelled' ? 'ring-2 ring-error' : '' }}">
-                <p class="text-sm text-gray-600">Cancelled</p>
-                <p class="text-2xl font-bold text-error mt-1">{{ $stats['cancelled'] }}</p>
+               class="group relative bg-white rounded-2xl p-6 border-2 {{ $status === 'cancelled' ? 'border-error' : 'border-gray-200' }} hover:border-error transition-all overflow-hidden">
+                <div class="absolute top-0 right-0 w-24 h-24 bg-error/5 rounded-full -translate-y-1/2 translate-x-1/2 group-hover:scale-150 transition-transform"></div>
+                <div class="relative">
+                    <div class="w-12 h-12 bg-error/10 rounded-xl flex items-center justify-center mb-3">
+                        <svg class="w-6 h-6 text-error" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </div>
+                    <p class="text-xs text-gray-600 font-bold uppercase mb-1">Cancelled</p>
+                    <p class="text-3xl font-black text-gray-900">{{ $stats['cancelled'] }}</p>
+                </div>
             </a>
         </div>
 
@@ -140,7 +189,10 @@
         <div id="alert-container"></div>
 
         <!-- Bookings Table -->
-        <div class="card">
+        <div class="bg-white rounded-2xl border-2 border-gray-200 p-6">
+            <div class="flex items-center justify-between mb-5">
+                <h2 class="text-xl font-black text-gray-900">Recent Bookings</h2>
+            </div>
             <div class="overflow-x-auto">
                 <table class="w-full">
                     <thead class="bg-gray-50">

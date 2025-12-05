@@ -1,6 +1,6 @@
 /**
- * User Location Tracker
- * Tracks and displays user locations on a map with real-time updates
+ * User Location Tracker (for Admin)
+ * Tracks and displays user locations on a map with routing
  */
 
 export class UserTracker {
@@ -69,16 +69,44 @@ export class UserTracker {
         if (adminLoc) {
             const adminMarker = L.marker([adminLoc.latitude, adminLoc.longitude], {
                 icon: L.divIcon({
-                    className: 'custom-marker',
-                    html: '<div style="background-color: #10B981; width: 30px; height: 30px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);"></div>',
-                    iconSize: [30, 30]
-                })
-            }).addTo(this.map).bindPopup(`
-                <div class="p-2">
-                    <h3 class="font-bold">Your Location</h3>
-                    <p class="text-sm text-gray-600">Admin</p>
-                </div>
-            `);
+                    className: 'custom-marker-admin',
+                    html: `
+                        <div style="position: relative;">
+                            <div style="
+                                background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+                                width: 40px;
+                                height: 40px;
+                                border-radius: 50% 50% 50% 0;
+                                transform: rotate(-45deg);
+                                border: 4px solid white;
+                                box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                            ">
+                                <svg style="transform: rotate(45deg); width: 20px; height: 20px; color: white;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                                </svg>
+                            </div>
+                            <div style="
+                                position: absolute;
+                                bottom: -8px;
+                                left: 50%;
+                                transform: translateX(-50%);
+                                width: 12px;
+                                height: 12px;
+                                background: rgba(59, 130, 246, 0.3);
+                                border-radius: 50%;
+                                animation: pulse 2s infinite;
+                            "></div>
+                        </div>
+                    `,
+                    iconSize: [40, 40],
+                    iconAnchor: [20, 40],
+                    popupAnchor: [0, -40]
+                }),
+                zIndexOffset: 1000
+            }).addTo(this.map);
             this.markers.push(adminMarker);
         }
 
@@ -88,28 +116,45 @@ export class UserTracker {
 
         // Add markers for each user
         users.forEach(user => {
-            const popupContent = `
-                <div class="p-2">
-                    <h3 class="font-bold">${user.name}</h3>
-                    <p class="text-sm text-gray-600">${user.phone}</p>
-                    <p class="text-xs text-gray-500">${user.address}</p>
-                    ${user.distance_km !== undefined ? `
-                        <div class="mt-2 text-xs">
-                            <p class="text-blue-600">Distance: ${user.distance_km} km</p>
-                            <p class="text-green-600">Time: ${user.eta_minutes} min</p>
-                            <p class="text-purple-600">ETA: ${user.eta}</p>
-                        </div>
-                    ` : ''}
-                </div>
-            `;
-            
             const marker = L.marker([user.latitude, user.longitude], {
                 icon: L.divIcon({
-                    className: 'custom-marker',
-                    html: '<div style="background-color: #EF4444; width: 30px; height: 30px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);"></div>',
-                    iconSize: [30, 30]
-                })
-            }).addTo(this.map).bindPopup(popupContent);
+                    className: 'custom-marker-user',
+                    html: `
+                        <div style="position: relative;">
+                            <div style="
+                                background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+                                width: 40px;
+                                height: 40px;
+                                border-radius: 50% 50% 50% 0;
+                                transform: rotate(-45deg);
+                                border: 4px solid white;
+                                box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                            ">
+                                <svg style="transform: rotate(45deg); width: 20px; height: 20px; color: white;" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
+                                </svg>
+                            </div>
+                            <div style="
+                                position: absolute;
+                                bottom: -8px;
+                                left: 50%;
+                                transform: translateX(-50%);
+                                width: 12px;
+                                height: 12px;
+                                background: rgba(16, 185, 129, 0.3);
+                                border-radius: 50%;
+                            "></div>
+                        </div>
+                    `,
+                    iconSize: [40, 40],
+                    iconAnchor: [20, 40],
+                    popupAnchor: [0, -40]
+                }),
+                zIndexOffset: 500
+            }).addTo(this.map);
             this.markers.push(marker);
         });
 
@@ -125,7 +170,18 @@ export class UserTracker {
         if (!listContainer) return;
         
         if (users.length === 0) {
-            listContainer.innerHTML = '<p class="text-gray-500 text-center py-8">No customers have booked with your branch yet</p>';
+            listContainer.innerHTML = `
+                <div class="rounded-xl border-2 border-dashed border-gray-200 p-12 text-center">
+                    <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <svg class="w-10 h-10 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-black text-gray-900 mb-2">No Customers Found</h3>
+                    <p class="text-gray-500">No customers have booked with your branch yet</p>
+                </div>
+            `;
+            this.updateStatCards(0, 0, 0, 0);
             return;
         }
 
@@ -137,56 +193,112 @@ export class UserTracker {
         // Store users for later use
         this.users = users;
 
-        listContainer.innerHTML = users.map(user => `
+        // Update stat cards
+        this.updateStatCards(
+            users.length,
+            users.length,
+            this.calculateAverageDistance(users),
+            this.calculateAverageETA(users)
+        );
+
+        listContainer.innerHTML = users.map((user, index) => `
             <button 
                 onclick="window.userTracker.selectUser(${user.id})"
-                class="user-item w-full text-left p-4 border border-gray-200 rounded-lg hover:border-primary-500 hover:bg-primary-50 transition-all duration-200"
+                class="user-item group w-full text-left bg-white rounded-xl border-2 border-gray-200 hover:border-wash hover:shadow-lg transition-all"
                 data-user-id="${user.id}"
             >
-                <div class="flex items-start gap-3">
-                    <div class="bg-red-100 rounded-full w-10 h-10 flex items-center justify-center flex-shrink-0">
-                        <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                        </svg>
+                <div class="flex items-center gap-3 p-3">
+                    <!-- Customer Number Badge -->
+                    <div class="w-10 h-10 bg-gradient-to-br from-wash to-wash-dark rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-md flex-shrink-0">
+                        ${index + 1}
                     </div>
+                    
+                    <!-- Customer Name -->
                     <div class="flex-1 min-w-0">
-                        <h3 class="font-bold text-gray-800 truncate">${user.name}</h3>
-                        <p class="text-sm text-gray-600 truncate">${user.phone}</p>
-                        <p class="text-xs text-gray-500 mt-1">${user.address || 'No address'}</p>
-                        ${user.distance_km !== undefined ? `
-                            <div class="mt-2 flex gap-2 text-xs">
-                                <span class="text-blue-600 font-semibold">📍 ${user.distance_km} km</span>
-                                <span class="text-green-600 font-semibold">⏱️ ${user.eta_minutes} min</span>
-                            </div>
-                        ` : ''}
+                        <div class="flex items-center gap-2">
+                            <h3 class="text-sm font-bold text-gray-900 group-hover:text-wash transition-colors truncate">${user.name}</h3>
+                            <span class="badge badge-in-progress text-xs flex-shrink-0">Active</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Arrow Icon -->
+                    <div class="flex-shrink-0">
+                        <svg class="w-5 h-5 text-gray-400 group-hover:text-wash transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
                     </div>
                 </div>
             </button>
         `).join('');
     }
 
+    updateStatCards(activeDeliveries, totalCustomers, avgDistance, avgETA) {
+        // Update Active Deliveries
+        const statActive = document.getElementById('stat-active');
+        if (statActive) {
+            statActive.textContent = activeDeliveries;
+        }
+
+        // Update Total Customers
+        const statCustomers = document.getElementById('stat-customers');
+        if (statCustomers) {
+            statCustomers.textContent = totalCustomers;
+        }
+
+        // Update Average Distance
+        const statDistance = document.getElementById('stat-distance');
+        if (statDistance) {
+            statDistance.textContent = avgDistance > 0 ? avgDistance : '0';
+        }
+
+        // Update Average ETA
+        const statEta = document.getElementById('stat-eta');
+        if (statEta) {
+            statEta.textContent = avgETA > 0 ? avgETA : '0';
+        }
+    }
+
+    calculateAverageDistance(users) {
+        if (users.length === 0) return 0;
+        const total = users.reduce((sum, user) => sum + (user.distance_km || 0), 0);
+        return Math.round(total / users.length * 10) / 10; // Round to 1 decimal
+    }
+
+    calculateAverageETA(users) {
+        if (users.length === 0) return 0;
+        const total = users.reduce((sum, user) => sum + (user.eta_minutes || 0), 0);
+        return Math.round(total / users.length);
+    }
+
     async selectUser(userId) {
         const user = this.users.find(u => u.id === userId);
-        if (!user) {
-            console.error('User not found:', userId);
+        if (!user || !this.adminLocation) {
+            console.error('User or admin location not found', { userId, user, adminLocation: this.adminLocation });
             return;
         }
+
+        // Clear ALL existing route layers (in case there are multiple)
+        this.map.eachLayer((layer) => {
+            if (layer instanceof L.Polyline || layer instanceof L.GeoJSON) {
+                // Don't remove the base tile layer
+                if (!(layer instanceof L.TileLayer)) {
+                    // Check if it's not a marker
+                    if (!this.markers.includes(layer)) {
+                        this.map.removeLayer(layer);
+                    }
+                }
+            }
+        });
         
-        if (!this.adminLocation) {
-            console.error('Admin location not available');
-            return;
-        }
-
-        console.log('Selecting user:', user);
-        console.log('Admin location:', this.adminLocation);
-
-        // Clear existing route layer
+        // Clear the route layer reference
         if (this.routeLayer) {
             this.map.removeLayer(this.routeLayer);
+            this.routeLayer = null;
         }
 
         // Fetch actual route from Geoapify
         try {
+            console.log('Fetching route for user:', user.name);
             const routeData = await this.fetchRoute(
                 this.adminLocation.latitude,
                 this.adminLocation.longitude,
@@ -194,28 +306,36 @@ export class UserTracker {
                 user.longitude
             );
 
-            if (routeData && routeData.features && routeData.features[0]) {
-                console.log('Drawing route from API data');
-                // Draw the actual route
-                this.routeLayer = L.geoJSON(routeData.features[0].geometry, {
-                    style: {
-                        color: '#EF4444',
-                        weight: 6,
-                        opacity: 0.9,
-                        lineJoin: 'round',
-                        lineCap: 'round'
-                    }
-                }).addTo(this.map);
+            if (routeData && routeData.features && routeData.features.length > 0 && routeData.features[0].geometry) {
+                console.log('Drawing route from API data', routeData.features[0].geometry);
+                
+                try {
+                    // Draw the actual route using GeoJSON
+                    this.routeLayer = L.geoJSON(routeData.features[0].geometry, {
+                        style: {
+                            color: '#10B981',
+                            weight: 6,
+                            opacity: 0.9,
+                            lineJoin: 'round',
+                            lineCap: 'round'
+                        }
+                    }).addTo(this.map);
 
-                // Fit map to show entire route with better padding
-                setTimeout(() => {
-                    this.map.fitBounds(this.routeLayer.getBounds(), { 
-                        padding: [50, 50],
-                        maxZoom: 14
-                    });
-                }, 100);
+                    // Fit map to show entire route with better padding
+                    setTimeout(() => {
+                        this.map.fitBounds(this.routeLayer.getBounds(), { 
+                            padding: [50, 50],
+                            maxZoom: 14
+                        });
+                    }, 100);
+                    
+                    console.log('Route drawn successfully');
+                } catch (error) {
+                    console.error('Error drawing route:', error);
+                    this.drawStraightLine(user);
+                }
             } else {
-                console.log('Route data invalid, falling back to straight line');
+                console.warn('Route data invalid or empty, falling back to straight line', routeData);
                 // Fallback to straight line if routing fails
                 this.drawStraightLine(user);
             }
@@ -230,14 +350,6 @@ export class UserTracker {
 
         // Highlight selected user
         this.highlightSelectedUser(userId);
-
-        // Open popup for selected user
-        this.markers.forEach(marker => {
-            const markerLatLng = marker.getLatLng();
-            if (markerLatLng.lat === user.latitude && markerLatLng.lng === user.longitude) {
-                marker.openPopup();
-            }
-        });
     }
 
     updateRouteInfo(user) {
@@ -264,26 +376,41 @@ export class UserTracker {
     }
 
     async fetchRoute(startLat, startLng, endLat, endLng) {
+        if (!this.apiKey) {
+            console.error('Geoapify API key is missing');
+            return null;
+        }
+
         try {
             const url = `https://api.geoapify.com/v1/routing?waypoints=${startLat},${startLng}|${endLat},${endLng}&mode=drive&apiKey=${this.apiKey}`;
-            console.log('Fetching route from:', url);
+            console.log('Fetching route from Geoapify API...');
+            console.log('Start:', startLat, startLng);
+            console.log('End:', endLat, endLng);
             
             const response = await fetch(url);
             
             if (!response.ok) {
                 const errorText = await response.text();
                 console.error('Routing API error:', response.status, errorText);
-                throw new Error(`Routing API request failed: ${response.status}`);
+                throw new Error(`Routing API request failed: ${response.status} - ${errorText}`);
             }
             
             const data = await response.json();
-            console.log('Route data received:', data);
+            console.log('Route data received successfully:', data);
             
             // Check if route data is valid
-            if (!data.features || !data.features[0] || !data.features[0].geometry) {
-                console.error('Invalid route data structure:', data);
+            if (!data.features || data.features.length === 0) {
+                console.error('No route features in response:', data);
                 return null;
             }
+            
+            if (!data.features[0].geometry) {
+                console.error('No geometry in route feature:', data.features[0]);
+                return null;
+            }
+            
+            console.log('Route geometry type:', data.features[0].geometry.type);
+            console.log('Route coordinates count:', data.features[0].geometry.coordinates?.length);
             
             return data;
         } catch (error) {
@@ -293,6 +420,14 @@ export class UserTracker {
     }
 
     drawStraightLine(user) {
+        console.warn('Drawing straight line fallback (routing API failed or unavailable)');
+        
+        // Ensure any existing route is removed first
+        if (this.routeLayer) {
+            this.map.removeLayer(this.routeLayer);
+            this.routeLayer = null;
+        }
+        
         this.routeLayer = L.polyline([
             [this.adminLocation.latitude, this.adminLocation.longitude],
             [user.latitude, user.longitude]
@@ -313,7 +448,7 @@ export class UserTracker {
     highlightSelectedUser(userId) {
         // Remove previous highlights
         document.querySelectorAll('.user-item').forEach(item => {
-            item.classList.remove('border-primary-500', 'bg-primary-50');
+            item.classList.remove('border-wash', 'bg-wash/5', 'shadow-lg');
             item.classList.add('border-gray-200');
         });
 
@@ -321,7 +456,10 @@ export class UserTracker {
         const selectedItem = document.querySelector(`[data-user-id="${userId}"]`);
         if (selectedItem) {
             selectedItem.classList.remove('border-gray-200');
-            selectedItem.classList.add('border-primary-500', 'bg-primary-50');
+            selectedItem.classList.add('border-wash', 'bg-wash/5', 'shadow-lg');
+            
+            // Scroll into view
+            selectedItem.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
     }
 
@@ -334,7 +472,7 @@ export class UserTracker {
     showError(message) {
         const listContainer = document.getElementById('user-list');
         if (listContainer) {
-            listContainer.innerHTML = `<p class="text-red-500">${message}</p>`;
+            listContainer.innerHTML = `<p class="text-red-500 text-center py-8">${message}</p>`;
         }
     }
 

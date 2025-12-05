@@ -11,7 +11,9 @@ export default defineConfig({
                 'resources/js/pages/admin-pricing.js',
                 'resources/js/pages/admin-booking.js',
                 'resources/js/pages/admin-analytics.js',
-                'resources/js/pages/admin-users.js'
+                'resources/js/pages/admin-users.js',
+                'resources/js/pages/route-to-user.js',
+                'resources/js/pages/route-to-admin.js'
             ],
             refresh: true,
         }),

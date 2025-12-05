@@ -216,6 +216,12 @@ class BookingController extends Controller
      */
     public function store(Request $request)
     {
+        // Log the incoming request data for debugging
+        Log::info('Admin booking creation attempt', [
+            'request_data' => $request->all(),
+            'admin_id' => Auth::guard('admin')->id(),
+        ]);
+
         $validated = $request->validate([
             'booking_type' => 'required|in:online,walkin',
             'user_id' => 'required_if:booking_type,online|nullable|exists:users,id',
@@ -234,6 +240,8 @@ class BookingController extends Controller
             'notes' => 'nullable|string',
             'weight' => 'nullable|numeric',
         ]);
+
+        Log::info('Validation passed', ['validated_data' => $validated]);
 
         $validated['admin_id'] = Auth::guard('admin')->id();
 
@@ -266,10 +274,14 @@ class BookingController extends Controller
 
         $result = $this->bookingService->createBooking($validated);
 
+        Log::info('Booking service result', ['result' => $result]);
+
         if ($result['success']) {
+            Log::info('Booking created successfully, redirecting with success message');
             return redirect()->back()->with('success', $result['message']);
         }
 
+        Log::error('Booking creation failed, redirecting with error', ['message' => $result['message']]);
         return redirect()->back()->with('error', $result['message'])->withInput();
     }
 

@@ -8,36 +8,34 @@
 @endphp
 
 <nav class="navbar fixed top-0 left-0 right-0" style="z-index: 9998;">
-    <div class="container mx-auto px-3 sm:px-4 flex items-center justify-between h-16">
+    <div class="container mx-auto px-6 h-full flex items-center justify-between">
         
         <!-- Branding -->
-        <div class="navbar-brand">
-            <div class="bg-white rounded-full p-1 flex items-center justify-center">
-                <img src="{{ asset('images/washhour_logo.png') }}" alt="WashHour Logo" class="navbar-logo">
+        <a href="{{ $isAdmin ? route('admin.dashboard') : route('user.dashboard') }}" class="navbar-brand">
+            <div class="bg-white rounded-full p-2">
+                <img src="{{ asset('images/washhour_logo.png') }}" alt="WashHour Logo" class="h-8 w-8">
             </div>
-            <a href="{{ $isAdmin ? route('admin.dashboard') : route('user.dashboard') }}" class="navbar-title hover:text-primary-100 transition-colors">
-                WashHour
-            </a>
-        </div>
+            <span class="navbar-title hover:text-white/90 transition-colors">WashHour</span>
+        </a>
 
         <!-- Right side: Profile -->
-        <div class="flex items-center gap-2 sm:gap-4">
+        <div class="flex items-center gap-4">
             <!-- User Type Badge -->
             @if($isAdmin)
-                <span class="badge bg-warning text-gray-900 font-bold">ADMIN</span>
+                <span class="badge badge-warning">ADMIN</span>
             @endif
 
             <!-- Interactive Profile Dropdown -->
             <div class="relative z-[9999]" x-data="{ open: false }" @click.away="open = false">
-                <button @click="open = !open" class="flex items-center gap-2 sm:gap-3 px-2 sm:px-4 py-2 rounded-md border border-primary-500 bg-white hover:bg-primary-50 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-primary-600 touch-target">
+                <button @click="open = !open" class="flex items-center gap-3 px-4 py-2.5 rounded-md border-2 border-white/20 bg-white/10 hover:bg-white/20 backdrop-blur-sm transition-all focus:outline-none focus:ring-4 focus:ring-white/30 touch-target">
                     <!-- User Avatar with Initials -->
-                    <div class="w-8 h-8 rounded-full bg-primary-600 text-white flex items-center justify-center font-semibold text-sm">
+                    <div class="w-9 h-9 rounded-full bg-white text-wash flex items-center justify-center font-bold text-sm">
                         {{ $userInitials }}
                     </div>
-                    <span class="text-sm text-gray-900 font-medium hidden sm:inline">{{ trim($userName) }}</span>
+                    <span class="text-sm text-white font-semibold hidden sm:inline">{{ trim($userName) }}</span>
                     <!-- Chevron Down Icon -->
-                    <svg class="w-4 h-4 text-gray-700 transition-transform duration-200 hidden sm:block" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    <svg class="w-4 h-4 text-white transition-transform hidden sm:block" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path>
                     </svg>
                 </button>
 

@@ -47,90 +47,131 @@
         </div>
     </div>
 
-    <div class="space-y-6">
-        <!-- Header -->
-        <x-modules.page-header
-            title="Revenue Report"
-            subtitle="{{ $allTime ? 'All Time Data' : $start->format('M d, Y') . ' - ' . $end->format('M d, Y') }}"
-            icon="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-            gradient="emerald"
-        >
-            <x-slot name="actions">
-                <a href="{{ route('admin.revenue.export.csv', request()->all()) }}" class="inline-flex items-center px-4 py-2 bg-white/10 hover:bg-white/20 backdrop-blur text-white font-medium rounded-xl transition-colors text-sm">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
-                    CSV
-                </a>
-                <a href="{{ route('admin.revenue.export', request()->all()) }}" class="inline-flex items-center px-4 py-2 bg-white hover:bg-white/90 text-emerald-700 font-medium rounded-xl transition-colors text-sm">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-                    </svg>
-                    Export
-                </a>
-            </x-slot>
-        </x-modules.page-header>
+    <div class="max-w-7xl mx-auto space-y-6">
+        <!-- Hero Header -->
+        <div class="relative bg-gradient-to-br from-wash via-wash-dark to-gray-900 rounded-2xl p-12 overflow-hidden">
+            <!-- Decorative Background -->
+            <div class="absolute inset-0 opacity-10">
+                <div class="absolute top-0 right-0 w-64 h-64 bg-white rounded-full -translate-y-1/2 translate-x-1/2"></div>
+                <div class="absolute bottom-0 left-0 w-48 h-48 bg-white rounded-full translate-y-1/2 -translate-x-1/2"></div>
+            </div>
+            
+            <!-- Content -->
+            <div class="relative flex items-center justify-between">
+                <div>
+                    <h1 class="text-5xl font-black text-white mb-3">Revenue Report</h1>
+                    <p class="text-xl text-white/80">{{ $allTime ? 'All Time Data' : $start->format('M d, Y') . ' - ' . $end->format('M d, Y') }}</p>
+                </div>
+                <div class="flex gap-3">
+                    <a href="{{ route('admin.revenue.export.csv', request()->all()) }}" class="inline-flex items-center px-4 py-2 bg-white/10 hover:bg-white/20 backdrop-blur text-white font-bold rounded-xl transition-colors text-sm">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        CSV
+                    </a>
+                    <a href="{{ route('admin.revenue.export', request()->all()) }}" class="inline-flex items-center px-4 py-2 bg-white hover:bg-white/90 text-wash font-bold rounded-xl transition-all hover:scale-105 hover:shadow-xl text-sm">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                        </svg>
+                        Export
+                    </a>
+                </div>
+            </div>
+        </div>
 
         <!-- Filters -->
         @php
             $isCustom = request('custom') == '1' || (request('start_date') && request('end_date') && !in_array($period, ['today', 'week', 'month', 'year']));
             $currentPeriod = $allTime ? 'all_time' : ($isCustom ? 'custom' : $period);
         @endphp
-        <x-modules.filter-panel
-            :action="route('admin.revenue.index')"
-            :status-filters="[
-                ['key' => 'today', 'label' => 'Today', 'color' => 'blue'],
-                ['key' => 'week', 'label' => 'This Week', 'color' => 'green'],
-                ['key' => 'month', 'label' => 'This Month', 'color' => 'yellow'],
-                ['key' => 'year', 'label' => 'This Year', 'color' => 'purple'],
-                ['key' => 'all_time', 'label' => 'All Time', 'color' => 'primary', 'icon' => 'list'],
-                ['key' => 'custom', 'label' => 'Custom Range', 'color' => 'red'],
-            ]"
-            :current-status="$currentPeriod"
-            :show-date-range="true"
-            :show-custom-date-filter="true"
-            :start-date-value="request('start_date')"
-            :end-date-value="request('end_date')"
-            :clear-url="route('admin.revenue.index')"
-            :show-clear="request()->hasAny(['period', 'start_date', 'end_date', 'all_time', 'custom'])"
-            submit-text="Apply"
-            grid-cols="lg:grid-cols-4"
-        />
+        <div class="bg-white rounded-2xl border-2 border-gray-200 p-6">
+            <form action="{{ route('admin.revenue.index') }}" method="GET" class="space-y-4">
+                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
+                    <button type="submit" name="period" value="today" class="px-4 py-2 rounded-xl border-2 {{ $currentPeriod === 'today' ? 'bg-info border-info text-white' : 'bg-info/5 border-info/20 text-gray-900 hover:bg-info hover:border-info hover:text-white' }} font-bold text-sm transition-all">
+                        Today
+                    </button>
+                    <button type="submit" name="period" value="week" class="px-4 py-2 rounded-xl border-2 {{ $currentPeriod === 'week' ? 'bg-success border-success text-white' : 'bg-success/5 border-success/20 text-gray-900 hover:bg-success hover:border-success hover:text-white' }} font-bold text-sm transition-all">
+                        This Week
+                    </button>
+                    <button type="submit" name="period" value="month" class="px-4 py-2 rounded-xl border-2 {{ $currentPeriod === 'month' ? 'bg-warning border-warning text-white' : 'bg-warning/5 border-warning/20 text-gray-900 hover:bg-warning hover:border-warning hover:text-white' }} font-bold text-sm transition-all">
+                        This Month
+                    </button>
+                    <button type="submit" name="period" value="year" class="px-4 py-2 rounded-xl border-2 {{ $currentPeriod === 'year' ? 'bg-purple-600 border-purple-600 text-white' : 'bg-purple-600/5 border-purple-600/20 text-gray-900 hover:bg-purple-600 hover:border-purple-600 hover:text-white' }} font-bold text-sm transition-all">
+                        This Year
+                    </button>
+                    <button type="submit" name="all_time" value="true" class="px-4 py-2 rounded-xl border-2 {{ $currentPeriod === 'all_time' ? 'bg-wash border-wash text-white' : 'bg-wash/5 border-wash/20 text-gray-900 hover:bg-wash hover:border-wash hover:text-white' }} font-bold text-sm transition-all">
+                        All Time
+                    </button>
+                    <button type="button" onclick="document.getElementById('customDateRange').classList.toggle('hidden')" class="px-4 py-2 rounded-xl border-2 {{ $currentPeriod === 'custom' ? 'bg-error border-error text-white' : 'bg-error/5 border-error/20 text-gray-900 hover:bg-error hover:border-error hover:text-white' }} font-bold text-sm transition-all">
+                        Custom
+                    </button>
+                </div>
+                
+                <div id="customDateRange" class="{{ $currentPeriod === 'custom' ? '' : 'hidden' }} grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t-2 border-gray-200">
+                    <div class="form-group">
+                        <label class="form-label">Start Date</label>
+                        <input type="date" name="start_date" value="{{ request('start_date') }}" class="form-input">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">End Date</label>
+                        <input type="date" name="end_date" value="{{ request('end_date') }}" class="form-input">
+                    </div>
+                    <div class="flex items-end gap-2">
+                        <button type="submit" name="custom" value="1" class="btn btn-primary flex-1">
+                            Apply
+                        </button>
+                        @if(request()->hasAny(['period', 'start_date', 'end_date', 'all_time', 'custom']))
+                        <a href="{{ route('admin.revenue.index') }}" class="btn btn-secondary">
+                            Clear
+                        </a>
+                        @endif
+                    </div>
+                </div>
+            </form>
+        </div>
 
-        @push('scripts')
-        <script>
-            document.querySelectorAll('.filter-btn[data-filter]').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const filter = this.dataset.filter;
-                    let url = '{{ route("admin.revenue.index") }}';
-                    
-                    if (filter === 'custom') {
-                        url += '?custom=1';
-                    } else if (filter === 'all_time') {
-                        url += '?all_time=true';
-                    } else {
-                        url += `?period=${filter}`;
-                    }
-                    
-                    window.location.href = url;
-                });
-            });
-        </script>
-        @endpush
+        <!-- Stat Cards -->
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-4 print:grid-cols-3 print:gap-2">
+            <!-- Total Revenue -->
+            <div class="group relative bg-white rounded-2xl p-6 border-2 border-gray-200 hover:border-success transition-all overflow-hidden print:p-3">
+                <div class="absolute top-0 right-0 w-24 h-24 bg-success/5 rounded-full -translate-y-1/2 translate-x-1/2 group-hover:scale-150 transition-transform"></div>
+                <div class="relative">
+                    <div class="w-12 h-12 bg-success/10 rounded-xl flex items-center justify-center mb-3">
+                        <svg class="w-6 h-6 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <p class="text-xs text-gray-600 font-bold uppercase mb-1 print:text-xs">Total Revenue</p>
+                    <p class="text-3xl font-black text-gray-900 print:text-xl">{{ $currency }}{{ number_format($totalRevenue, $reportConfig['decimal_places'] ?? 2) }}</p>
+                </div>
+            </div>
 
-        <!-- Stats -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 print:grid-cols-3 print:gap-2">
-            <div class="card p-6 print:p-3">
-                <p class="text-sm text-gray-600 print:text-xs">Total Revenue</p>
-                <p class="text-3xl font-bold text-success mt-2 print:text-xl print:mt-1">{{ $currency }}{{ number_format($totalRevenue, $reportConfig['decimal_places'] ?? 2) }}</p>
+            <!-- Total Transactions -->
+            <div class="group relative bg-white rounded-2xl p-6 border-2 border-gray-200 hover:border-wash transition-all overflow-hidden print:p-3">
+                <div class="absolute top-0 right-0 w-24 h-24 bg-wash/5 rounded-full -translate-y-1/2 translate-x-1/2 group-hover:scale-150 transition-transform"></div>
+                <div class="relative">
+                    <div class="w-12 h-12 bg-wash/10 rounded-xl flex items-center justify-center mb-3">
+                        <svg class="w-6 h-6 text-wash" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                        </svg>
+                    </div>
+                    <p class="text-xs text-gray-600 font-bold uppercase mb-1 print:text-xs">Total Transactions</p>
+                    <p class="text-3xl font-black text-gray-900 print:text-xl">{{ number_format($totalTransactions) }}</p>
+                </div>
             </div>
-            <div class="card p-6 print:p-3">
-                <p class="text-sm text-gray-600 print:text-xs">Total Transactions</p>
-                <p class="text-3xl font-bold text-primary mt-2 print:text-xl print:mt-1">{{ number_format($totalTransactions) }}</p>
-            </div>
-            <div class="card p-6 print:p-3">
-                <p class="text-sm text-gray-600 print:text-xs">Average Order</p>
-                <p class="text-3xl font-bold text-gray-900 mt-2 print:text-xl print:mt-1">{{ $currency }}{{ number_format($averageOrder, $reportConfig['decimal_places'] ?? 2) }}</p>
+
+            <!-- Average Order -->
+            <div class="group relative bg-white rounded-2xl p-6 border-2 border-gray-200 hover:border-info transition-all overflow-hidden print:p-3">
+                <div class="absolute top-0 right-0 w-24 h-24 bg-info/5 rounded-full -translate-y-1/2 translate-x-1/2 group-hover:scale-150 transition-transform"></div>
+                <div class="relative">
+                    <div class="w-12 h-12 bg-info/10 rounded-xl flex items-center justify-center mb-3">
+                        <svg class="w-6 h-6 text-info" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                        </svg>
+                    </div>
+                    <p class="text-xs text-gray-600 font-bold uppercase mb-1 print:text-xs">Average Order</p>
+                    <p class="text-3xl font-black text-gray-900 print:text-xl">{{ $currency }}{{ number_format($averageOrder, $reportConfig['decimal_places'] ?? 2) }}</p>
+                </div>
             </div>
         </div>
 

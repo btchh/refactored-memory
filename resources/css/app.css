@@ -8,41 +8,34 @@
 @plugin "daisyui";
 
 @theme {
-    /* ============================================
-       DESIGN SYSTEM FOUNDATION - DESIGN TOKENS
-       ============================================ */
+    /* Brand Colors - WashHour Identity */
+    --color-wash: #0066ff;
+    --color-wash-light: #4d94ff;
+    --color-wash-dark: #0052cc;
     
-    /* Font Family */
-    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+    --color-primary-50: #e6f0ff;
+    --color-primary-100: #b3d1ff;
+    --color-primary-200: #80b3ff;
+    --color-primary-300: #4d94ff;
+    --color-primary-400: #1a75ff;
+    --color-primary-500: #0066ff;
+    --color-primary-600: #0052cc;
+    --color-primary-700: #003d99;
+    --color-primary-800: #002966;
+    --color-primary-900: #001433;
+    --color-primary: #0066ff;
     
-    /* ============================================
-       COLOR PALETTE
-       ============================================ */
-    
-    /* Primary Colors (Blue) */
-    --color-primary-50: #eff6ff;
-    --color-primary-100: #dbeafe;
-    --color-primary-200: #bfdbfe;
-    --color-primary-300: #93c5fd;
-    --color-primary-400: #60a5fa;
-    --color-primary-500: #3b82f6;
-    --color-primary-600: #2563eb;
-    --color-primary-700: #1d4ed8;
-    --color-primary-800: #1e40af;
-    --color-primary-900: #1e3a8a;
-    --color-primary: #2563eb; /* Main primary - 600 */
-    
-    /* Neutral/Gray Colors */
-    --color-gray-50: #f9fafb;
-    --color-gray-100: #f3f4f6;
-    --color-gray-200: #e5e7eb;
-    --color-gray-300: #d1d5db;
-    --color-gray-400: #9ca3af;
-    --color-gray-500: #6b7280;
-    --color-gray-600: #4b5563;
-    --color-gray-700: #374151;
-    --color-gray-800: #1f2937;
-    --color-gray-900: #111827;
+    /* Neutrals - Refined grayscale */
+    --color-gray-50: #fafafa;
+    --color-gray-100: #f5f5f5;
+    --color-gray-200: #eeeeee;
+    --color-gray-300: #e0e0e0;
+    --color-gray-400: #bdbdbd;
+    --color-gray-500: #9e9e9e;
+    --color-gray-600: #757575;
+    --color-gray-700: #616161;
+    --color-gray-800: #424242;
+    --color-gray-900: #212121;
     
     /* Semantic Colors */
     --color-success: #10b981;
@@ -50,798 +43,230 @@
     --color-error: #ef4444;
     --color-info: #3b82f6;
     
-    /* Base Colors (for DaisyUI compatibility) */
     --color-base-100: #ffffff;
-    --color-base-200: #f3f4f6;
-    --color-base-300: #e5e7eb;
-    --color-neutral: #1f2937;
-    
-    /* ============================================
-       TYPOGRAPHY SCALE
-       ============================================ */
-    
-    --font-size-xs: 0.75rem;      /* 12px */
-    --font-size-sm: 0.875rem;     /* 14px */
-    --font-size-base: 1rem;       /* 16px */
-    --font-size-lg: 1.125rem;     /* 18px */
-    --font-size-xl: 1.25rem;      /* 20px */
-    --font-size-2xl: 1.5rem;      /* 24px */
-    --font-size-3xl: 1.875rem;    /* 30px */
-    --font-size-4xl: 2.25rem;     /* 36px */
-    --font-size-5xl: 3rem;        /* 48px */
-    --font-size-6xl: 3.75rem;     /* 60px */
-    
-    /* Font Weights */
-    --font-weight-normal: 400;
-    --font-weight-medium: 500;
-    --font-weight-semibold: 600;
-    --font-weight-bold: 700;
-    
-    /* Line Heights */
-    --line-height-tight: 1.25;
-    --line-height-normal: 1.5;
-    --line-height-relaxed: 1.75;
-    
-    /* ============================================
-       SPACING SYSTEM (4px increments)
-       ============================================ */
-    
-    --spacing-1: 0.25rem;   /* 4px */
-    --spacing-2: 0.5rem;    /* 8px */
-    --spacing-3: 0.75rem;   /* 12px */
-    --spacing-4: 1rem;      /* 16px */
-    --spacing-5: 1.25rem;   /* 20px */
-    --spacing-6: 1.5rem;    /* 24px */
-    --spacing-8: 2rem;      /* 32px */
-    --spacing-10: 2.5rem;   /* 40px */
-    --spacing-12: 3rem;     /* 48px */
-    --spacing-16: 4rem;     /* 64px */
-    
-    /* ============================================
-       BORDER RADIUS
-       ============================================ */
-    
-    --radius-sm: 0.25rem;   /* 4px */
-    --radius-md: 0.5rem;    /* 8px */
-    --radius-lg: 0.75rem;   /* 12px */
-    --radius-xl: 1rem;      /* 16px */
-    --radius-full: 9999px;  /* Fully rounded */
-    
-    /* ============================================
-       SHADOWS
-       ============================================ */
-    
-    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
-    --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+    --color-base-200: #f5f5f5;
+    --color-base-300: #eeeeee;
+    --color-neutral: #212121;
 }
 
-/* Custom Animations */
-@keyframes slideInUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-@keyframes slideIn {
-    from {
-        opacity: 0;
-        transform: translateX(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
-
-@keyframes fadeOut {
-    from {
-        opacity: 1;
-    }
-    to {
-        opacity: 0;
-    }
-}
-
-@keyframes scaleIn {
-    from {
-        opacity: 0;
-        transform: scale(0.95);
-    }
-    to {
-        opacity: 1;
-        transform: scale(1);
-    }
-}
-
-@keyframes pulse-soft {
-    0%, 100% {
-        opacity: 1;
-    }
-    50% {
-        opacity: 0.8;
-    }
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 1;
-    }
-}
-
-.animate-slide-in-up {
-    animation: slideInUp 0.4s ease-out;
-}
-
-.animate-slide-in {
-    animation: slideIn 0.3s ease-out;
-}
-
-.animate-fade-in {
-    animation: fadeIn 0.3s ease-out;
-}
-
-.animate-fade-out {
-    animation: fadeOut 0.3s ease-out;
-}
-
-.animate-scale-in {
-    animation: scaleIn 0.3s ease-out;
-}
-
-.animate-pulse-soft {
-    animation: pulse-soft 2s ease-in-out infinite;
-}
-
-/* Calendar Styles */
-.calendar-day {
-    @apply aspect-square flex items-center justify-center rounded-lg cursor-pointer transition-all duration-200;
-    @apply text-sm font-medium;
-    min-width: 40px; /* Touch target requirement */
-    min-height: 40px;
-}
-
-.calendar-day:hover:not(.disabled) {
-    @apply bg-gray-100;
-}
-
-.calendar-day.selected {
-    @apply bg-primary-600 text-white shadow-md;
-}
-
-.calendar-day.available {
-    @apply bg-success/10 text-gray-900 hover:bg-success/20;
-}
-
-.calendar-day.disabled {
-    @apply bg-gray-100 text-gray-400 cursor-not-allowed;
-}
-
-/* Responsive Calendar */
-@media (max-width: 640px) {
-    .calendar-day {
-        @apply text-xs;
-        min-width: 36px;
-        min-height: 36px;
-    }
-}
-
-/* Card Hover Effects */
-.card-hover {
-    @apply transition-all duration-300 hover:shadow-xl hover:-translate-y-1;
-}
-
-/* Gradient Text */
-.gradient-text {
-    @apply bg-gradient-to-r from-blue-600 to-yellow-500 bg-clip-text text-transparent;
-}
-
-/* Custom Checkbox/Radio */
-.checkbox-custom:checked {
-    @apply bg-blue-600 border-blue-600;
-}
-
-/* Service/Product Cards */
-.service-card {
-    @apply border-2 border-gray-200 rounded-lg p-4 cursor-pointer transition-all duration-200;
-    @apply hover:border-primary-400 hover:shadow-sm;
-    min-height: 44px; /* Touch target requirement */
-}
-
-.service-card.selected {
-    @apply border-primary-600 bg-primary-50 shadow-sm;
-}
-
-/* Smooth Transitions */
+/* Base Resets */
 * {
-    @apply transition-colors duration-200;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
-/* ============================================
-   BASE COMPONENT CLASSES
-   ============================================ */
-
-/* ============================================
-   BUTTON COMPONENTS
-   Requirements: 2.2, 6.1, 9.4, 10.4
-   ============================================ */
-
-/* Base Button */
+/* Buttons - WashHour Design System */
 .btn {
-    @apply inline-flex items-center justify-center gap-2 px-6 py-3 font-semibold rounded-md;
-    @apply transition-all duration-150 ease-in-out;
-    @apply focus:outline-none focus:ring-2 focus:ring-offset-2;
-    @apply disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none;
-    min-height: 44px; /* Touch accessibility requirement */
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 font-bold rounded-xl;
+    @apply transition-all duration-150;
+    @apply focus:outline-none focus:ring-4 focus:ring-offset-0;
+    @apply disabled:opacity-40 disabled:cursor-not-allowed disabled:pointer-events-none;
+    min-height: 48px;
+    letter-spacing: 0.01em;
 }
 
-/* Primary Button Variant */
 .btn-primary {
-    @apply bg-primary-600 text-white;
-    @apply hover:bg-primary-700;
-    @apply focus:ring-primary-500;
-    @apply active:bg-primary-800;
+    @apply bg-wash text-white shadow-sm;
+    @apply hover:bg-wash-dark hover:scale-105 hover:shadow-xl;
+    @apply focus:ring-wash/30;
 }
 
-/* Secondary Button Variant */
 .btn-secondary {
-    @apply bg-gray-100 text-gray-700;
-    @apply hover:bg-gray-200;
-    @apply focus:ring-gray-500;
-    @apply active:bg-gray-300;
+    @apply bg-gray-200 text-gray-900 shadow-sm;
+    @apply hover:bg-gray-300 hover:scale-105;
+    @apply focus:ring-gray-300/50;
 }
 
-/* Outline Button Variant */
 .btn-outline {
-    @apply bg-transparent border border-gray-300 text-gray-700;
-    @apply hover:bg-gray-50 hover:border-gray-400;
-    @apply focus:ring-gray-500;
-    @apply active:bg-gray-100;
+    @apply border-2 border-gray-300 text-gray-900 bg-white;
+    @apply hover:border-gray-400 hover:bg-gray-50;
+    @apply focus:ring-gray-300/50;
 }
 
-/* Error Button Variant */
-.btn-error {
-    @apply bg-error text-white;
-    @apply hover:bg-error/90;
-    @apply focus:ring-error;
-    @apply active:bg-error/80;
+.btn-ghost {
+    @apply text-gray-700 hover:bg-gray-100;
+    @apply focus:ring-gray-200;
 }
 
-/* Button Sizes */
 .btn-sm {
     @apply px-4 py-2 text-sm;
-    min-height: 36px;
+    min-height: 40px;
 }
 
 .btn-lg {
     @apply px-8 py-4 text-lg;
-    min-height: 52px;
+    min-height: 56px;
 }
 
-/* Full Width Button */
-.btn-block {
-    @apply w-full;
-}
-
-/* Icon-only Button */
-.btn-icon {
-    @apply p-3;
-    min-width: 44px;
-}
-
-/* ============================================
-   FORM INPUT COMPONENTS
-   Requirements: 6.1, 6.2, 6.3, 6.4, 6.5, 10.1
-   ============================================ */
-
-/* Form Group Container */
+/* Forms - WashHour Design System */
 .form-group {
-    @apply mb-6;
+    @apply space-y-2;
 }
 
-/* Form Label */
 .form-label {
-    @apply block text-sm font-medium text-gray-800 mb-2;
+    @apply block text-sm font-bold text-gray-700;
 }
 
-/* Required Field Indicator */
-.form-label .required {
-    @apply text-red-600 ml-1;
-}
-
-/* Text Input */
-.form-input {
-    @apply w-full px-3 py-2.5 border border-gray-300 rounded-md bg-white text-base text-gray-900;
-    @apply focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500;
-    @apply disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed;
-    @apply placeholder:text-gray-500;
-    @apply transition-all duration-200;
-    min-height: 44px; /* Touch accessibility requirement */
-}
-
-/* Input Hover State */
-.form-input:hover:not(:disabled):not(:focus) {
-    @apply border-gray-400;
-}
-
-/* Input Error State */
-.form-input.error,
-.form-input:invalid:not(:placeholder-shown) {
-    @apply border-error ring-2 ring-error/20;
-}
-
-/* Input Success State */
-.form-input.success {
-    @apply border-success ring-2 ring-success/20;
-}
-
-/* Select Dropdown */
-.form-select {
-    @apply w-full px-3 py-2.5 border border-gray-300 rounded-md bg-white text-base text-gray-900;
-    @apply appearance-none bg-no-repeat pr-10;
-    @apply focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500;
-    @apply disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed;
-    @apply transition-all duration-200 cursor-pointer;
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
-    background-position: right 0.75rem center;
-    background-size: 1.25em 1.25em;
-    min-height: 44px; /* Touch accessibility requirement */
-}
-
-.form-select:hover:not(:disabled):not(:focus) {
-    @apply border-gray-400;
-}
-
-.form-select:focus {
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%232563eb' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
-}
-
-.form-select.error {
-    @apply border-error ring-2 ring-error/20;
-}
-
-/* Textarea */
+.form-input,
+.form-select,
 .form-textarea {
-    @apply w-full px-3 py-2.5 border border-gray-300 rounded-md bg-white text-base text-gray-900 resize-y;
-    @apply focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500;
-    @apply disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed;
-    @apply placeholder:text-gray-500;
-    @apply transition-all duration-200;
-    min-height: 100px;
+    @apply w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-white text-gray-900;
+    @apply focus:outline-none focus:border-wash focus:ring-2 focus:ring-wash/20;
+    @apply disabled:bg-gray-100 disabled:cursor-not-allowed disabled:text-gray-500;
+    @apply placeholder:text-gray-400;
+    @apply transition-colors duration-150;
+    min-height: 48px;
+    font-size: 15px;
 }
 
+.form-input:hover:not(:disabled):not(:focus),
+.form-select:hover:not(:disabled):not(:focus),
 .form-textarea:hover:not(:disabled):not(:focus) {
-    @apply border-gray-400;
+    @apply border-gray-300;
 }
 
-.form-textarea.error {
-    @apply border-error ring-2 ring-error/20;
+.form-input.error {
+    @apply border-error focus:border-error focus:ring-error/20;
 }
 
-/* Checkbox */
-.form-checkbox {
-    @apply w-5 h-5 text-primary-600 border-gray-300 rounded;
-    @apply focus:ring-2 focus:ring-primary-500 focus:ring-offset-0;
-    @apply disabled:opacity-50 disabled:cursor-not-allowed;
-    @apply cursor-pointer transition-colors duration-200;
+.form-select {
+    @apply appearance-none bg-no-repeat pr-12 cursor-pointer;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23424242' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 1rem center;
+    background-size: 1.25em 1.25em;
 }
 
-/* Radio Button */
+.form-textarea {
+    @apply resize-y;
+    min-height: 120px;
+}
+
+.form-checkbox,
 .form-radio {
-    @apply w-5 h-5 text-primary-600 border-gray-300;
-    @apply focus:ring-2 focus:ring-primary-500 focus:ring-offset-0;
-    @apply disabled:opacity-50 disabled:cursor-not-allowed;
-    @apply cursor-pointer transition-colors duration-200;
+    @apply w-5 h-5 text-wash border-2 border-gray-300 cursor-pointer;
+    @apply focus:ring-4 focus:ring-wash/20 focus:ring-offset-0;
+    @apply transition-all duration-150;
 }
 
-/* Checkbox/Radio Label */
+.form-checkbox {
+    @apply rounded;
+}
+
 .form-check-label {
-    @apply ml-2 text-sm text-gray-800 cursor-pointer select-none;
+    @apply ml-3 text-sm font-medium text-gray-900 cursor-pointer select-none;
 }
 
-/* Input Group (for icons/addons) */
-.input-group {
-    @apply relative flex items-center;
-}
-
-.input-group-icon {
-    @apply absolute left-3 text-gray-400 pointer-events-none;
-}
-
-.input-group .form-input {
-    @apply pl-10;
-}
-
-/* Validation Messages */
 .form-error {
-    @apply text-red-700 text-sm mt-1 flex items-center gap-1;
-}
-
-.form-success {
-    @apply text-green-700 text-sm mt-1 flex items-center gap-1;
+    @apply text-error text-sm font-medium mt-2;
 }
 
 .form-help {
-    @apply text-gray-600 text-sm mt-1;
+    @apply text-gray-600 text-sm mt-2;
 }
 
-/* Input with Icon */
-.form-input-icon {
-    @apply pl-10;
-}
-
-/* Date/Time Inputs */
-.form-input[type="date"],
-.form-input[type="time"],
-.form-input[type="datetime-local"] {
-    @apply cursor-pointer;
-}
-
-/* File Input */
-.form-file {
-    @apply w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4;
-    @apply file:rounded-md file:border-0 file:text-sm file:font-semibold;
-    @apply file:bg-primary-50 file:text-primary-600;
-    @apply hover:file:bg-primary-100 file:cursor-pointer;
-    @apply cursor-pointer;
-}
-
-/* ============================================
-   CARD COMPONENTS
-   Requirements: 1.5, 2.1, 2.3, 4.1, 4.5
-   ============================================ */
-
-/* Base Card */
+/* Cards - WashHour Design System */
 .card {
-    @apply bg-white border border-gray-200 rounded-lg shadow-sm;
-    @apply transition-shadow duration-200;
+    @apply bg-white border-2 border-gray-200 rounded-2xl shadow-sm;
 }
 
-/* Card Header */
 .card-header {
-    @apply px-6 py-4 border-b border-gray-200;
+    @apply px-6 py-5 border-b border-gray-200;
 }
 
 .card-title {
-    @apply text-xl font-semibold text-gray-900;
+    @apply text-xl font-black text-gray-900;
+    letter-spacing: -0.01em;
 }
 
-.card-subtitle {
-    @apply text-sm text-gray-700 mt-1;
-}
-
-/* Card Body */
 .card-body {
-    @apply px-6 py-6;
+    @apply p-6;
 }
 
-/* Card Footer */
 .card-footer {
-    @apply px-6 py-4 border-t border-gray-200 bg-gray-50 rounded-b-lg;
+    @apply px-6 py-5 border-t border-gray-200 bg-gray-50 rounded-b-2xl;
 }
 
-/* Card Variants */
-.card-hover {
-    @apply transition-all duration-300 hover:shadow-md;
-}
-
-.card-elevated {
-    @apply shadow-md;
-}
-
-.card-bordered {
-    @apply border-2;
-}
-
-/* Stat Card Variant (for dashboard metrics) */
-.stat-card {
-    @apply card p-6;
-}
-
-.stat-icon-container {
-    @apply w-12 h-12 rounded-full flex items-center justify-center mb-4;
-    @apply bg-primary-50;
-}
-
-.stat-icon {
-    @apply w-6 h-6 text-primary-600;
-}
-
-.stat-label {
-    @apply text-sm font-medium text-gray-700 mb-1;
-}
-
-.stat-value {
-    @apply text-3xl font-bold text-gray-900 mb-2;
-}
-
-.stat-change {
-    @apply text-sm font-medium flex items-center gap-1;
-}
-
-.stat-change.positive {
-    @apply text-green-700;
-}
-
-.stat-change.negative {
-    @apply text-red-700;
-}
-
-.stat-change.neutral {
-    @apply text-gray-600;
-}
-
-/* Action Card (for quick actions) */
-.action-card {
-    @apply card p-6 cursor-pointer;
-    @apply hover:shadow-md hover:border-gray-300;
-    @apply transition-all duration-200;
-}
-
-.action-card-icon {
-    @apply w-10 h-10 rounded-full flex items-center justify-center mb-4;
-    @apply bg-primary-50;
-}
-
-.action-card-icon svg {
-    @apply w-5 h-5 text-primary-600;
-}
-
-.action-card-title {
-    @apply text-lg font-semibold text-gray-900 mb-2;
-}
-
-.action-card-description {
-    @apply text-sm text-gray-700;
-}
-
-/* Admin Stat Card (with colored left border) */
-.admin-stat-card {
-    @apply card p-6 border-l-4;
-}
-
-.admin-stat-card.primary {
-    @apply border-l-primary-600;
-}
-
-.admin-stat-card.success {
-    @apply border-l-success;
-}
-
-.admin-stat-card.warning {
-    @apply border-l-warning;
-}
-
-.admin-stat-card.info {
-    @apply border-l-info;
-}
-
-/* Card Grid Layouts */
-.card-grid {
-    @apply grid gap-4 sm:gap-6;
-}
-
-.card-grid-2 {
-    @apply grid-cols-1 md:grid-cols-2;
-}
-
-.card-grid-3 {
-    @apply grid-cols-1 sm:grid-cols-2 lg:grid-cols-3;
-}
-
-.card-grid-4 {
-    @apply grid-cols-1 sm:grid-cols-2 lg:grid-cols-4;
-}
-
-/* Empty State Card */
-.empty-state {
-    @apply card p-12 text-center;
-}
-
-.empty-state-icon {
-    @apply w-16 h-16 mx-auto mb-4 text-gray-500;
-}
-
-.empty-state-title {
-    @apply text-xl font-semibold text-gray-800 mb-2;
-}
-
-.empty-state-description {
-    @apply text-base text-gray-600 mb-6;
-}
-
-/* ============================================
-   BADGE AND STATUS INDICATOR COMPONENTS
-   Requirements: 12.1, 12.2, 12.3
-   ============================================ */
-
-/* Base Badge */
+/* Badges - WashHour Design System */
 .badge {
-    @apply inline-flex items-center gap-1 px-3 py-1 rounded-full;
-    @apply text-xs font-semibold uppercase tracking-wide;
-    @apply transition-colors duration-200;
+    @apply inline-block text-xs px-3 py-1 rounded-full font-bold uppercase;
+    letter-spacing: 0.05em;
 }
 
-/* Badge Variants (10% opacity backgrounds with solid text) */
 .badge-success {
-    @apply bg-success/10 text-green-700;
+    @apply bg-success/10 text-success;
 }
 
 .badge-warning {
-    @apply bg-warning/10 text-amber-700;
+    @apply bg-warning/10 text-warning;
 }
 
 .badge-error {
-    @apply bg-error/10 text-red-700;
+    @apply bg-error/10 text-error;
 }
 
 .badge-info {
-    @apply bg-info/10 text-blue-700;
-}
-
-.badge-neutral {
-    @apply bg-gray-100 text-gray-800;
+    @apply bg-info/10 text-info;
 }
 
 .badge-primary {
-    @apply bg-primary-500/10 text-primary-700;
+    @apply bg-wash/10 text-wash;
 }
 
-/* Badge Sizes */
-.badge-sm {
-    @apply px-2 py-0.5 text-[10px];
+.badge-pending {
+    @apply bg-warning/10 text-warning;
 }
 
-.badge-lg {
-    @apply px-4 py-1.5 text-sm;
+.badge-in-progress {
+    @apply bg-info/10 text-info;
 }
 
-/* Badge with Icon */
-.badge-icon {
-    @apply w-3.5 h-3.5;
+.badge-completed {
+    @apply bg-success/10 text-success;
 }
 
-/* Status Indicators (for booking status) */
-.status-indicator {
-    @apply inline-flex items-center gap-2 px-3 py-1.5 rounded-md;
-    @apply text-sm font-medium;
+.badge-cancelled {
+    @apply bg-error/10 text-error;
+}
+
+/* Status Indicators */
+.status {
+    @apply inline-flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-semibold;
 }
 
 .status-pending {
-    @apply bg-warning/10 text-amber-700 border border-warning/20;
+    @apply bg-warning/10 text-warning border border-warning/20;
 }
 
 .status-in-progress {
-    @apply bg-info/10 text-blue-700 border border-info/20;
+    @apply bg-info/10 text-info border border-info/20;
 }
 
 .status-completed {
-    @apply bg-success/10 text-green-700 border border-success/20;
+    @apply bg-success/10 text-success border border-success/20;
 }
 
 .status-cancelled {
-    @apply bg-error/10 text-red-700 border border-error/20;
+    @apply bg-error/10 text-error border border-error/20;
 }
 
-/* Status Dot (for inline status) */
-.status-dot {
-    @apply inline-block w-2 h-2 rounded-full;
-}
-
-.status-dot.success {
-    @apply bg-green-600;
-}
-
-.status-dot.warning {
-    @apply bg-amber-600;
-}
-
-.status-dot.error {
-    @apply bg-red-600;
-}
-
-.status-dot.info {
-    @apply bg-blue-600;
-}
-
-.status-dot.neutral {
-    @apply bg-gray-500;
-}
-
-/* Pulse Animation for Active Status */
-.status-dot.pulse {
-    @apply animate-pulse;
-}
-
-/* Status with Dot and Text */
-.status-with-dot {
-    @apply inline-flex items-center gap-2;
-}
-
-/* Timeline Status Indicator */
-.timeline-status {
-    @apply flex items-center gap-3;
-}
-
-.timeline-status-icon {
-    @apply w-8 h-8 rounded-full flex items-center justify-center;
-    @apply border-2 transition-all duration-200;
-}
-
-.timeline-status-icon.completed {
-    @apply bg-success border-success text-white;
-}
-
-.timeline-status-icon.active {
-    @apply bg-primary-600 border-primary-600 text-white;
-}
-
-.timeline-status-icon.pending {
-    @apply bg-white border-gray-300 text-gray-500;
-}
-
-.timeline-status-label {
-    @apply text-sm font-medium;
-}
-
-.timeline-status-label.completed {
-    @apply text-green-700;
-}
-
-.timeline-status-label.active {
-    @apply text-primary-700;
-}
-
-.timeline-status-label.pending {
-    @apply text-gray-600;
-}
-
-/* Tab Components */
-.tab-button {
-    @apply inline-flex items-center gap-2 px-4 py-3 text-sm font-medium text-gray-700;
-    @apply border-b-2 border-transparent transition-all duration-200;
-    @apply hover:text-gray-900 hover:border-gray-300;
-    @apply focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2;
-    min-height: 44px;
-}
-
-.tab-button.active {
-    @apply text-primary-700 border-primary-600;
-}
-
-.tab-content {
-    @apply transition-opacity duration-200;
-}
-
-.tab-content.hidden {
-    @apply hidden;
-}
-
-/* Navigation Components */
+/* Navigation - Bold, distinctive */
 .navbar {
-    @apply bg-primary-600 border-b border-primary-700 shadow-md sticky top-0 z-50;
-    height: 64px;
+    @apply bg-wash sticky top-0 z-50;
+    height: 72px;
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.1);
 }
 
 .navbar-brand {
-    @apply flex items-center gap-2 sm:gap-3;
+    @apply flex items-center gap-3;
 }
 
 .navbar-logo {
-    @apply h-6 sm:h-8;
+    @apply h-10;
 }
 
 .navbar-title {
-    @apply text-lg sm:text-xl font-bold text-white;
+    @apply text-2xl font-black text-white;
+    letter-spacing: -0.02em;
 }
 
 .sidebar {
@@ -849,82 +274,47 @@
 }
 
 .sidebar-link {
-    @apply flex items-center gap-3 px-3 py-3 rounded-md text-gray-900 transition-colors;
-    @apply hover:bg-primary-50 hover:text-primary-700;
-    min-height: 44px; /* Touch target requirement */
+    @apply flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 font-medium;
+    @apply transition-all duration-150;
+    min-height: 48px;
+}
+
+.sidebar-link:hover {
+    @apply bg-gray-100 text-gray-900;
 }
 
 .sidebar-link.active {
-    @apply bg-primary-600 text-white font-medium shadow-sm;
+    @apply bg-wash text-white shadow-sm;
 }
 
 .sidebar-icon {
-    @apply w-5 h-5 text-gray-700;
+    @apply w-5 h-5;
 }
 
-.sidebar-link:hover .sidebar-icon {
-    @apply text-primary-700;
-}
-
-.sidebar-link.active .sidebar-icon {
-    @apply text-white;
-}
-
-/* Mobile Navigation */
-@media (max-width: 767px) {
-    .sidebar {
-        @apply w-full;
-    }
-    
-    .sidebar-link {
-        @apply text-base;
-    }
-}
-
-/* Alert Components */
+/* Alerts - WashHour Design System */
 .alert {
-    @apply flex items-start gap-3 p-4 rounded-lg border-l-4;
+    @apply flex items-start gap-4 p-5 rounded-xl border-l-4;
 }
 
 .alert-success {
-    @apply bg-success/5 border-success text-green-800;
+    @apply bg-success/5 border-success text-success;
 }
 
 .alert-warning {
-    @apply bg-warning/5 border-warning text-amber-800;
+    @apply bg-warning/5 border-warning text-warning;
 }
 
 .alert-error {
-    @apply bg-error/5 border-error text-red-800;
+    @apply bg-error/5 border-error text-error;
 }
 
 .alert-info {
-    @apply bg-info/5 border-info text-blue-800;
+    @apply bg-info/5 border-info text-info;
 }
 
-.alert-icon {
-    @apply w-5 h-5 flex-shrink-0;
-}
-
-.alert-content {
-    @apply flex-1;
-}
-
-.alert-title {
-    @apply font-semibold mb-1;
-}
-
-.alert-message {
-    @apply text-sm;
-}
-
-.alert-close {
-    @apply text-gray-500 hover:text-gray-700 transition-colors;
-}
-
-/* Modal Components */
+/* Modals - WashHour Design System */
 .modal-backdrop {
-    @apply fixed inset-0 bg-black/50 z-40;
+    @apply fixed inset-0 bg-gray-900/60 z-40 backdrop-blur-sm;
 }
 
 .modal-container {
@@ -932,713 +322,124 @@
 }
 
 .modal-content {
-    @apply bg-white rounded-lg shadow-xl max-w-lg w-full;
+    @apply bg-white rounded-2xl shadow-2xl max-w-lg w-full;
 }
 
 .modal-header {
-    @apply px-6 py-4 border-b border-gray-200;
+    @apply px-6 py-5 border-b border-gray-200;
 }
 
 .modal-title {
-    @apply text-xl font-semibold text-gray-900;
+    @apply text-xl font-black text-gray-900;
 }
 
 .modal-body {
-    @apply px-6 py-6;
+    @apply p-6;
 }
 
 .modal-footer {
-    @apply px-6 py-4 border-t border-gray-200 flex justify-end gap-3;
+    @apply px-6 py-5 border-t border-gray-200 flex justify-end gap-3;
 }
 
-/* ============================================
-   UTILITY CLASSES
-   ============================================ */
-
-/* Focus Visible */
-.focus-visible {
-    @apply focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2;
-}
-
-/* Touch Target */
-.touch-target {
+/* Calendar - WashHour Design System */
+.calendar-day {
+    @apply aspect-square flex items-center justify-center rounded-xl cursor-pointer;
+    @apply text-sm font-semibold transition-all duration-150;
     min-width: 44px;
     min-height: 44px;
 }
 
-/* Container */
-.container-custom {
-    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+.calendar-day:hover:not(.disabled) {
+    @apply bg-gray-100 scale-105;
 }
 
-/* Section Spacing */
-.section {
-    @apply py-12 md:py-16;
+.calendar-day.selected {
+    @apply bg-wash text-white shadow-md;
 }
 
-/* Text Utilities */
-.text-balance {
-    text-wrap: balance;
+.calendar-day.available {
+    @apply bg-success/10 text-success hover:bg-success/20;
 }
 
-/* Reduced Motion */
-@media (prefers-reduced-motion: reduce) {
-    *,
-    *::before,
-    *::after {
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
+.calendar-day.disabled {
+    @apply text-gray-400 cursor-not-allowed opacity-50;
+}
+
+/* Service Cards - WashHour Design System */
+.service-card {
+    @apply border-2 border-gray-200 rounded-xl p-5 cursor-pointer;
+    @apply transition-all duration-150;
+    min-height: 48px;
+}
+
+.service-card:hover {
+    @apply border-gray-300 shadow-sm;
+}
+
+.service-card.selected {
+    @apply border-wash bg-wash/5 shadow-sm;
+}
+
+/* Animations */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
 }
 
-/* ============================================
-   RESPONSIVE DESIGN - MOBILE LAYOUT
-   Requirements: 9.1, 9.2, 9.3, 9.4, 9.5
-   ============================================ */
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.5;
+        transform: scale(1.5);
+    }
+}
 
-/* Mobile Layout (320px - 767px) */
+.animate-slide-in {
+    animation: slideIn 0.2s ease-out;
+}
+
+/* Utilities */
+.touch-target {
+    min-width: 48px;
+    min-height: 48px;
+}
+
+/* Responsive */
 @media (max-width: 767px) {
-    /* Typography adjustments for mobile */
-    .text-5xl {
-        @apply text-3xl;
+    .navbar {
+        height: 64px;
     }
     
-    .text-4xl {
-        @apply text-2xl;
-    }
-    
-    .text-3xl {
+    .navbar-title {
         @apply text-xl;
     }
     
-    .text-2xl {
-        @apply text-lg;
-    }
-    
-    /* Card padding adjustments */
-    .card {
-        @apply p-4;
-    }
-    
-    .card-header,
-    .card-body,
-    .card-footer {
-        @apply px-4 py-3;
-    }
-    
-    .stat-card {
-        @apply p-4;
-    }
-    
-    .action-card {
-        @apply p-4;
-    }
-    
-    /* Button adjustments */
-    .btn {
-        @apply text-sm px-4 py-2.5;
-    }
-    
-    .btn-lg {
-        @apply text-base px-6 py-3;
-    }
-    
-    /* Form adjustments */
-    .form-group {
-        @apply mb-4;
-    }
-    
-    /* Modal adjustments */
-    .modal-content {
-        @apply max-w-full mx-4;
-    }
-    
-    .modal-header,
-    .modal-body,
-    .modal-footer {
-        @apply px-4 py-3;
-    }
-    
-    /* Stat card adjustments */
-    .stat-value {
-        @apply text-2xl;
-    }
-    
-    .stat-icon-container {
-        @apply w-10 h-10 mb-3;
-    }
-    
-    .stat-icon {
-        @apply w-5 h-5;
-    }
-    
-    /* Action card adjustments */
-    .action-card-icon {
-        @apply w-8 h-8 mb-3;
-    }
-    
-    .action-card-title {
-        @apply text-base;
-    }
-    
-    .action-card-description {
-        @apply text-xs;
-    }
-    
-    /* Empty state adjustments */
-    .empty-state {
-        @apply p-8;
-    }
-    
-    .empty-state-icon {
-        @apply w-12 h-12 text-gray-500;
-    }
-    
-    .empty-state-title {
-        @apply text-lg font-semibold text-gray-800;
-    }
-    
-    .empty-state-description {
-        @apply text-sm text-gray-600;
-    }
-    
-    /* Table responsiveness */
-    .table-responsive {
-        @apply overflow-x-auto -mx-4 px-4;
-    }
-    
-    /* Navbar adjustments */
-    .navbar-title {
-        @apply text-base;
-    }
-    
-    /* Badge adjustments */
-    .badge {
-        @apply text-[10px] px-2 py-0.5;
-    }
-    
-    /* Alert adjustments */
-    .alert {
-        @apply p-3 gap-2;
-    }
-    
-    .alert-icon {
-        @apply w-4 h-4;
-    }
-    
-    .alert-title {
-        @apply text-sm font-semibold;
-    }
-    
-    .alert-message {
-        @apply text-xs;
-    }
-}
-
-/* Tablet Layout (768px - 1023px) */
-@media (min-width: 768px) and (max-width: 1023px) {
-    /* Adjust grid layouts for tablet */
-    .card-grid-4 {
-        @apply grid-cols-2;
-    }
-    
-    .card-grid-3 {
-        @apply grid-cols-2;
-    }
-    
-    /* Adjust typography slightly */
-    .text-5xl {
-        @apply text-4xl;
-    }
-    
-    .text-4xl {
-        @apply text-3xl;
-    }
-    
-    /* Sidebar adjustments for tablet */
     .sidebar {
-        @apply w-56;
+        @apply w-full p-3;
     }
     
-    /* Main content adjustment */
-    main {
-        @apply ml-56;
-    }
-    
-    /* Card padding adjustments */
-    .card {
+    .card-body,
+    .modal-body {
         @apply p-5;
     }
     
-    .card-header,
-    .card-body,
-    .card-footer {
-        @apply px-5 py-4;
-    }
-    
-    /* Button adjustments */
     .btn {
-        @apply px-5 py-2.5;
-    }
-    
-    /* Modal adjustments */
-    .modal-content {
-        @apply max-w-2xl;
-    }
-    
-    /* Stat card adjustments */
-    .stat-value {
-        @apply text-2xl;
-    }
-    
-    /* Action card adjustments */
-    .action-card-title {
-        @apply text-base;
-    }
-    
-    /* Form adjustments */
-    .form-group {
-        @apply mb-5;
-    }
-    
-    /* Navigation adjustments */
-    .navbar-title {
-        @apply text-lg;
-    }
-    
-    /* Ensure touch targets remain adequate */
-    button,
-    a.btn,
-    .btn,
-    .sidebar-link,
-    .form-input,
-    .form-select {
         min-height: 44px;
     }
 }
 
-/* Desktop Layout (1024px+) */
-@media (min-width: 1024px) {
-    /* Ensure proper spacing on large screens */
-    .container-custom {
-        @apply max-w-7xl;
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
     }
-    
-    /* Optimize card layouts for desktop */
-    .card-grid {
-        @apply gap-6;
-    }
-    
-    /* Full sidebar width */
-    .sidebar {
-        @apply w-64;
-    }
-    
-    /* Proper main content margin */
-    main {
-        @apply ml-64;
-    }
-    
-    /* Optimize typography for desktop */
-    .text-5xl {
-        @apply text-5xl;
-    }
-    
-    .text-4xl {
-        @apply text-4xl;
-    }
-    
-    .text-3xl {
-        @apply text-3xl;
-    }
-    
-    /* Card padding optimization */
-    .card {
-        @apply p-6;
-    }
-    
-    .card-header,
-    .card-body,
-    .card-footer {
-        @apply px-6 py-4;
-    }
-    
-    .stat-card {
-        @apply p-6;
-    }
-    
-    .action-card {
-        @apply p-6;
-    }
-    
-    /* Button sizing */
-    .btn {
-        @apply px-6 py-3;
-    }
-    
-    .btn-lg {
-        @apply px-8 py-4;
-    }
-    
-    /* Form optimization */
-    .form-group {
-        @apply mb-6;
-    }
-    
-    /* Modal sizing */
-    .modal-content {
-        @apply max-w-lg;
-    }
-    
-    /* Stat card optimization */
-    .stat-value {
-        @apply text-3xl;
-    }
-    
-    .stat-icon-container {
-        @apply w-12 h-12;
-    }
-    
-    .stat-icon {
-        @apply w-6 h-6;
-    }
-    
-    /* Action card optimization */
-    .action-card-icon {
-        @apply w-10 h-10;
-    }
-    
-    .action-card-title {
-        @apply text-lg;
-    }
-    
-    .action-card-description {
-        @apply text-sm;
-    }
-    
-    /* Empty state optimization */
-    .empty-state {
-        @apply p-12;
-    }
-    
-    .empty-state-icon {
-        @apply w-16 h-16;
-    }
-    
-    .empty-state-title {
-        @apply text-xl;
-    }
-    
-    .empty-state-description {
-        @apply text-base;
-    }
-    
-    /* Navigation optimization */
-    .navbar-title {
-        @apply text-xl;
-    }
-    
-    /* Badge sizing */
-    .badge {
-        @apply text-xs px-3 py-1;
-    }
-    
-    /* Alert sizing */
-    .alert {
-        @apply p-4 gap-3;
-    }
-    
-    .alert-icon {
-        @apply w-5 h-5;
-    }
-    
-    .alert-title {
-        @apply text-base;
-    }
-    
-    .alert-message {
-        @apply text-sm;
-    }
-    
-    /* Ensure hover effects work properly on desktop */
-    .card-hover:hover {
-        @apply shadow-md -translate-y-0.5;
-    }
-    
-    .action-card:hover {
-        @apply shadow-md border-gray-300;
-    }
-    
-    /* Optimize grid layouts for large screens */
-    .card-grid-4 {
-        @apply grid-cols-4;
-    }
-    
-    .card-grid-3 {
-        @apply grid-cols-3;
-    }
-    
-    .card-grid-2 {
-        @apply grid-cols-2;
-    }
-}
-
-/* Extra large desktop (1440px+) */
-@media (min-width: 1440px) {
-    .container-custom {
-        @apply max-w-[1400px];
-    }
-    
-    /* Increase spacing for very large screens */
-    .section-spacing {
-        @apply py-20;
-    }
-}
-
-/* Ultra wide desktop (1920px+) */
-@media (min-width: 1920px) {
-    .container-custom {
-        @apply max-w-[1600px];
-    }
-}
-
-/* Touch Target Enforcement for Mobile */
-@media (max-width: 767px) {
-    /* Ensure all interactive elements meet 44px minimum */
-    button,
-    a.btn,
-    .btn,
-    .sidebar-link,
-    .form-input,
-    .form-select,
-    .form-checkbox,
-    .form-radio,
-    input[type="submit"],
-    input[type="button"],
-    .calendar-day,
-    .service-card {
-        min-height: 44px;
-        min-width: 44px;
-    }
-    
-    /* Adjust checkbox and radio to maintain touch targets */
-    .form-checkbox,
-    .form-radio {
-        @apply w-6 h-6;
-    }
-}
-
-/* Mobile-specific utilities */
-@media (max-width: 767px) {
-    .mobile-hidden {
-        @apply hidden;
-    }
-    
-    .mobile-full-width {
-        @apply w-full;
-    }
-    
-    .mobile-text-center {
-        @apply text-center;
-    }
-    
-    .mobile-stack {
-        @apply flex-col;
-    }
-}
-
-/* Tablet-specific utilities */
-@media (min-width: 768px) and (max-width: 1023px) {
-    .tablet-hidden {
-        @apply hidden;
-    }
-    
-    .tablet-full-width {
-        @apply w-full;
-    }
-    
-    .tablet-grid-2 {
-        @apply grid-cols-2;
-    }
-}
-
-/* Responsive table wrapper */
-.table-wrapper {
-    @apply overflow-x-auto -mx-4 sm:mx-0;
-}
-
-@media (max-width: 767px) {
-    .table-wrapper {
-        @apply -mx-4;
-    }
-    
-    table {
-        @apply text-sm;
-    }
-    
-    th, td {
-        @apply px-3 py-2;
-    }
-}
-
-/* Responsive container */
-.responsive-container {
-    @apply w-full px-4 sm:px-6 lg:px-8;
-}
-
-/* Responsive spacing */
-.section-spacing {
-    @apply py-8 sm:py-12 md:py-16;
-}
-
-/* Responsive text sizing */
-@media (max-width: 767px) {
-    h1 {
-        @apply text-2xl;
-    }
-    
-    h2 {
-        @apply text-xl;
-    }
-    
-    h3 {
-        @apply text-lg;
-    }
-}
-
-@media (min-width: 768px) and (max-width: 1023px) {
-    h1 {
-        @apply text-3xl;
-    }
-    
-    h2 {
-        @apply text-2xl;
-    }
-    
-    h3 {
-        @apply text-xl;
-    }
-}
-
-@media (min-width: 1024px) {
-    h1 {
-        @apply text-4xl;
-    }
-    
-    h2 {
-        @apply text-3xl;
-    }
-    
-    h3 {
-        @apply text-2xl;
-    }
-}
-
-/* Desktop-specific utilities */
-@media (min-width: 1024px) {
-    .desktop-hidden {
-        @apply hidden;
-    }
-    
-    .desktop-flex {
-        @apply flex;
-    }
-    
-    .desktop-grid {
-        @apply grid;
-    }
-    
-    .desktop-block {
-        @apply block;
-    }
-}
-
-/* Tab Styles */
-.tab-button {
-    @apply inline-flex items-center gap-2 px-4 py-3 border-b-2 border-transparent;
-    @apply text-sm font-medium text-gray-600 transition-colors duration-200;
-    @apply hover:text-gray-900 hover:border-gray-300;
-}
-
-.tab-button.active {
-    @apply border-primary-600 text-primary-600;
-}
-
-.tab-content {
-    animation: fadeIn 0.3s ease-out;
-}
-
-/* Responsive flex direction */
-.responsive-flex {
-    @apply flex flex-col lg:flex-row;
-}
-
-/* Responsive gap */
-.responsive-gap {
-    @apply gap-4 sm:gap-6 lg:gap-8;
-}
-
-/* Responsive padding */
-.responsive-padding {
-    @apply p-4 sm:p-6 lg:p-8;
-}
-
-/* Responsive margin */
-.responsive-margin {
-    @apply m-4 sm:m-6 lg:m-8;
-}
-
-/* Pricing Tab Styles */
-.pricing-tab {
-    @apply text-gray-600 border-transparent;
-}
-
-.pricing-tab:hover {
-    @apply text-gray-900 border-gray-300;
-}
-
-.pricing-tab.active {
-    @apply text-primary-600 border-primary-600 font-semibold;
-}
-
-.pricing-panel {
-    @apply transition-opacity duration-200;
-}
-
-/* Error Button */
-.btn-error {
-    @apply bg-error text-white hover:bg-error/90 focus:ring-error;
-}
-
-/* Period Filter Buttons */
-.period-btn.active {
-    @apply bg-primary-600 text-white border-primary-600;
-}
-
-.period-btn.active:hover {
-    @apply bg-primary-700 border-primary-700;
-}
-
-/* Date Picker Styling */
-.date-picker-input {
-    @apply cursor-pointer;
-}
-
-.date-picker-input::-webkit-calendar-picker-indicator {
-    opacity: 0;
-    cursor: pointer;
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    left: 0;
-    top: 0;
-}
-
-.date-picker-input:hover {
-    @apply border-gray-400;
-}
-
-.date-picker-input:focus {
-    @apply ring-2 ring-primary-500 border-primary-500;
 }

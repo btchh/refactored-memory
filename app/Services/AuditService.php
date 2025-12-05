@@ -33,7 +33,6 @@ class AuditService
             'description' => $description,
             'old_values' => $oldValues,
             'new_values' => $newValues,
-            'ip_address' => Request::ip(),
         ]);
     }
 
@@ -108,7 +107,6 @@ class AuditService
             'admin_id' => $admin->id,
             'action' => 'login',
             'description' => "Admin {$admin->fname} {$admin->lname} logged in",
-            'ip_address' => Request::ip(),
         ]);
     }
 
@@ -124,7 +122,6 @@ class AuditService
                 'admin_id' => $admin->id,
                 'action' => 'logout',
                 'description' => "Admin {$admin->fname} {$admin->lname} logged out",
-                'ip_address' => Request::ip(),
             ]);
         }
     }

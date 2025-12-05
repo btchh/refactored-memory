@@ -55,21 +55,25 @@ export class AdminWizard {
         for (let i = 1; i <= 3; i++) {
             const indicator = document.getElementById('step' + i + '-indicator');
             const line = document.getElementById('progress-line-' + i);
+            const label = indicator?.parentElement.querySelector('p');
             
             if (!indicator) continue;
             
             if (i < currentStep) {
                 // Completed step
-                indicator.className = 'w-12 h-12 mx-auto rounded-full bg-gradient-to-br from-green-500 to-teal-500 text-white flex items-center justify-center font-bold text-lg shadow-lg';
-                if (line) line.className = 'flex-1 h-2 bg-gradient-to-r from-green-500 to-teal-500 rounded-full mx-2';
+                indicator.className = 'w-12 h-12 mx-auto rounded-full bg-success text-white flex items-center justify-center font-bold text-lg';
+                if (line) line.className = 'flex-1 h-2 bg-success rounded-full mx-2';
+                if (label) label.className = 'text-sm mt-2 font-bold text-success';
             } else if (i === currentStep) {
                 // Current step
-                indicator.className = 'w-12 h-12 mx-auto rounded-full bg-gradient-to-br from-purple-600 to-pink-600 text-white flex items-center justify-center font-bold text-lg shadow-lg';
+                indicator.className = 'w-12 h-12 mx-auto rounded-full bg-wash text-white flex items-center justify-center font-bold text-lg';
                 if (line) line.className = 'flex-1 h-2 bg-gray-300 rounded-full mx-2';
+                if (label) label.className = 'text-sm mt-2 font-bold text-wash';
             } else {
                 // Future step
                 indicator.className = 'w-12 h-12 mx-auto rounded-full bg-gray-300 text-gray-600 flex items-center justify-center font-bold text-lg';
                 if (line) line.className = 'flex-1 h-2 bg-gray-300 rounded-full mx-2';
+                if (label) label.className = 'text-sm mt-2 text-gray-500 font-bold';
             }
         }
     }

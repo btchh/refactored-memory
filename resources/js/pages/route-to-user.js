@@ -1,6 +1,6 @@
 /**
  * Track User Locations Page
- * Initializes the user location tracker for admin
+ * Initializes the user location tracker for admin to find customers
  */
 
 import { UserTracker } from '../modules/user-tracker.js';

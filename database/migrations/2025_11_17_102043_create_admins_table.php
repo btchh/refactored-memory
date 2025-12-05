@@ -23,8 +23,6 @@ return new class extends Migration
             $table->string('branch_address')->nullable(); // Branch/Shop location
             $table->decimal('branch_latitude', 10, 8)->nullable();
             $table->decimal('branch_longitude', 11, 8)->nullable();
-            $table->decimal('latitude', 10, 8)->nullable(); // Personal location
-            $table->decimal('longitude', 11, 8)->nullable();
             $table->timestamp('location_updated_at')->nullable();
             $table->string('password');
             $table->rememberToken();

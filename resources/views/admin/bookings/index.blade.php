@@ -1,29 +1,27 @@
 <x-layout>
     <x-slot name="title">Booking Management</x-slot>
 
-    <div class="space-y-6">
-        <!-- Header -->
-        <div class="bg-gradient-to-r from-primary-600 to-primary-700 rounded-2xl p-8 text-white">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center gap-4">
-                    <div class="bg-white/20 backdrop-blur rounded-xl p-4">
-                        <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                        </svg>
-                    </div>
-                    <div>
-                        <h1 class="text-3xl font-bold mb-1">Booking Management</h1>
-                        <p class="text-white/80">Create and manage customer bookings</p>
-                    </div>
-                </div>
+    <div class="max-w-7xl mx-auto space-y-6">
+        <!-- Hero Header -->
+        <div class="relative bg-gradient-to-br from-wash via-wash-dark to-gray-900 rounded-2xl p-12 overflow-hidden">
+            <!-- Decorative Background -->
+            <div class="absolute inset-0 opacity-10">
+                <div class="absolute top-0 right-0 w-64 h-64 bg-white rounded-full -translate-y-1/2 translate-x-1/2"></div>
+                <div class="absolute bottom-0 left-0 w-48 h-48 bg-white rounded-full translate-y-1/2 -translate-x-1/2"></div>
+            </div>
+            
+            <!-- Content -->
+            <div class="relative">
+                <h1 class="text-5xl font-black text-white mb-3">Booking Management</h1>
+                <p class="text-xl text-white/80">Create and manage customer bookings</p>
             </div>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <!-- Calendar Panel -->
             <div class="lg:col-span-1 space-y-6">
-                <div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
-                    <h2 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                <div class="bg-white rounded-2xl border-2 border-gray-200 p-6">
+                    <h2 class="text-xl font-black text-gray-900 mb-4 flex items-center gap-2">
                         <svg class="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
@@ -63,7 +61,7 @@
             <!-- Right Column -->
             <div class="lg:col-span-2 space-y-6">
                 <!-- Date Bookings Section -->
-                <div id="date-bookings-section" class="bg-white rounded-xl border border-gray-200 shadow-sm hidden">
+                <div id="date-bookings-section" class="bg-white rounded-2xl border-2 border-gray-200 hidden">
                     <div class="p-5 border-b border-gray-200 flex items-center justify-between">
                         <div class="flex items-center gap-3">
                             <div class="w-10 h-10 bg-primary-100 rounded-lg flex items-center justify-center">
@@ -89,7 +87,7 @@
                 </div>
 
                 <!-- Empty State -->
-                <div id="empty-state" class="bg-white rounded-xl border-2 border-dashed border-gray-200 p-12 text-center">
+                <div id="empty-state" class="bg-white rounded-2xl border-2 border-dashed border-gray-200 p-12 text-center">
                     <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
                         <svg class="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -104,8 +102,8 @@
                     @csrf
 
                     <!-- Service Type Selection -->
-                    <div class="bg-white rounded-lg border border-gray-200 p-6">
-                        <h2 class="text-lg font-bold text-gray-900 mb-2">Choose Service Type</h2>
+                    <div class="bg-white rounded-2xl border-2 border-gray-200 p-6">
+                        <h2 class="text-xl font-black text-gray-900 mb-2">Choose Service Type</h2>
                         <p class="text-sm text-gray-500 mb-4">Select how the customer's laundry will be picked up and delivered</p>
                         
                         <input type="hidden" name="pickup_method" id="admin_pickup_method" value="branch_pickup">
@@ -214,15 +212,40 @@
                         // Update hidden fields for admin booking
                         document.querySelectorAll('.admin-service-card').forEach(card => {
                             card.addEventListener('click', function() {
-                                document.getElementById('admin_pickup_method').value = this.dataset.pickup;
-                                document.getElementById('admin_delivery_method').value = this.dataset.delivery;
+                                const pickupMethod = this.dataset.pickup;
+                                const deliveryMethod = this.dataset.delivery;
+                                
+                                document.getElementById('admin_pickup_method').value = pickupMethod;
+                                document.getElementById('admin_delivery_method').value = deliveryMethod;
+                                
+                                // Update pickup address requirement
+                                const pickupAddressField = document.getElementById('pickup_address');
+                                const pickupAddressSection = document.getElementById('pickup-address-section');
+                                
+                                if (pickupMethod === 'branch_pickup') {
+                                    // Branch picks up - address is required
+                                    pickupAddressField.required = true;
+                                    pickupAddressSection.classList.remove('hidden');
+                                } else {
+                                    // Customer drops off - address not required
+                                    pickupAddressField.required = false;
+                                    pickupAddressSection.classList.add('hidden');
+                                }
                             });
+                        });
+                        
+                        // Initialize on page load
+                        document.addEventListener('DOMContentLoaded', function() {
+                            const firstCard = document.querySelector('.admin-service-card input:checked');
+                            if (firstCard) {
+                                firstCard.closest('.admin-service-card').click();
+                            }
                         });
                     </script>
 
                     <!-- Booking Type Selection -->
-                    <div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
-                        <h2 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                    <div class="bg-white rounded-2xl border-2 border-gray-200 p-6">
+                        <h2 class="text-xl font-black text-gray-900 mb-4 flex items-center gap-2">
                             <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
                             </svg>
@@ -276,8 +299,8 @@
                     </div>
 
                     <!-- Customer Selection -->
-                    <div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm" id="customer-selection-section">
-                        <h2 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                    <div class="bg-white rounded-2xl border-2 border-gray-200 p-6" id="customer-selection-section">
+                        <h2 class="text-xl font-black text-gray-900 mb-4 flex items-center gap-2">
                             <svg class="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                             </svg>
@@ -293,7 +316,10 @@
                                 @foreach($users as $user)
                                     <option value="{{ $user->id }}" 
                                             data-email="{{ $user->email }}" 
-                                            data-phone="{{ $user->phone }}">
+                                            data-phone="{{ $user->phone }}"
+                                            data-address="{{ $user->address ?? '' }}"
+                                            data-latitude="{{ $user->latitude ?? '' }}"
+                                            data-longitude="{{ $user->longitude ?? '' }}">
                                         {{ $user->fname }} {{ $user->lname }} ({{ $user->email }})
                                     </option>
                                 @endforeach
@@ -365,24 +391,39 @@
                             const guestIndicator = document.getElementById('guest-indicator');
                             const isWalkin = document.getElementById('walkin-radio').checked;
                             
+                            // Get address fields
+                            const pickupAddress = document.getElementById('pickup_address');
+                            const latitude = document.getElementById('latitude');
+                            const longitude = document.getElementById('longitude');
+                            
                             if (this.value) {
                                 document.getElementById('selected-user-name').textContent = selectedOption.text.split(' (')[0];
                                 document.getElementById('selected-user-email').textContent = selectedOption.dataset.email;
                                 document.getElementById('selected-user-phone').textContent = selectedOption.dataset.phone;
                                 userInfo.classList.remove('hidden');
                                 guestIndicator.classList.add('hidden');
+                                
+                                // Populate address fields
+                                if (pickupAddress) pickupAddress.value = selectedOption.dataset.address || '';
+                                if (latitude) latitude.value = selectedOption.dataset.latitude || '';
+                                if (longitude) longitude.value = selectedOption.dataset.longitude || '';
                             } else {
                                 userInfo.classList.add('hidden');
                                 // Show guest indicator only for walk-in
                                 if (isWalkin) {
                                     guestIndicator.classList.remove('hidden');
                                 }
+                                
+                                // Clear address fields
+                                if (pickupAddress) pickupAddress.value = '';
+                                if (latitude) latitude.value = '';
+                                if (longitude) longitude.value = '';
                             }
                         });
                     </script>
 
                     <!-- Pickup Address (for pickup service type) -->
-                    <div id="pickup-address-section" class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+                    <div id="pickup-address-section" class="bg-white rounded-2xl border-2 border-gray-200 p-6">
                         <div class="flex items-center gap-3 mb-4">
                             <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
                                 <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -391,18 +432,18 @@
                                 </svg>
                             </div>
                             <div>
-                                <h2 class="text-lg font-bold text-gray-900">Pickup Location</h2>
+                                <h2 class="text-xl font-black text-gray-900">Pickup Location</h2>
                                 <p class="text-sm text-gray-500">Customer's address for pickup</p>
                             </div>
                         </div>
-                        <input type="text" name="pickup_address" id="pickup_address" class="form-input bg-gray-50" required readonly>
+                        <input type="text" name="pickup_address" id="pickup_address" class="form-input bg-gray-50" placeholder="Enter pickup address or select a customer">
                         <input type="hidden" name="latitude" id="latitude">
                         <input type="hidden" name="longitude" id="longitude">
                     </div>
 
                     <!-- Booking Details -->
-                    <div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
-                        <h2 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                    <div class="bg-white rounded-2xl border-2 border-gray-200 p-6">
+                        <h2 class="text-xl font-black text-gray-900 mb-4 flex items-center gap-2">
                             <svg class="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                             </svg>
@@ -488,7 +529,7 @@
                 </form>
 
                 <!-- User's Bookings List -->
-                <div id="user-bookings-section" class="bg-white rounded-xl border border-gray-200 shadow-sm hidden">
+                <div id="user-bookings-section" class="bg-white rounded-2xl border-2 border-gray-200 hidden">
                     <div class="p-5 border-b border-gray-200">
                         <h2 class="font-bold text-gray-900"><span id="bookings-user-name"></span>'s Bookings</h2>
                     </div>

@@ -1,6 +1,6 @@
 /**
  * Track Admin/Shop Locations Page
- * Initializes the admin location tracker for users
+ * Initializes the admin location tracker for users to find branches
  */
 
 import { AdminTracker } from '../modules/admin-tracker.js';

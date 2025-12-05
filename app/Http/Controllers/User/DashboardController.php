@@ -24,6 +24,10 @@ class DashboardController extends Controller
             ->where('status', 'completed')
             ->count();
         
+        $totalSpent = Transaction::where('user_id', $user->id)
+            ->where('status', 'completed')
+            ->sum('total_price');
+        
         // Get next upcoming booking
         $nextBooking = Transaction::where('user_id', $user->id)
             ->whereIn('status', ['pending', 'in_progress'])
@@ -41,7 +45,8 @@ class DashboardController extends Controller
         
         return view('user.dashboard.index', compact(
             'activeOrders',
-            'completedOrders', 
+            'completedOrders',
+            'totalSpent',
             'nextBooking',
             'recentBookings'
         ));

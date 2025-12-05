@@ -18,7 +18,7 @@
     @include('components.nav')
 
     <!-- Page Layout -->
-    <div class="flex min-h-screen pt-16">
+    <div class="flex min-h-screen pt-[72px]">
         <!-- Mobile/Tablet Menu Button -->
         <button @click="sidebarOpen = !sidebarOpen" 
                 class="lg:hidden fixed bottom-6 right-6 z-[100] w-14 h-14 bg-primary-600 text-white rounded-full shadow-lg flex items-center justify-center hover:bg-primary-700 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
@@ -40,12 +40,12 @@
              x-transition:leave="transition-opacity ease-linear duration-300"
              x-transition:leave-start="opacity-100"
              x-transition:leave-end="opacity-0"
-             class="lg:hidden fixed inset-0 bg-black/50 z-[95] top-16"
+             class="lg:hidden fixed inset-0 bg-black/50 z-[95] top-[72px]"
              style="display: none;"
              aria-hidden="true"></div>
 
         <!-- Sidebar -->
-        <aside class="w-64 md:w-56 lg:w-64 fixed top-16 bottom-0 left-0 z-[96] overflow-y-auto bg-white border-r border-gray-200 transition-transform duration-300 lg:translate-x-0"
+        <aside class="w-64 md:w-56 lg:w-64 fixed top-[72px] bottom-0 left-0 z-[96] overflow-y-auto bg-white border-r border-gray-200 transition-transform duration-300 lg:translate-x-0"
                :class="{ '-translate-x-full': !sidebarOpen, 'translate-x-0': sidebarOpen }"
                x-cloak>
             @if(Auth::guard('admin')->check())
@@ -56,7 +56,7 @@
         </aside>
 
         <!-- Main Content -->
-        <main class="flex-1 lg:ml-64 md:ml-56 p-4 sm:p-6 md:p-7 lg:p-8 w-full">
+        <main class="flex-1 lg:ml-64 md:ml-56 p-4 w-full">
             {{ $slot }}
         </main>
     </div>

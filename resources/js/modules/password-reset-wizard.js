@@ -63,11 +63,11 @@ export class PasswordResetWizard {
             
             if (i < currentStep) {
                 // Completed step
-                indicator.className = 'w-10 h-10 mx-auto rounded-full bg-green-600 text-white flex items-center justify-center font-bold';
-                if (line) line.className = 'flex-1 h-1 bg-green-600';
+                indicator.className = 'w-10 h-10 mx-auto rounded-full bg-wash text-white flex items-center justify-center font-bold';
+                if (line) line.className = 'flex-1 h-1 bg-wash';
             } else if (i === currentStep) {
                 // Current step
-                indicator.className = 'w-10 h-10 mx-auto rounded-full bg-green-600 text-white flex items-center justify-center font-bold';
+                indicator.className = 'w-10 h-10 mx-auto rounded-full bg-wash text-white flex items-center justify-center font-bold';
                 if (line) line.className = 'flex-1 h-1 bg-gray-300';
             } else {
                 // Future step

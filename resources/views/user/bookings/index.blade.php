@@ -1,20 +1,27 @@
 <x-layout>
     <x-slot name="title">Book Laundry Service</x-slot>
 
-    <div class="space-y-6">
-        <!-- Page Header -->
-        <x-modules.page-header
-            title="Book Laundry Service"
-            subtitle="Select a date and time to schedule your laundry"
-            icon="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-            gradient="amber"
-        />
+    <div class="max-w-7xl mx-auto space-y-6">
+        <!-- Hero Header -->
+        <div class="relative bg-gradient-to-br from-wash via-wash-dark to-gray-900 rounded-2xl p-12 overflow-hidden">
+            <!-- Decorative Background -->
+            <div class="absolute inset-0 opacity-10">
+                <div class="absolute top-0 right-0 w-64 h-64 bg-white rounded-full -translate-y-1/2 translate-x-1/2"></div>
+                <div class="absolute bottom-0 left-0 w-48 h-48 bg-white rounded-full translate-y-1/2 -translate-x-1/2"></div>
+            </div>
+            
+            <!-- Content -->
+            <div class="relative">
+                <h1 class="text-5xl font-black text-white mb-3">Book Your Laundry</h1>
+                <p class="text-xl text-white/80">Select a date and time to schedule your laundry service</p>
+            </div>
+        </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <!-- Calendar -->
             <div class="lg:col-span-1">
-                <div class="bg-white rounded-lg border border-gray-200 p-6">
-                    <h2 class="text-lg font-bold text-gray-900 mb-4">Select Date</h2>
+                <div class="bg-white rounded-2xl border-2 border-gray-200 p-6">
+                    <h2 class="text-xl font-black text-gray-900 mb-4">Select Date</h2>
                     
                     <div id="calendar-container" class="mb-4">
                         <div class="flex justify-between items-center mb-4">
@@ -49,11 +56,11 @@
             <!-- Booking Form -->
             <div class="lg:col-span-2">
                 <!-- Empty State -->
-                <div id="empty-state" class="bg-white rounded-lg border-2 border-dashed border-gray-300 p-12 text-center">
+                <div id="empty-state" class="bg-white rounded-2xl border-2 border-dashed border-gray-300 p-12 text-center">
                     <svg class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
-                    <h3 class="text-xl font-bold text-gray-800 mb-2">Select a Date</h3>
+                    <h3 class="text-xl font-black text-gray-800 mb-2">Select a Date</h3>
                     <p class="text-gray-500">Choose a date from the calendar to start booking</p>
                 </div>
 
@@ -62,8 +69,8 @@
                     @csrf
 
                     <!-- Service Type Selection - Four Options -->
-                    <div class="bg-white rounded-lg border border-gray-200 p-6">
-                        <h2 class="text-lg font-bold text-gray-900 mb-2">Choose Your Service</h2>
+                    <div class="bg-white rounded-2xl border-2 border-gray-200 p-6">
+                        <h2 class="text-xl font-black text-gray-900 mb-2">Choose Your Service</h2>
                         <p class="text-sm text-gray-500 mb-4">Select how you want your laundry picked up and delivered</p>
                         
                         <input type="hidden" name="pickup_method" id="pickup_method" value="branch_pickup">
@@ -73,22 +80,22 @@
                             <!-- Full Service -->
                             <label class="service-option-card cursor-pointer group" data-pickup="branch_pickup" data-delivery="branch_delivery">
                                 <input type="radio" name="service_option" value="full_service" class="hidden" checked>
-                                <div class="relative border-2 border-gray-200 rounded-xl p-4 transition-all duration-200 hover:border-blue-300 hover:shadow-md group-has-[:checked]:border-blue-500 group-has-[:checked]:bg-blue-50 group-has-[:checked]:shadow-lg">
-                                    <div class="absolute top-3 right-3 w-5 h-5 rounded-full border-2 border-gray-300 flex items-center justify-center group-has-[:checked]:border-blue-500 group-has-[:checked]:bg-blue-500">
+                                <div class="relative border-2 border-gray-200 rounded-xl p-4 transition-all duration-200 hover:border-wash/50 hover:shadow-md group-has-[:checked]:border-wash group-has-[:checked]:bg-wash/5 group-has-[:checked]:shadow-lg">
+                                    <div class="absolute top-3 right-3 w-5 h-5 rounded-full border-2 border-gray-300 flex items-center justify-center group-has-[:checked]:border-wash group-has-[:checked]:bg-wash">
                                         <svg class="w-3 h-3 text-white hidden group-has-[:checked]:block" fill="currentColor" viewBox="0 0 20 20">
                                             <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
                                         </svg>
                                     </div>
                                     <div class="flex items-start gap-3">
-                                        <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0 group-has-[:checked]:bg-blue-200">
-                                            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <div class="w-12 h-12 bg-wash/10 rounded-lg flex items-center justify-center flex-shrink-0 group-has-[:checked]:bg-wash/20">
+                                            <svg class="w-6 h-6 text-wash" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>
                                             </svg>
                                         </div>
                                         <div class="flex-1">
                                             <h3 class="font-bold text-gray-900 mb-1">Full Service</h3>
                                             <p class="text-xs text-gray-500 mb-2">We pick up & deliver</p>
-                                            <span class="inline-block px-2 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded">Most Convenient</span>
+                                            <span class="inline-block px-2 py-1 bg-wash/10 text-wash text-xs font-bold rounded">Most Convenient</span>
                                         </div>
                                     </div>
                                 </div>
@@ -191,30 +198,30 @@
                     </script>
 
                     <!-- Your Information -->
-                    <div class="bg-white rounded-lg border border-gray-200 p-6">
-                        <h2 class="text-lg font-bold text-gray-900 mb-4">Your Information</h2>
+                    <div class="bg-white rounded-2xl border-2 border-gray-200 p-6">
+                        <h2 class="text-xl font-black text-gray-900 mb-4">Your Information</h2>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                            <div class="form-group">
+                                <label class="form-label">Name</label>
                                 <input type="text" value="{{ $user->fname }} {{ $user->lname }}" class="form-input bg-gray-50" readonly>
                             </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                            <div class="form-group">
+                                <label class="form-label">Email</label>
                                 <input type="text" value="{{ $user->email }}" class="form-input bg-gray-50" readonly>
                             </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+                            <div class="form-group">
+                                <label class="form-label">Phone</label>
                                 <input type="text" value="{{ $user->phone }}" class="form-input bg-gray-50" readonly>
                             </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Address</label>
+                            <div class="form-group">
+                                <label class="form-label">Address</label>
                                 <input type="text" value="{{ $user->address }}" class="form-input bg-gray-50" readonly>
                             </div>
                         </div>
                     </div>
 
                     <!-- Branch Selection -->
-                    <div class="bg-white rounded-xl border border-gray-200 p-6">
+                    <div class="bg-white rounded-2xl border-2 border-gray-200 p-6">
                         <div class="flex items-center gap-3 mb-4">
                             <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
                                 <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -222,7 +229,7 @@
                                 </svg>
                             </div>
                             <div>
-                                <h2 class="text-lg font-bold text-gray-900">Select Branch</h2>
+                                <h2 class="text-xl font-black text-gray-900">Select Branch</h2>
                                 <p class="text-sm text-gray-500">Choose your preferred laundry branch ({{ count($branches) }} available)</p>
                             </div>
                         </div>
@@ -294,26 +301,28 @@
                     </div>
 
                     <!-- Pickup Address (Only shown for branch pickup) -->
-                    <div id="pickup-address-field" class="bg-gradient-to-r from-blue-50 to-blue-100/50 rounded-xl border border-blue-200 p-6">
+                    <div id="pickup-address-field" class="bg-gradient-to-r from-wash/10 to-wash/5 rounded-2xl border-2 border-wash/20 p-6">
                         <div class="flex items-center gap-3 mb-4">
-                            <div class="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center shadow-lg shadow-blue-200">
+                            <div class="w-12 h-12 bg-wash rounded-xl flex items-center justify-center shadow-lg shadow-wash/20">
                                 <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
                                 </svg>
                             </div>
                             <div>
-                                <h2 class="text-lg font-bold text-gray-900">Pickup Location</h2>
+                                <h2 class="text-xl font-black text-gray-900">Pickup Location</h2>
                                 <p class="text-sm text-gray-600">Where should we pick up your laundry?</p>
                             </div>
                         </div>
-                        <input type="text" name="pickup_address" id="pickup_address" value="{{ $user->address }}" class="form-input bg-white/80 backdrop-blur border-blue-200 focus:border-blue-400 focus:ring-blue-400 rounded-xl" readonly>
+                        <div class="form-group">
+                            <input type="text" name="pickup_address" id="pickup_address" value="{{ $user->address }}" class="form-input bg-white/80 backdrop-blur" readonly>
+                        </div>
                         <input type="hidden" name="latitude" id="latitude" value="{{ $user->latitude }}">
                         <input type="hidden" name="longitude" id="longitude" value="{{ $user->longitude }}">
                     </div>
 
                     <!-- Booking Details -->
-                    <div class="bg-white rounded-xl border border-gray-200 p-6">
+                    <div class="bg-white rounded-2xl border-2 border-gray-200 p-6">
                         <div class="flex items-center gap-3 mb-6">
                             <div class="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
                                 <svg class="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -321,41 +330,41 @@
                                 </svg>
                             </div>
                             <div>
-                                <h2 class="text-lg font-bold text-gray-900">Booking Details</h2>
+                                <h2 class="text-xl font-black text-gray-900">Booking Details</h2>
                                 <p class="text-sm text-gray-500">Configure your laundry order</p>
                             </div>
                         </div>
                         
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                             <!-- Date & Time Row -->
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Date</label>
-                                <input type="date" name="booking_date" id="booking_date" class="form-input bg-gray-50 rounded-xl" required readonly>
+                            <div class="form-group">
+                                <label class="form-label">Date</label>
+                                <input type="date" name="booking_date" id="booking_date" class="form-input bg-gray-50" required readonly>
                             </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Time <span class="text-red-500">*</span></label>
-                                <select name="booking_time" id="booking_time" class="form-select rounded-xl" required>
+                            <div class="form-group">
+                                <label class="form-label">Time <span class="text-error">*</span></label>
+                                <select name="booking_time" id="booking_time" class="form-select" required>
                                     <option value="">Select time slot</option>
                                 </select>
                             </div>
                             
                             <!-- Item Type -->
                             <div class="md:col-span-2">
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Item Type <span class="text-red-500">*</span></label>
+                                <label class="form-label">Item Type <span class="text-error">*</span></label>
                                 <div class="grid grid-cols-3 gap-3">
                                     <label class="cursor-pointer">
                                         <input type="radio" name="item_type" value="clothes" class="hidden peer">
-                                        <div class="flex flex-col items-center p-4 border-2 border-gray-200 rounded-xl transition-all peer-checked:border-orange-500 peer-checked:bg-orange-50 hover:border-orange-300">
-                                            <svg class="w-8 h-8 text-gray-400 peer-checked:text-orange-500 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <div class="flex flex-col items-center p-4 border-2 border-gray-200 rounded-xl transition-all peer-checked:border-wash peer-checked:bg-wash/5 hover:border-wash/50">
+                                            <svg class="w-8 h-8 text-gray-400 peer-checked:text-wash mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/>
                                             </svg>
-                                            <span class="text-sm font-medium text-gray-700">Clothes</span>
+                                            <span class="text-sm font-bold text-gray-700">Clothes</span>
                                         </div>
                                     </label>
                                     <label class="cursor-pointer">
                                         <input type="radio" name="item_type" value="comforter" class="hidden peer">
-                                        <div class="flex flex-col items-center p-4 border-2 border-gray-200 rounded-xl transition-all peer-checked:border-orange-500 peer-checked:bg-orange-50 hover:border-orange-300">
-                                            <svg class="w-8 h-8 text-gray-400 peer-checked:text-orange-500 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <div class="flex flex-col items-center p-4 border-2 border-gray-200 rounded-xl transition-all peer-checked:border-wash peer-checked:bg-wash/5 hover:border-wash/50">
+                                            <svg class="w-8 h-8 text-gray-400 peer-checked:text-wash mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"/>
                                             </svg>
                                             <span class="text-sm font-medium text-gray-700">Comforter</span>
@@ -363,11 +372,11 @@
                                     </label>
                                     <label class="cursor-pointer">
                                         <input type="radio" name="item_type" value="shoes" class="hidden peer">
-                                        <div class="flex flex-col items-center p-4 border-2 border-gray-200 rounded-xl transition-all peer-checked:border-orange-500 peer-checked:bg-orange-50 hover:border-orange-300">
-                                            <svg class="w-8 h-8 text-gray-400 peer-checked:text-orange-500 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <div class="flex flex-col items-center p-4 border-2 border-gray-200 rounded-xl transition-all peer-checked:border-wash peer-checked:bg-wash/5 hover:border-wash/50">
+                                            <svg class="w-8 h-8 text-gray-400 peer-checked:text-wash mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
                                             </svg>
-                                            <span class="text-sm font-medium text-gray-700">Shoes</span>
+                                            <span class="text-sm font-bold text-gray-700">Shoes</span>
                                         </div>
                                     </label>
                                 </div>
@@ -398,30 +407,30 @@
                             
                             <!-- Notes -->
                             <div class="md:col-span-2">
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Special Instructions (Optional)</label>
-                                <textarea name="notes" id="notes" class="form-textarea rounded-xl" rows="2" placeholder="Any special requests or instructions..."></textarea>
+                                <label class="form-label">Special Instructions (Optional)</label>
+                                <textarea name="notes" id="notes" class="form-textarea" rows="2" placeholder="Any special requests or instructions..."></textarea>
                             </div>
                         </div>
 
                         <!-- Total & Actions -->
-                        <div class="mt-8 pt-6 border-t border-gray-200">
-                            <div class="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-4 mb-4">
+                        <div class="mt-8 pt-6 border-t-2 border-gray-200">
+                            <div class="bg-gradient-to-r from-wash/10 to-wash/5 rounded-2xl p-6 mb-4 border-2 border-wash/20">
                                 <div class="flex items-center justify-between">
                                     <div class="flex items-center gap-3">
-                                        <div class="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center">
-                                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <div class="w-12 h-12 bg-wash rounded-xl flex items-center justify-center shadow-lg shadow-wash/20">
+                                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                             </svg>
                                         </div>
-                                        <span class="text-lg font-semibold text-gray-700">Total Amount</span>
+                                        <span class="text-xl font-black text-gray-900">Total Amount</span>
                                     </div>
-                                    <span class="text-3xl font-bold text-green-600">₱<span id="total-price">0.00</span></span>
+                                    <span class="text-3xl font-black text-wash">₱<span id="total-price">0.00</span></span>
                                 </div>
                             </div>
                             <div class="flex gap-3">
-                                <button type="button" id="clear-selection" class="btn btn-outline flex-1 rounded-xl">Clear</button>
-                                <button type="submit" class="btn btn-primary flex-1 rounded-xl">
-                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <button type="button" id="clear-selection" class="btn btn-secondary flex-1">Clear</button>
+                                <button type="submit" class="btn btn-primary btn-lg flex-1">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                                     </svg>
                                     Submit Booking
