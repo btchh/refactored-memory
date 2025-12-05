@@ -12,8 +12,10 @@
         
         <!-- Branding -->
         <div class="navbar-brand">
-            <img src="{{ asset('images/washhour_logo.png') }}" alt="WashHour Logo" class="navbar-logo">
-            <a href="{{ $isAdmin ? route('admin.dashboard') : route('user.dashboard') }}" class="navbar-title hover:text-primary-600 transition-colors">
+            <div class="bg-white rounded-full p-1 flex items-center justify-center">
+                <img src="{{ asset('images/washhour_logo.png') }}" alt="WashHour Logo" class="navbar-logo">
+            </div>
+            <a href="{{ $isAdmin ? route('admin.dashboard') : route('user.dashboard') }}" class="navbar-title hover:text-primary-100 transition-colors">
                 WashHour
             </a>
         </div>
@@ -22,19 +24,19 @@
         <div class="flex items-center gap-2 sm:gap-4">
             <!-- User Type Badge -->
             @if($isAdmin)
-                <span class="badge badge-warning">ADMIN</span>
+                <span class="badge bg-warning text-gray-900 font-bold">ADMIN</span>
             @endif
 
             <!-- Interactive Profile Dropdown -->
             <div class="relative z-[9999]" x-data="{ open: false }" @click.away="open = false">
-                <button @click="open = !open" class="flex items-center gap-2 sm:gap-3 px-2 sm:px-4 py-2 rounded-md border border-gray-200 bg-white hover:bg-gray-50 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 touch-target">
+                <button @click="open = !open" class="flex items-center gap-2 sm:gap-3 px-2 sm:px-4 py-2 rounded-md border border-primary-500 bg-white hover:bg-primary-50 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-primary-600 touch-target">
                     <!-- User Avatar with Initials -->
-                    <div class="w-8 h-8 rounded-full bg-primary-100 text-primary-600 flex items-center justify-center font-semibold text-sm">
+                    <div class="w-8 h-8 rounded-full bg-primary-600 text-white flex items-center justify-center font-semibold text-sm">
                         {{ $userInitials }}
                     </div>
-                    <span class="text-sm text-gray-700 font-medium hidden sm:inline">{{ trim($userName) }}</span>
+                    <span class="text-sm text-gray-900 font-medium hidden sm:inline">{{ trim($userName) }}</span>
                     <!-- Chevron Down Icon -->
-                    <svg class="w-4 h-4 text-gray-500 transition-transform duration-200 hidden sm:block" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <svg class="w-4 h-4 text-gray-700 transition-transform duration-200 hidden sm:block" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                     </svg>
                 </button>

@@ -148,6 +148,7 @@ The WashHour system uses a relational database with 11 core tables managing user
 | weight | DECIMAL(10,2) | NULLABLE | Laundry weight (kg) |
 | total_price | DECIMAL(10,2) | NOT NULL | Total order amount |
 | status | ENUM | DEFAULT 'pending' | pending, in_progress, completed, cancelled |
+| completed_at | TIMESTAMP | NULLABLE | Completion timestamp |
 | booking_type | ENUM | DEFAULT 'online' | online, walkin |
 | created_at | TIMESTAMP | | Order creation |
 | updated_at | TIMESTAMP | | Last update |
@@ -530,11 +531,17 @@ ORDER BY bookings DESC
 
 ## 📝 Schema Version
 
-**Current Version:** 1.5.0  
-**Last Updated:** December 4, 2025  
+**Current Version:** 1.6.0  
+**Last Updated:** December 5, 2025  
 **Total Tables:** 11 (+ 3 Laravel system tables)
 
-### Recent Changes (v1.5.0)
+### Recent Changes (v1.6.0)
+- Added `completed_at` timestamp field to transactions table
+- Tracks exact completion time for completed orders
+- Enables accurate completion time analytics and reporting
+- Consolidated migration into main create_transactions_table migration
+
+### Previous Changes (v1.5.0)
 - Replaced ambiguous `service_type` with clear `pickup_method` and `delivery_method` fields
 - Four distinct service combinations now supported
 - Better pricing flexibility (charge separately for pickup/delivery)

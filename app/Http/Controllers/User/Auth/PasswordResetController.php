@@ -3,10 +3,9 @@
 namespace App\Http\Controllers\User\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\User\SendPasswordResetOtp;
-use App\Http\Requests\User\VerifyPasswordResetOtp;
 use App\Http\Requests\User\PasswordReset;
 use App\Services\UserService;
+use Illuminate\Http\Request;
 
 class PasswordResetController extends Controller
 {
@@ -25,53 +24,80 @@ class PasswordResetController extends Controller
     /**
      * Send password reset OTP
      */
-    public function sendPasswordResetOtp(SendPasswordResetOtp $request)
+    public function sendPasswordResetOtp(Request $request)
     {
-        try {
-            $result = $this->userService->initiatePassReset($request->phone);
+        // Manual validation for JSON response
+        $validator = \Validator::make($request->all(), [
+            'phone' => ['required', 'string', 'regex:/^(09|\+639)\d{9}$/'],
+        ], [
+            'phone.required' => 'Phone number is required',
+            'phone.regex' => 'Phone number must be a valid Philippine mobile number',
+        ]);
 
-            return redirect()->back()->with('success', $result['message']);
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => $validator->errors()->first()
+            ], 422);
+        }
+
+        try {
+            $result = $this->userService->sendPasswordResetOtp($request->phone);
+
+            return response()->json($result, $result['success'] ? 200 : 400);
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 400);
         }
     }
 
     /**
-     * Verify password reset OTP and reset password
+     * Verify password reset OTP
      */
-    public function verifyPasswordResetOtp(VerifyPasswordResetOtp $request)
+    public function verifyPasswordResetOtp(Request $request)
     {
-        try {
-            $otpResult = $this->userService->verifyOtp($request->phone, $request->otp);
+        $request->validate([
+            'phone' => 'required',
+            'otp' => 'required|digits:6'
+        ]);
 
-            if (!$otpResult['success']) {
-                return redirect()->back()->with('error', 'Invalid or expired OTP');
+        try {
+            $result = $this->userService->verifyOtp($request->phone, $request->otp);
+            
+            return response()->json($result, $result['success'] ? 200 : 400);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 400);
+        }
+    }
+
+    /**
+     * Reset password (handles form submission from step 3)
+     */
+    public function resetPassword(Request $request)
+    {
+        $request->validate([
+            'phone' => ['required', 'string', 'regex:/^(09|\+639)\d{9}$/'],
+            'otp' => 'required|digits:6',
+            'password' => 'required|min:8|confirmed',
+        ]);
+
+        try {
+            $result = $this->userService->resetPassword(
+                $request->phone,
+                $request->otp,
+                $request->password
+            );
+
+            if ($result['success']) {
+                return redirect()->route('user.login')->with('success', $result['message']);
             }
 
-            return redirect()->route('user.reset-password', ['phone' => $request->phone])
-                ->with('success', 'OTP verified successfully');
-        } catch (\Exception $e) {
-            return redirect()->back()->with('error', $e->getMessage());
-        }
-    }
-
-    /**
-     * Show reset password form
-     */
-    public function showResetPassword($phone)
-    {
-        return view('user.auth.forgot-password', ['phone' => $phone]);
-    }
-
-    /**
-     * Reset password
-     */
-    public function resetPassword(PasswordReset $request)
-    {
-        try {
-            $this->userService->completePassReset($request->phone, $request->password);
-
-            return redirect()->route('user.login')->with('success', 'Password has been reset successfully. You can now login with your new password.');
+            return redirect()->back()->with('error', $result['message']);
         } catch (\Exception $e) {
             return redirect()->back()->with('error', $e->getMessage());
         }

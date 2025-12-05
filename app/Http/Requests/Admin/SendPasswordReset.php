@@ -22,15 +22,15 @@ class SendPasswordReset extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => 'required|email',
+            'phone' => ['required', 'string', 'regex:/^(09|\+639)\d{9}$/'],
         ];
     }
 
     public function messages(): array
     {
         return [
-            'email.required' => 'Email is required',
-            'email.email' => 'Email must be a valid email address',
+            'phone.required' => 'Phone number is required',
+            'phone.regex' => 'Phone number must be a valid Philippine mobile number (e.g., 09123456789)',
         ];
     }
 }

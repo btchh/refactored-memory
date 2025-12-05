@@ -12,18 +12,17 @@ Route::middleware(['guest:admin'])->group(function () {
         ->middleware('rate.limit.progressive:login')
         ->name('login.submit');
     
-    // Password Reset - Progressive rate limiting (3 attempts for OTP)
+    // Password Reset - Rate limiting disabled for testing
     Route::get('forgot-password', [PasswordResetController::class, 'showForgotPassword'])->name('forgot-password');
-    Route::post('send-password-reset', [PasswordResetController::class, 'sendPasswordReset'])
-        ->middleware('rate.limit.progressive:otp')
-        ->name('send-password-reset');
-    Route::get('reset-password/{token}', [PasswordResetController::class, 'showResetPassword'])->name('reset-password');
+    Route::post('send-password-reset-otp', [PasswordResetController::class, 'sendPasswordReset'])
+        // ->middleware('rate.limit.progressive:otp')
+        ->name('send-password-reset-otp');
+    Route::post('verify-password-reset-otp', [PasswordResetController::class, 'verifyPasswordReset'])
+        // ->middleware('rate.limit.progressive:otp')
+        ->name('verify-password-reset-otp');
     Route::post('reset-password', [PasswordResetController::class, 'resetPassword'])
-        ->middleware('rate.limit.progressive:login')
+        // ->middleware('rate.limit.progressive:login')
         ->name('reset-password.submit');
-    Route::post('verify-password-reset', [PasswordResetController::class, 'verifyPasswordReset'])
-        ->middleware('rate.limit.progressive:otp')
-        ->name('verify-password-reset');
 });
 
 // Protected routes

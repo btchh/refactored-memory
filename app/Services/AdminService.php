@@ -132,4 +132,70 @@ class AdminService
     {
         return Admin::where('email', $email)->first();
     }
+
+    //send password reset OTP
+    public function sendPasswordResetOtp(string $phone): array
+    {
+        //check if admin exists with this $phone
+        $admin = Admin::where('phone', $phone)->first();
+
+        //to not reveal whether the phone exists, we return success either way
+        if (!$admin) {
+            return [
+                'success' => true,
+                'message' => 'If the phone number exists in our system, an OTP has been sent.'
+            ];
+        }
+
+        //send OTP via SMS
+        $result = $this->messageService->sendPasswordResetOtp($phone);
+
+        Log::info("Admin Password Reset OTP Send Result: " . json_encode($result));
+
+        if (isset($result['status']) && $result['status'] === 'success') {
+            return [
+                'success' => true,
+                'message' => 'OTP sent successfully to your phone.',
+            ];
+        }
+
+        return [
+            'success' => false,
+            'message' => 'Failed to send OTP. Please try again.',
+        ];
+    }
+
+    //reset password with OTP verification
+    public function resetPassword(string $phone, string $otp, string $password): array
+    {
+        // Verify OTP first
+        $verifyResult = $this->verifyOtp($phone, $otp);
+        
+        if (!$verifyResult['success']) {
+            return [
+                'success' => false,
+                'message' => 'Invalid or expired OTP code.'
+            ];
+        }
+
+        // Find admin
+        $admin = Admin::where('phone', $phone)->first();
+
+        if (!$admin) {
+            return [
+                'success' => false,
+                'message' => 'Admin not found.'
+            ];
+        }
+
+        // Update password
+        $admin->update([
+            'password' => Hash::make($password)
+        ]);
+
+        return [
+            'success' => true,
+            'message' => 'Password has been reset successfully. You can now login with your new password.'
+        ];
+    }
 }

@@ -22,8 +22,7 @@ class PasswordReset extends FormRequest
     public function rules(): array
     {
         return [
-            'token' => 'required|string',
-            'email' => 'required|email',
+            'phone' => ['required', 'string', 'regex:/^(09|\+639)\d{9}$/'],
             'password' => 'required|string|confirmed|min:8',
         ];
     }
@@ -31,14 +30,11 @@ class PasswordReset extends FormRequest
     public function messages(): array
     {
         return [
-            'token.required' => 'Reset token is required',
-            'email.required' => 'Email is required',
-            'email.email' => 'Email must be a valid email address',
+            'phone.required' => 'Phone number is required',
+            'phone.regex' => 'Phone number must be a valid Philippine mobile number',
             'password.required' => 'Password is required',
             'password.confirmed' => 'Password confirmation does not match',
             'password.min' => 'Password must be at least 8 characters long',
         ];
     }
-
-    //password reset = "I forgot my password and want to reset it"
 }

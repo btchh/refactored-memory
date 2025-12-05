@@ -828,7 +828,7 @@
 
 /* Navigation Components */
 .navbar {
-    @apply bg-white border-b border-gray-200 shadow-sm sticky top-0 z-50;
+    @apply bg-primary-600 border-b border-primary-700 shadow-md sticky top-0 z-50;
     height: 64px;
 }
 
@@ -841,7 +841,7 @@
 }
 
 .navbar-title {
-    @apply text-lg sm:text-xl font-bold text-gray-900;
+    @apply text-lg sm:text-xl font-bold text-white;
 }
 
 .sidebar {
@@ -849,21 +849,25 @@
 }
 
 .sidebar-link {
-    @apply flex items-center gap-3 px-3 py-3 rounded-md text-gray-800 transition-colors;
-    @apply hover:bg-gray-50;
+    @apply flex items-center gap-3 px-3 py-3 rounded-md text-gray-900 transition-colors;
+    @apply hover:bg-primary-50 hover:text-primary-700;
     min-height: 44px; /* Touch target requirement */
 }
 
 .sidebar-link.active {
-    @apply bg-primary-50 text-primary-700 font-medium;
+    @apply bg-primary-600 text-white font-medium shadow-sm;
 }
 
 .sidebar-icon {
-    @apply w-5 h-5 text-gray-600;
+    @apply w-5 h-5 text-gray-700;
+}
+
+.sidebar-link:hover .sidebar-icon {
+    @apply text-primary-700;
 }
 
 .sidebar-link.active .sidebar-icon {
-    @apply text-primary-700;
+    @apply text-white;
 }
 
 /* Mobile Navigation */

@@ -3,20 +3,14 @@
 namespace App\Http\Controllers\Admin\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Admin\SendPasswordReset;
-use App\Http\Requests\Admin\VerifyPasswordReset;
 use App\Http\Requests\Admin\PasswordReset;
 use App\Services\AdminService;
-use App\Services\MessageService;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
+use Illuminate\Http\Request;
 
 class PasswordResetController extends Controller
 {
     public function __construct(
-        private AdminService $adminService,
-        private MessageService $messageService
+        private AdminService $adminService
     ) {}
 
     /**
@@ -28,86 +22,84 @@ class PasswordResetController extends Controller
     }
 
     /**
-     * Send password reset link
+     * Send password reset OTP
      */
-    public function sendPasswordReset(SendPasswordReset $request)
+    public function sendPasswordReset(Request $request)
     {
-        $admin = $this->adminService->findAdminByEmail($request->email);
+        // Manual validation for JSON response
+        $validator = \Validator::make($request->all(), [
+            'phone' => ['required', 'string', 'regex:/^(09|\+639)\d{9}$/'],
+        ], [
+            'phone.required' => 'Phone number is required',
+            'phone.regex' => 'Phone number must be a valid Philippine mobile number',
+        ]);
 
-        if (!$admin) {
-            return redirect()->back()->with('error', 'Admin not found with this email');
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => $validator->errors()->first()
+            ], 422);
         }
 
-        $token = Str::random(60);
-
-        DB::table('password_reset_tokens')->updateOrInsert(
-            ['email' => $request->email],
-            ['token' => Hash::make($token), 'created_at' => now()]
-        );
-
-        $this->messageService->sendPasswordResetLink($admin->email, $token);
-
-        return redirect()->back()->with('success', 'Password reset link sent to your email');
-    }
-
-    /**
-     * Show reset password form
-     */
-    public function showResetPassword($token)
-    {
-        return view('admin.auth.forgot-password', ['token' => $token]);
-    }
-
-    /**
-     * Verify OTP and reset password
-     */
-    public function verifyPasswordReset(VerifyPasswordReset $request)
-    {
         try {
-            $result = $this->adminService->verifyOtp($request->email, $request->otp);
+            $result = $this->adminService->sendPasswordResetOtp($request->phone);
+
+            return response()->json($result, $result['success'] ? 200 : 400);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 400);
+        }
+    }
+
+    /**
+     * Verify password reset OTP
+     */
+    public function verifyPasswordReset(Request $request)
+    {
+        $request->validate([
+            'phone' => 'required',
+            'otp' => 'required|digits:6'
+        ]);
+
+        try {
+            $result = $this->adminService->verifyOtp($request->phone, $request->otp);
+            
+            return response()->json($result, $result['success'] ? 200 : 400);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 400);
+        }
+    }
+
+    /**
+     * Reset password (handles form submission from step 3)
+     */
+    public function resetPassword(Request $request)
+    {
+        $request->validate([
+            'phone' => ['required', 'string', 'regex:/^(09|\+639)\d{9}$/'],
+            'otp' => 'required|digits:6',
+            'password' => 'required|min:8|confirmed',
+        ]);
+
+        try {
+            $result = $this->adminService->resetPassword(
+                $request->phone,
+                $request->otp,
+                $request->password
+            );
 
             if ($result['success']) {
-                return redirect()->route('admin.reset-password', ['token' => $request->token])
-                    ->with('success', 'OTP verified successfully');
+                return redirect()->route('admin.login')->with('success', $result['message']);
             }
 
             return redirect()->back()->with('error', $result['message']);
         } catch (\Exception $e) {
             return redirect()->back()->with('error', $e->getMessage());
         }
-    }
-
-    /**
-     * Reset password with token
-     */
-    public function resetPassword(PasswordReset $request)
-    {
-        $tokenRecord = DB::table('password_reset_tokens')
-            ->where('email', $request->email)
-            ->first();
-
-        if (!$tokenRecord) {
-            return redirect()->back()->with('error', 'Invalid reset token');
-        }
-
-        if (!Hash::check($request->token, $tokenRecord->token)) {
-            return redirect()->back()->with('error', 'Invalid reset token');
-        }
-
-        if (now()->diffInMinutes($tokenRecord->created_at) > 60) {
-            return redirect()->back()->with('error', 'Reset token has expired');
-        }
-
-        $admin = $this->adminService->findAdminByEmail($request->email);
-
-        if (!$admin) {
-            return redirect()->back()->with('error', 'Admin not found');
-        }
-
-        $this->adminService->updatePassword($admin->id, $request->password);
-
-        DB::table('password_reset_tokens')->where('email', $request->email)->delete();
-
-        return redirect()->route('admin.login')->with('success', 'Password reset successfully');
     }
 }

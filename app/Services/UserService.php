@@ -95,8 +95,8 @@ class UserService
         return true;
     }
 
-    //password reset process / send password reset otp
-    public function initiatePassReset(string $phone): array
+    //send password reset OTP
+    public function sendPasswordResetOtp(string $phone): array
     {
         //check if user exists with this $phone
         $user = User::where('phone', $phone)->first();
@@ -112,36 +112,53 @@ class UserService
         //send OTP via SMS
         $result = $this->messageService->sendPasswordResetOtp($phone);
 
-        Log::info("Password Reset OTP Send Result: {$result}");
+        Log::info("Password Reset OTP Send Result: " . json_encode($result));
 
-        if (isset($result['success']) && $result['success'] === true) {
+        if (isset($result['status']) && $result['status'] === 'success') {
             return [
                 'success' => true,
-                'message' => 'If the phone number exists in our system, an OTP has been sent.'
+                'message' => 'OTP sent successfully to your phone.',
             ];
         }
 
         return [
             'success' => false,
-            'message' => 'Password reset process initiated.'
+            'message' => 'Failed to send OTP. Please try again.',
         ];
     }
 
-    //complete password reset with verified otp
-    public function completePassReset(string $phone, string $password): bool
+    //reset password with OTP verification
+    public function resetPassword(string $phone, string $otp, string $password): array
     {
+        // Verify OTP first
+        $verifyResult = $this->verifyOtp($phone, $otp);
+        
+        if (!$verifyResult['success']) {
+            return [
+                'success' => false,
+                'message' => 'Invalid or expired OTP code.'
+            ];
+        }
+
+        // Find user
         $user = User::where('phone', $phone)->first();
 
         if (!$user) {
-            throw new \Exception("User not found.");
+            return [
+                'success' => false,
+                'message' => 'User not found.'
+            ];
         }
 
-        //update password
+        // Update password
         $user->update([
             'password' => Hash::make($password)
         ]);
 
-        return true;
+        return [
+            'success' => true,
+            'message' => 'Password has been reset successfully. You can now login with your new password.'
+        ];
     }
 
     //send Registration OTP
