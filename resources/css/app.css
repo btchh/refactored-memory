@@ -1642,3 +1642,347 @@
 .date-picker-input:focus {
     @apply ring-2 ring-primary-500 border-primary-500;
 }
+
+/* ============================================
+   AUTH PAGE ENHANCEMENTS
+   ============================================ */
+
+/* Floating animation for background elements */
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-20px);
+    }
+}
+
+.animate-float {
+    animation: float 6s ease-in-out infinite;
+}
+
+/* Gradient border animation */
+@keyframes gradient-border {
+    0%, 100% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+}
+
+.gradient-border-animated {
+    background: linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899, #3b82f6);
+    background-size: 300% 300%;
+    animation: gradient-border 3s ease infinite;
+}
+
+/* Shimmer effect for loading states */
+@keyframes shimmer {
+    0% {
+        background-position: -1000px 0;
+    }
+    100% {
+        background-position: 1000px 0;
+    }
+}
+
+.shimmer {
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    background-size: 1000px 100%;
+    animation: shimmer 2s infinite;
+}
+
+/* Progress bar fill animation */
+@keyframes progress-fill {
+    from {
+        transform: translateX(-100%);
+    }
+    to {
+        transform: translateX(0);
+    }
+}
+
+.progress-fill-animated {
+    animation: progress-fill 0.5s ease-out forwards;
+}
+
+/* Input focus glow */
+.input-glow:focus {
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1),
+                0 0 20px rgba(59, 130, 246, 0.2);
+}
+
+/* Button press effect */
+.btn-press:active {
+    transform: scale(0.98);
+}
+
+/* Card entrance animation */
+@keyframes card-entrance {
+    from {
+        opacity: 0;
+        transform: translateY(30px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.card-entrance {
+    animation: card-entrance 0.5s ease-out;
+}
+
+/* Smooth step transition */
+.step-transition {
+    transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+}
+
+.step-hidden {
+    opacity: 0;
+    transform: translateX(20px);
+    pointer-events: none;
+}
+
+.step-visible {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* ============================================
+   USER AUTH PAGES STYLING ENHANCEMENTS
+   ============================================ */
+
+/* Enhanced card styling for auth pages */
+.card-entrance {
+    animation: card-entrance 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Smooth hover effects for links */
+a[href*="register"],
+a[href*="login"],
+a[href*="forgot-password"] {
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+a[href*="register"]:hover,
+a[href*="login"]:hover,
+a[href*="forgot-password"]:hover {
+    transform: translateX(2px);
+}
+
+/* Enhanced checkbox styling */
+input[type="checkbox"]:checked {
+    background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z'/%3e%3c/svg%3e");
+}
+
+/* Progress indicator enhancements */
+#step1-indicator,
+#step2-indicator,
+#step3-indicator {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+#step1-indicator:hover,
+#step2-indicator:hover,
+#step3-indicator:hover {
+    transform: scale(1.05);
+}
+
+/* Progress line animations */
+#progress-line-1,
+#progress-line-2 {
+    transition: background-color 0.5s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Step content transitions */
+.step-content {
+    animation: fadeInUp 0.4s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Form input focus enhancements */
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="tel"]:focus,
+input[type="password"]:focus {
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    border-color: #3b82f6;
+}
+
+/* Button hover enhancements */
+button[type="submit"],
+button[type="button"] {
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+button[type="submit"]:hover,
+button[type="button"]:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+}
+
+button[type="submit"]:active,
+button[type="button"]:active {
+    transform: translateY(0);
+}
+
+/* Password strength bar animations */
+#password-strength-bar {
+    transition: all 0.3s ease;
+}
+
+/* Error message styling */
+#contact-error,
+#otp-error {
+    animation: shake 0.4s ease;
+    background: #fee;
+    border: 1px solid #fcc;
+    border-radius: 0.5rem;
+    padding: 0.75rem;
+    color: #c00;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-10px); }
+    75% { transform: translateX(10px); }
+}
+
+/* Modal enhancements */
+#account-status-modal {
+    animation: fadeIn 0.3s ease;
+}
+
+#account-status-modal > div {
+    animation: slideInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Floating background orbs - enhanced animation */
+.animate-pulse {
+    animation: pulse-glow 4s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+    0%, 100% {
+        opacity: 0.6;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.8;
+        transform: scale(1.05);
+    }
+}
+
+/* Header text enhancements */
+h1, h2 {
+    letter-spacing: -0.025em;
+}
+
+/* Card shadow enhancement on hover */
+.card-entrance:hover {
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+}
+
+/* Smooth transitions for all interactive elements */
+label,
+p,
+a {
+    transition: color 0.2s ease;
+}
+
+/* Focus visible for accessibility */
+*:focus-visible {
+    outline: 2px solid #3b82f6;
+    outline-offset: 2px;
+    border-radius: 0.25rem;
+}
+
+/* Loading state for buttons */
+button[disabled] {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+/* Backdrop blur enhancement */
+.backdrop-blur-sm {
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+/* Smooth scroll behavior */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Enhanced form spacing */
+form {
+    position: relative;
+}
+
+/* Input placeholder styling */
+::placeholder {
+    color: #9ca3af;
+    opacity: 1;
+}
+
+:-ms-input-placeholder {
+    color: #9ca3af;
+}
+
+::-ms-input-placeholder {
+    color: #9ca3af;
+}
+
+/* Selection styling */
+::selection {
+    background-color: #dbeafe;
+    color: #1e40af;
+}
+
+::-moz-selection {
+    background-color: #dbeafe;
+    color: #1e40af;
+}
+
+/* Responsive enhancements for mobile */
+@media (max-width: 640px) {
+    .card-entrance {
+        margin: 0.5rem;
+    }
+    
+    h1 {
+        font-size: 1.5rem;
+    }
+    
+    h2 {
+        font-size: 1.125rem;
+    }
+}
+
+/* Print styles */
+@media print {
+    .absolute,
+    button,
+    a {
+        display: none !important;
+    }
+}

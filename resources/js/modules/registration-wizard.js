@@ -40,40 +40,57 @@ export class RegistrationWizard {
     }
 
     goToStep(step) {
-        // Hide all steps
-        document.querySelectorAll('.step-content').forEach(el => el.classList.add('hidden'));
+        // Hide all steps with fade out
+        document.querySelectorAll('.step-content').forEach(el => {
+            el.classList.add('hidden');
+            el.classList.remove('animate-slide-in-up');
+        });
         
-        // Show target step
+        // Show target step with animation
         const targetStep = document.getElementById('step' + step);
         if (targetStep) {
             targetStep.classList.remove('hidden');
+            // Trigger animation after a brief delay
+            setTimeout(() => {
+                targetStep.classList.add('animate-slide-in-up');
+            }, 10);
         }
         
         // Update progress indicators
         this.updateProgressIndicators(step);
         
         this.currentStep = step;
+        
+        // Scroll to top of form smoothly
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     updateProgressIndicators(currentStep) {
         for (let i = 1; i <= 3; i++) {
             const indicator = document.getElementById('step' + i + '-indicator');
             const line = document.getElementById('progress-line-' + i);
+            const label = indicator?.nextElementSibling;
             
             if (!indicator) continue;
             
             if (i < currentStep) {
-                // Completed step
-                indicator.className = 'w-10 h-10 mx-auto rounded-full bg-green-600 text-white flex items-center justify-center font-bold';
-                if (line) line.className = 'flex-1 h-1 bg-green-600';
+                // Completed step - green with checkmark
+                indicator.className = 'w-12 h-12 mx-auto rounded-full bg-gradient-to-br from-green-500 to-emerald-600 text-white flex items-center justify-center font-bold shadow-lg transition-all duration-300';
+                indicator.innerHTML = '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>';
+                if (line) line.className = 'flex-1 h-1.5 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full mx-2 transition-all duration-500';
+                if (label) label.className = 'text-xs mt-2 font-semibold text-green-600';
             } else if (i === currentStep) {
-                // Current step
-                indicator.className = 'w-10 h-10 mx-auto rounded-full bg-green-600 text-white flex items-center justify-center font-bold';
-                if (line) line.className = 'flex-1 h-1 bg-gray-300';
+                // Current step - gradient with animation
+                indicator.className = 'w-12 h-12 mx-auto rounded-full bg-gradient-to-br from-blue-500 to-purple-600 text-white flex items-center justify-center font-bold shadow-lg transition-all duration-300 animate-pulse';
+                indicator.textContent = i;
+                if (line) line.className = 'flex-1 h-1.5 bg-gray-200 rounded-full mx-2 transition-all duration-500';
+                if (label) label.className = 'text-xs mt-2 font-semibold text-blue-600';
             } else {
-                // Future step
-                indicator.className = 'w-10 h-10 mx-auto rounded-full bg-gray-300 text-gray-600 flex items-center justify-center font-bold';
-                if (line) line.className = 'flex-1 h-1 bg-gray-300';
+                // Future step - gray
+                indicator.className = 'w-12 h-12 mx-auto rounded-full bg-gray-200 text-gray-500 flex items-center justify-center font-bold transition-all duration-300';
+                indicator.textContent = i;
+                if (line) line.className = 'flex-1 h-1.5 bg-gray-200 rounded-full mx-2 transition-all duration-500';
+                if (label) label.className = 'text-xs mt-2 text-gray-500 font-medium';
             }
         }
     }
