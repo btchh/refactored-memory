@@ -274,22 +274,24 @@
                     ];
                     $config = $actionConfig[$log->action] ?? ['bg' => 'bg-gray-50', 'text' => 'text-gray-700', 'border' => 'border-gray-200', 'icon' => 'M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z'];
                 @endphp
-                <div class="bg-white rounded-xl border border-gray-200 p-4 hover:shadow-md transition-shadow">
-                    <!-- Header -->
-                    <div class="flex items-start justify-between gap-3 mb-3">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center text-gray-500 flex-shrink-0">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                </svg>
-                            </div>
-                            <div>
-                                <p class="text-sm font-medium text-gray-900">{{ $log->created_at->format('M j, Y') }}</p>
-                                <p class="text-xs text-gray-500">{{ $log->created_at->format('g:i A') }}</p>
-                            </div>
+                <div class="bg-white rounded-2xl border-2 border-gray-200 p-4 hover:shadow-lg transition-all">
+                    <!-- Header with Time -->
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center text-gray-500 flex-shrink-0">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
                         </div>
-                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 {{ $config['bg'] }} {{ $config['text'] }} border {{ $config['border'] }} rounded-lg text-xs font-semibold flex-shrink-0">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-bold text-gray-900">{{ $log->created_at->format('M j, Y') }}</p>
+                            <p class="text-xs text-gray-500 font-medium">{{ $log->created_at->format('g:i A') }}</p>
+                        </div>
+                    </div>
+
+                    <!-- Action Badge -->
+                    <div class="mb-3">
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 {{ $config['bg'] }} {{ $config['text'] }} border-2 {{ $config['border'] }} rounded-xl text-xs font-bold uppercase">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $config['icon'] }}"/>
                             </svg>
                             {{ ucfirst(str_replace('_', ' ', $log->action)) }}
@@ -297,29 +299,29 @@
                     </div>
 
                     <!-- Description -->
-                    <div class="mb-3">
-                        <p class="text-sm text-gray-900 break-words">
+                    <div class="mb-3 pb-3 border-b-2 border-gray-100">
+                        <p class="text-sm text-gray-900 font-medium leading-relaxed break-words">
                             {{ $log->description }}
                         </p>
                     </div>
 
                     <!-- Footer -->
-                    <div class="flex items-center justify-between gap-3 pt-3 border-t border-gray-100">
-                        <div class="flex items-center gap-2">
-                            <div class="w-7 h-7 rounded-full bg-primary-100 flex items-center justify-center flex-shrink-0">
-                                <span class="text-xs font-semibold text-primary-700">
+                    <div class="flex items-center justify-between gap-3">
+                        <div class="flex items-center gap-2 flex-1 min-w-0">
+                            <div class="w-8 h-8 rounded-full bg-gradient-to-br from-wash to-wash-dark flex items-center justify-center flex-shrink-0">
+                                <span class="text-xs font-black text-white">
                                     {{ strtoupper(substr($log->admin->fname, 0, 1)) }}{{ strtoupper(substr($log->admin->lname, 0, 1)) }}
                                 </span>
                             </div>
-                            <span class="text-xs text-gray-700 truncate">{{ $log->admin->fname }} {{ $log->admin->lname }}</span>
+                            <span class="text-xs text-gray-700 font-semibold truncate">{{ $log->admin->fname }} {{ $log->admin->lname }}</span>
                         </div>
                         @if($log->model_type)
                             <div class="flex items-center gap-1.5 flex-shrink-0">
-                                <span class="px-2 py-0.5 bg-gray-100 text-gray-700 rounded text-xs font-medium">
+                                <span class="px-2.5 py-1 bg-gray-100 text-gray-700 rounded-lg text-xs font-bold">
                                     {{ class_basename($log->model_type) }}
                                 </span>
                                 @if($log->model_id)
-                                    <span class="text-xs text-gray-400">#{{ $log->model_id }}</span>
+                                    <span class="text-xs text-gray-500 font-medium">#{{ $log->model_id }}</span>
                                 @endif
                             </div>
                         @endif

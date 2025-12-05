@@ -356,8 +356,9 @@ export class UserTracker {
         const routeInfo = document.getElementById('route-info');
         if (!routeInfo) return;
 
-        // Show the panel
+        // Show the panel (use flex to match the layout)
         routeInfo.classList.remove('hidden');
+        routeInfo.classList.add('flex');
 
         // Update the information
         document.getElementById('distance').textContent = user.distance_km ? `${user.distance_km} km` : '-';
@@ -365,7 +366,6 @@ export class UserTracker {
         document.getElementById('eta').textContent = user.eta || '-';
         document.getElementById('customer-name').textContent = user.name;
         document.getElementById('customer-address').textContent = user.address || '-';
-        document.getElementById('customer-phone').textContent = user.phone || '-';
 
         // Update Google Maps link
         const googleMapsLink = document.getElementById('google-maps-link');

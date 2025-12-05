@@ -1,6 +1,6 @@
 {
   "resources/css/app.css": {
-    "file": "assets/app-DBxZYHKm.css",
+    "file": "assets/app-D9NmaIVy.css",
     "src": "resources/css/app.css",
     "isEntry": true,
     "name": "app",
@@ -39,13 +39,13 @@
     "isEntry": true
   },
   "resources/js/pages/route-to-admin.js": {
-    "file": "assets/route-to-admin-B2plb7Fh.js",
+    "file": "assets/route-to-admin-Cnia7O1D.js",
     "name": "route-to-admin",
     "src": "resources/js/pages/route-to-admin.js",
     "isEntry": true
   },
   "resources/js/pages/route-to-user.js": {
-    "file": "assets/route-to-user-FwhWiEQ-.js",
+    "file": "assets/route-to-user-Vj_Q2D1O.js",
     "name": "route-to-user",
     "src": "resources/js/pages/route-to-user.js",
     "isEntry": true

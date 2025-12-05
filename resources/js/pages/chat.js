@@ -24,35 +24,46 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         
-        // Determine colors based on user type (green for user chat, blue for admin chat)
-        const isUserSide = currentUserType === 'user';
-        const ownBgColor = isUserSide ? 'bg-green-600' : 'bg-blue-600';
-        const ownTextColor = isUserSide ? 'text-green-200' : 'text-blue-200';
-        
         const messageDiv = document.createElement('div');
-        messageDiv.className = `flex ${isOwn ? 'justify-end' : 'justify-start'}`;
+        messageDiv.className = `flex ${isOwn ? 'justify-end' : 'justify-start'} animate-slide-in`;
         messageDiv.setAttribute('data-message-id', message.id);
         
-        // Show sender name for admin messages (since multiple admins can respond from same branch)
-        const showSenderName = message.sender_type === 'admin' && message.sender_name;
-        const senderNameColor = isUserSide ? 'text-green-600' : 'text-blue-600';
-        const senderNameHtml = showSenderName 
-            ? `<p class="text-xs font-semibold ${isOwn ? ownTextColor : senderNameColor} mb-1">${escapeHtml(message.sender_name)}</p>` 
-            : '';
+        if (isOwn) {
+            // Own message - gradient wash bubble
+            messageDiv.innerHTML = `
+                <div class="flex flex-col items-end max-w-[75%]">
+                    <div class="bg-gradient-to-br from-wash to-wash-dark rounded-2xl rounded-tr-md px-5 py-4 shadow-lg">
+                        <p class="text-sm text-white leading-relaxed font-medium">${escapeHtml(message.message)}</p>
+                    </div>
+                    <p class="text-xs font-semibold text-gray-400 mt-2 mr-3">${message.formatted_time}</p>
+                </div>
+            `;
+        } else {
+            // Other party's message - white bubble with avatar
+            const avatarContent = message.sender_type === 'admin' 
+                ? `<svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                   </svg>`
+                : `<svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                   </svg>`;
+            
+            messageDiv.innerHTML = `
+                <div class="flex gap-3 max-w-[75%]">
+                    <div class="w-10 h-10 bg-gray-200 rounded-xl flex items-center justify-center flex-shrink-0">
+                        ${avatarContent}
+                    </div>
+                    <div class="flex-1">
+                        <div class="bg-white border-2 border-gray-200 rounded-2xl rounded-tl-md px-5 py-4 shadow-sm">
+                            <p class="text-xs font-black text-gray-900 mb-2 uppercase">${escapeHtml(message.sender_name || 'User')}</p>
+                            <p class="text-sm text-gray-800 leading-relaxed">${escapeHtml(message.message)}</p>
+                        </div>
+                        <p class="text-xs font-semibold text-gray-400 mt-2 ml-3">${message.formatted_time}</p>
+                    </div>
+                </div>
+            `;
+        }
         
-        const bubbleClass = isOwn 
-            ? `${ownBgColor} text-white rounded-2xl rounded-br-md` 
-            : 'bg-white text-gray-900 rounded-2xl rounded-bl-md shadow-sm border border-gray-100';
-        
-        messageDiv.innerHTML = `
-            <div class="max-w-[75%] ${bubbleClass} px-4 py-3">
-                ${senderNameHtml}
-                <p class="text-sm leading-relaxed">${escapeHtml(message.message)}</p>
-                <p class="text-xs ${isOwn ? ownTextColor : 'text-gray-400'} mt-2 text-right">
-                    ${message.formatted_time}
-                </p>
-            </div>
-        `;
         messagesContainer.appendChild(messageDiv);
         scrollToBottom();
         

@@ -2,7 +2,7 @@
     <x-slot:title>Chat - {{ $branchAddress }}</x-slot:title>
 
     <!-- Modern Chat Interface -->
-    <div class="fixed inset-0 top-[72px] bg-gradient-to-br from-gray-50 to-gray-100 flex flex-col">
+    <div class="fixed inset-0 top-[72px] left-0 lg:left-64 bg-gradient-to-br from-gray-50 to-gray-100 flex flex-col">
         <!-- Chat Header -->
         <div class="bg-white border-b-2 border-gray-200 px-6 py-5 flex items-center justify-between shadow-sm">
             <div class="flex items-center gap-4">

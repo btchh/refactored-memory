@@ -311,8 +311,9 @@ export class AdminTracker {
         const routeInfo = document.getElementById('route-info');
         if (!routeInfo) return;
 
-        // Show the panel
+        // Show the panel (use flex to match the layout)
         routeInfo.classList.remove('hidden');
+        routeInfo.classList.add('flex');
 
         // Update the information
         document.getElementById('distance').textContent = admin.distance_km ? `${admin.distance_km} km` : '-';
@@ -324,11 +325,6 @@ export class AdminTracker {
         const shopAddress = document.getElementById('shop-address');
         if (shopAddress) {
             shopAddress.textContent = admin.address || '-';
-        }
-        
-        const shopPhone = document.getElementById('shop-phone');
-        if (shopPhone) {
-            shopPhone.textContent = admin.phone || '-';
         }
 
         // Update Google Maps link
