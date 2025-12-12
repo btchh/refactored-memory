@@ -10,19 +10,46 @@ use Illuminate\Support\Facades\Hash;
 class AuthService
 {
     protected $auditService;
+    protected $loginAttemptService;
 
-    public function __construct(AuditService $auditService)
+    public function __construct(AuditService $auditService, LoginAttemptService $loginAttemptService)
     {
         $this->auditService = $auditService;
+        $this->loginAttemptService = $loginAttemptService;
     }
 
     //attempt user login
     public function loginUser(
         string $loginField,
         string $password,
-        bool $remember = false
+        bool $remember = false,
+        ?string $ipAddress = null
     ): array {
         $feildType = filter_var($loginField, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
+        $ipAddress = $ipAddress ?? request()->ip();
+
+        // Check current state before attempting
+        $currentState = $this->loginAttemptService->checkState($loginField, $ipAddress, 'login');
+        
+        // Block for spam attacks
+        if ($currentState['action'] === 'block') {
+            return [
+                'success' => false,
+                'message' => $currentState['message'],
+                'reason' => 'spam_blocked',
+                'action' => 'block',
+            ];
+        }
+        
+        // Redirect for too many attempts (but allow them to try)
+        if ($currentState['action'] === 'redirect') {
+            return [
+                'success' => false,
+                'message' => $currentState['message'],
+                'reason' => 'too_many_attempts',
+                'action' => 'redirect',
+            ];
+        }
 
         // First check if user exists (including soft-deleted users)
         $user = User::withTrashed()->where($feildType, $loginField)->first();
@@ -48,6 +75,9 @@ class AuthService
             
             // User is active, proceed with login
             if (Auth::guard('web')->attempt([$feildType => $loginField, 'password' => $password], $remember)) {
+                // Clear failed attempts on successful login
+                $this->loginAttemptService->clearAttempts($loginField, $ipAddress);
+                
                 $user = Auth::guard('web')->user();
                 return [
                     'success' => true,
@@ -57,9 +87,13 @@ class AuthService
             }
         }
 
+        // Record failed attempt and get warning state
+        $attemptState = $this->loginAttemptService->recordFailedAttempt($loginField, $ipAddress);
+
         return [
             'success' => false,
             'message' => 'Invalid Credentials',
+            'attempt_warning' => $attemptState,
         ];
     }
 
@@ -67,11 +101,39 @@ class AuthService
     public function loginAdmin(
         string $loginField,
         string $password,
-        bool $remember = false
+        bool $remember = false,
+        ?string $ipAddress = null
     ): array {
         $feildType = filter_var($loginField, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
+        $ipAddress = $ipAddress ?? request()->ip();
+
+        // Check current state before attempting
+        $currentState = $this->loginAttemptService->checkState($loginField, $ipAddress, 'login');
+        
+        // Block for spam attacks
+        if ($currentState['action'] === 'block') {
+            return [
+                'success' => false,
+                'message' => $currentState['message'],
+                'reason' => 'spam_blocked',
+                'action' => 'block',
+            ];
+        }
+        
+        // Redirect for too many attempts (but allow them to try)
+        if ($currentState['action'] === 'redirect') {
+            return [
+                'success' => false,
+                'message' => $currentState['message'],
+                'reason' => 'too_many_attempts',
+                'action' => 'redirect',
+            ];
+        }
 
         if (Auth::guard('admin')->attempt([$feildType => $loginField, 'password' => $password], $remember)) {
+            // Clear failed attempts on successful login
+            $this->loginAttemptService->clearAttempts($loginField, $ipAddress);
+            
             $admin = Auth::guard('admin')->user();
             
             // Log the login action
@@ -84,9 +146,13 @@ class AuthService
             ];
         }
 
+        // Record failed attempt and get warning state
+        $attemptState = $this->loginAttemptService->recordFailedAttempt($loginField, $ipAddress);
+
         return [
             'success' => false,
             'message' => 'Invalid Credentials',
+            'attempt_warning' => $attemptState,
         ];
     }
 
@@ -96,13 +162,19 @@ class AuthService
         /** @var \App\Models\User $user */
         $user = Auth::guard('web')->user();
 
-        // Clear remember token if it exists
-        if ($user && !empty($user->remember_token)) {
+        if ($user) {
+            // Clear remember token
             $user->remember_token = null;
             $user->save();
         }
 
+        // Logout and forget the user completely
         Auth::guard('web')->logout();
+        
+        // Also logout from admin guard if somehow logged in
+        if (Auth::guard('admin')->check()) {
+            Auth::guard('admin')->logout();
+        }
 
         return true;
     }
@@ -110,18 +182,25 @@ class AuthService
     //admin logout
     public function logoutAdmin(): bool
     {
-        /** @var \App\Models\Admin @admin */
+        /** @var \App\Models\Admin $admin */
         $admin = Auth::guard('admin')->user();
 
         // Log the logout action before logging out
         $this->auditService->logLogout();
 
-        if ($admin && !empty($admin->remember_token)) {
+        if ($admin) {
+            // Clear remember token
             $admin->remember_token = null;
             $admin->save();
         }
 
+        // Logout and forget the admin completely
         Auth::guard('admin')->logout();
+        
+        // Also logout from web guard if somehow logged in
+        if (Auth::guard('web')->check()) {
+            Auth::guard('web')->logout();
+        }
 
         return true;
     }

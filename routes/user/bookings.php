@@ -4,10 +4,10 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\User\BookingController;
 
 Route::middleware(['auth:web', 'prevent.back', 'check.user.status'])->group(function () {
-    // Booking - Progressive rate limiting (10 attempts, then 5min, 10min, 15min...)
+    // Booking - DB rate limiting with warnings
     Route::get('booking', [BookingController::class, 'showBooking'])->name('booking');
     Route::post('booking', [BookingController::class, 'submitBooking'])
-        ->middleware('rate.limit.progressive:booking')
+        ->middleware('rate.limit:booking')
         ->name('booking.submit');
     
     // Booking AJAX Endpoints

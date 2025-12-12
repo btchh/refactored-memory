@@ -4,24 +4,21 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\Auth\LoginController;
 use App\Http\Controllers\Admin\Auth\PasswordResetController;
 
-// Public routes (Authentication) with progressive rate limiting
+// Public routes (Authentication)
 Route::middleware(['guest:admin'])->group(function () {
-    // Login - Progressive rate limiting (5 attempts, then 5min, 10min, 15min...)
+    // Login - attempts tracked in database with warning/redirect flow
     Route::get('login', [LoginController::class, 'showLogin'])->name('login');
-    Route::post('login', [LoginController::class, 'login'])
-        ->middleware('rate.limit.progressive:login')
-        ->name('login.submit');
+    Route::post('login', [LoginController::class, 'login'])->name('login.submit');
     
-    // Password Reset - Rate limiting disabled for testing
+    // Password Reset - DB rate limiting with warnings
     Route::get('forgot-password', [PasswordResetController::class, 'showForgotPassword'])->name('forgot-password');
     Route::post('send-password-reset-otp', [PasswordResetController::class, 'sendPasswordReset'])
-        // ->middleware('rate.limit.progressive:otp')
+        ->middleware('rate.limit:otp')
         ->name('send-password-reset-otp');
     Route::post('verify-password-reset-otp', [PasswordResetController::class, 'verifyPasswordReset'])
-        // ->middleware('rate.limit.progressive:otp')
+        ->middleware('rate.limit:otp')
         ->name('verify-password-reset-otp');
     Route::post('reset-password', [PasswordResetController::class, 'resetPassword'])
-        // ->middleware('rate.limit.progressive:login')
         ->name('reset-password.submit');
 });
 

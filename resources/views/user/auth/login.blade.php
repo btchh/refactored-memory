@@ -31,22 +31,21 @@
                 @endif
 
                 <!-- Login Form -->
-                <form action="{{ route('user.login') }}" method="POST" class="space-y-6">
+                <form action="{{ route('user.login') }}" method="POST" class="space-y-6" autocomplete="off">
                     @csrf
                     
                     <!-- Username Input -->
                     <div class="form-group">
                         <label for="username" class="form-label">Username <span class="text-error">*</span></label>
                         <input type="text" id="username" name="username" class="form-input" 
-                            placeholder="Enter your username" required>
+                            placeholder="Enter your username" required autocomplete="username">
                     </div>
                     
                     <!-- Password Input -->
                     <div class="form-group">
                         <label for="password" class="form-label">Password <span class="text-error">*</span></label>
                         <input type="password" id="password" name="password" class="form-input" 
-                            placeholder="Enter your password" required>
-                    </div>
+                            placeholder="Enter your password" required autocomplete="current-password">
 
                     <!-- Remember Me -->
                     <div class="flex items-center">

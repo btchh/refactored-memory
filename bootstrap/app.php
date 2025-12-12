@@ -23,7 +23,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'prevent.back' => \App\Http\Middleware\PreventBackHistory::class,
             'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
             'check.user.status' => \App\Http\Middleware\CheckUserStatus::class,
-            'rate.limit.progressive' => \App\Http\Middleware\ProgressiveRateLimiter::class,
+            'rate.limit' => \App\Http\Middleware\RateLimitMiddleware::class,
         ]);
         
         // Configure authentication redirects for different guards
