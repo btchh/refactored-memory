@@ -227,9 +227,9 @@ class Transaction extends Model
             return 'Self Pickup';
         }
         
-        // Self Service: customer_dropoff + customer_pickup
+        // Drop & Collect: customer_dropoff + customer_pickup
         if ($this->pickup_method === 'customer_dropoff' && $this->delivery_method === 'customer_pickup') {
-            return 'Self Service';
+            return 'Drop & Collect';
         }
         
         // Fallback for any other combination
@@ -247,9 +247,9 @@ class Transaction extends Model
     }
 
     /**
-     * Check if self service (customer handles both)
+     * Check if drop & collect (customer handles both drop-off and pickup)
      */
-    public function isSelfService()
+    public function isDropAndCollect()
     {
         return $this->isCustomerDropoff() && $this->isCustomerPickup();
     }

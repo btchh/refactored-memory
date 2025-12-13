@@ -28,26 +28,16 @@ class AuthService
         $feildType = filter_var($loginField, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
         $ipAddress = $ipAddress ?? request()->ip();
 
-        // Check current state before attempting
+        // Check current state - only block for obvious spam attacks
         $currentState = $this->loginAttemptService->checkState($loginField, $ipAddress, 'login');
         
-        // Block for spam attacks
+        // Only hard block for spam attacks (15+ attempts)
         if ($currentState['action'] === 'block') {
             return [
                 'success' => false,
                 'message' => $currentState['message'],
                 'reason' => 'spam_blocked',
                 'action' => 'block',
-            ];
-        }
-        
-        // Redirect for too many attempts (but allow them to try)
-        if ($currentState['action'] === 'redirect') {
-            return [
-                'success' => false,
-                'message' => $currentState['message'],
-                'reason' => 'too_many_attempts',
-                'action' => 'redirect',
             ];
         }
 
@@ -90,6 +80,7 @@ class AuthService
         // Record failed attempt and get warning state
         $attemptState = $this->loginAttemptService->recordFailedAttempt($loginField, $ipAddress);
 
+        // Return with appropriate warning/redirect action
         return [
             'success' => false,
             'message' => 'Invalid Credentials',
@@ -107,26 +98,16 @@ class AuthService
         $feildType = filter_var($loginField, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
         $ipAddress = $ipAddress ?? request()->ip();
 
-        // Check current state before attempting
+        // Check current state - only block for obvious spam attacks
         $currentState = $this->loginAttemptService->checkState($loginField, $ipAddress, 'login');
         
-        // Block for spam attacks
+        // Only hard block for spam attacks (15+ attempts)
         if ($currentState['action'] === 'block') {
             return [
                 'success' => false,
                 'message' => $currentState['message'],
                 'reason' => 'spam_blocked',
                 'action' => 'block',
-            ];
-        }
-        
-        // Redirect for too many attempts (but allow them to try)
-        if ($currentState['action'] === 'redirect') {
-            return [
-                'success' => false,
-                'message' => $currentState['message'],
-                'reason' => 'too_many_attempts',
-                'action' => 'redirect',
             ];
         }
 
@@ -149,6 +130,7 @@ class AuthService
         // Record failed attempt and get warning state
         $attemptState = $this->loginAttemptService->recordFailedAttempt($loginField, $ipAddress);
 
+        // Return with appropriate warning/redirect action
         return [
             'success' => false,
             'message' => 'Invalid Credentials',

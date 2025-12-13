@@ -33,6 +33,11 @@ return [
         'delivery_tomorrow' => 'Reminder! Your pickup and delivery service #:booking_id is scheduled for tomorrow, :schedule. Please prepare your laundry items.',
     ],
 
+    'admin' => [
+        'booking_cancelled_by_customer' => 'ALERT: Customer :customer_name has cancelled booking #:booking_id scheduled for :schedule. Reason: :reason. Please review and update your schedule.',
+        'new_booking' => 'New booking received! Booking #:booking_id from :customer_name for :schedule. Service: :service_description. Please prepare accordingly.',
+    ],
+
     'general' => [
         'welcome' => 'Welcome to WashHour Laundry Shop! Your registration is successful. You can now book our services online. For assistance, contact us at :contact_number.',
     ],

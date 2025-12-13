@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Storage;
 
 class Message extends Model
 {
@@ -12,6 +13,9 @@ class Message extends Model
         'sender_type',
         'sender_id',
         'message',
+        'attachment_path',
+        'attachment_type',
+        'attachment_name',
         'is_read',
         'read_at',
     ];
@@ -20,6 +24,8 @@ class Message extends Model
         'is_read' => 'boolean',
         'read_at' => 'datetime',
     ];
+
+    protected $appends = ['attachment_url', 'has_attachment'];
 
     public function conversation(): BelongsTo
     {
@@ -52,5 +58,23 @@ class Message extends Model
                 'read_at' => now(),
             ]);
         }
+    }
+
+    public function getAttachmentUrlAttribute(): ?string
+    {
+        if (!$this->attachment_path) {
+            return null;
+        }
+        return Storage::url($this->attachment_path);
+    }
+
+    public function getHasAttachmentAttribute(): bool
+    {
+        return !empty($this->attachment_path);
+    }
+
+    public function isImage(): bool
+    {
+        return $this->attachment_type === 'image';
     }
 }

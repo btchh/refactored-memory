@@ -3,16 +3,21 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Traits\HasFilters;
 use App\Models\User;
 use App\Models\Service;
 use App\Models\Product;
+use App\Models\Transaction;
 use App\Services\BookingService;
 use App\Services\CalApiService;
+use App\Services\FilterService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class BookingController extends Controller
 {
+    use HasFilters;
+
     protected $bookingService;
     protected $calApiService;
 
@@ -20,6 +25,7 @@ class BookingController extends Controller
     {
         $this->bookingService = $bookingService;
         $this->calApiService = $calApiService;
+        $this->initializeFilters();
     }
 
     /**
@@ -366,13 +372,25 @@ class BookingController extends Controller
     }
 
     /**
-     * Cancel a booking
+     * Cancel a booking (DELETE method)
      */
     public function cancel(Request $request, $id)
     {
         $reason = $request->input('reason');
 
-        $result = $this->bookingService->cancelBooking($id, $reason);
+        $result = $this->bookingService->cancelBooking($id, $reason, true); // byAdmin = true
+
+        return response()->json($result);
+    }
+
+    /**
+     * Cancel a booking with reason (POST method)
+     */
+    public function cancelWithReason(Request $request, $id)
+    {
+        $reason = $request->input('reason', 'Cancelled by admin');
+
+        $result = $this->bookingService->cancelBooking($id, $reason, true); // byAdmin = true
 
         return response()->json($result);
     }

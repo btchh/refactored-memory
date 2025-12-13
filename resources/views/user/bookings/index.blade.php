@@ -23,7 +23,7 @@
                 <div class="bg-white rounded-2xl border-2 border-gray-200 p-6">
                     <h2 class="text-xl font-black text-gray-900 mb-4">Select Date</h2>
                     
-                    <div id="calendar-container" class="mb-4">
+                    <div id="calendar-container" class="date-time-picker mb-4">
                         <div class="flex justify-between items-center mb-4">
                             <button id="prev-month" class="p-2 hover:bg-gray-100 rounded-lg">
                                 <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -69,7 +69,8 @@
                     @csrf
 
                     <!-- Service Type Selection - Four Options -->
-                    <div class="bg-white rounded-2xl border-2 border-gray-200 p-6">
+<parameter name="path">resources/views/user/bookings/index.blade.php                 <!-- Service Type Selection - Four Options -->
+                    <div class="pickup-delivery-options bg-white rounded-2xl border-2 border-gray-200 p-6">
                         <h2 class="text-xl font-black text-gray-900 mb-2">Choose Your Service</h2>
                         <p class="text-sm text-gray-500 mb-4">Select how you want your laundry picked up and delivered</p>
                         
@@ -119,7 +120,7 @@
                                         <div class="flex-1">
                                             <h3 class="font-bold text-gray-900 mb-1">Self Drop-off</h3>
                                             <p class="text-xs text-gray-500 mb-2">You drop off, we deliver</p>
-                                            <span class="inline-block px-2 py-1 bg-green-100 text-green-700 text-xs font-medium rounded">Save on Pickup</span>
+                                            <span class="inline-block px-2 py-1 bg-green-100 text-green-700 text-xs font-medium rounded">Drop Off at Branch</span>
                                         </div>
                                     </div>
                                 </div>
@@ -143,15 +144,15 @@
                                         <div class="flex-1">
                                             <h3 class="font-bold text-gray-900 mb-1">Self Pickup</h3>
                                             <p class="text-xs text-gray-500 mb-2">We pick up, you collect</p>
-                                            <span class="inline-block px-2 py-1 bg-purple-100 text-purple-700 text-xs font-medium rounded">Save on Delivery</span>
+                                            <span class="inline-block px-2 py-1 bg-purple-100 text-purple-700 text-xs font-medium rounded">Collect at Branch</span>
                                         </div>
                                     </div>
                                 </div>
                             </label>
 
-                            <!-- Self Service -->
+                            <!-- Drop & Collect -->
                             <label class="service-option-card cursor-pointer group" data-pickup="customer_dropoff" data-delivery="customer_pickup">
-                                <input type="radio" name="service_option" value="self_service" class="hidden">
+                                <input type="radio" name="service_option" value="drop_collect" class="hidden">
                                 <div class="relative border-2 border-gray-200 rounded-xl p-4 transition-all duration-200 hover:border-orange-300 hover:shadow-md group-has-[:checked]:border-orange-500 group-has-[:checked]:bg-orange-50 group-has-[:checked]:shadow-lg">
                                     <div class="absolute top-3 right-3 w-5 h-5 rounded-full border-2 border-gray-300 flex items-center justify-center group-has-[:checked]:border-orange-500 group-has-[:checked]:bg-orange-500">
                                         <svg class="w-3 h-3 text-white hidden group-has-[:checked]:block" fill="currentColor" viewBox="0 0 20 20">
@@ -161,13 +162,13 @@
                                     <div class="flex items-start gap-3">
                                         <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center flex-shrink-0 group-has-[:checked]:bg-orange-200">
                                             <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
                                             </svg>
                                         </div>
                                         <div class="flex-1">
-                                            <h3 class="font-bold text-gray-900 mb-1">Self Service</h3>
-                                            <p class="text-xs text-gray-500 mb-2">You drop off & collect</p>
-                                            <span class="inline-block px-2 py-1 bg-orange-100 text-orange-700 text-xs font-medium rounded">Best Price</span>
+                                            <h3 class="font-bold text-gray-900 mb-1">Drop & Collect</h3>
+                                            <p class="text-xs text-gray-500 mb-2">Visit branch to drop off & pick up</p>
+                                            <span class="inline-block px-2 py-1 bg-orange-100 text-orange-700 text-xs font-medium rounded">Visit Branch</span>
                                         </div>
                                     </div>
                                 </div>
@@ -221,7 +222,7 @@
                     </div>
 
                     <!-- Branch Selection -->
-                    <div class="bg-white rounded-2xl border-2 border-gray-200 p-6">
+                    <div class="branch-selector bg-white rounded-2xl border-2 border-gray-200 p-6">
                         <div class="flex items-center gap-3 mb-4">
                             <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
                                 <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -315,7 +316,7 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <input type="text" name="pickup_address" id="pickup_address" value="{{ $user->address }}" class="form-input bg-white/80 backdrop-blur" readonly>
+                            <input type="text" name="pickup_address" id="pickup_address" value="{{ $user->address }}" class="form-input bg-white" placeholder="Enter pickup address">
                         </div>
                         <input type="hidden" name="latitude" id="latitude" value="{{ $user->latitude }}">
                         <input type="hidden" name="longitude" id="longitude" value="{{ $user->longitude }}">
@@ -390,7 +391,7 @@
                             </div>
                             
                             <!-- Services -->
-                            <div class="md:col-span-2">
+                            <div class="service-selector md:col-span-2">
                                 <label class="block text-sm font-medium text-gray-700 mb-3">Services</label>
                                 <div id="services-container" class="grid grid-cols-2 gap-3">
                                     <p class="text-gray-400 col-span-2 text-sm text-center py-4 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200">Select a branch and item type first</p>
@@ -413,7 +414,7 @@
                         </div>
 
                         <!-- Total & Actions -->
-                        <div class="mt-8 pt-6 border-t-2 border-gray-200">
+                        <div class="booking-summary mt-8 pt-6 border-t-2 border-gray-200">
                             <div class="bg-gradient-to-r from-wash/10 to-wash/5 rounded-2xl p-6 mb-4 border-2 border-wash/20">
                                 <div class="flex items-center justify-between">
                                     <div class="flex items-center gap-3">
@@ -457,4 +458,11 @@
     </script>
     @vite(['resources/js/pages/user-booking.js'])
     @endpush
+
+    <!-- Help Tour Button -->
+    <button class="help-tour-btn" onclick="if(window.tour) window.tour.startUserBookingForm()" title="Take a tour of this page">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+    </button>
 </x-layout>

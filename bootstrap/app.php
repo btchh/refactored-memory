@@ -13,7 +13,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withBroadcasting(
         __DIR__.'/../routes/channels.php',
-        ['prefix' => 'api', 'middleware' => ['web', 'auth:web,admin']],
+        ['middleware' => ['web', 'auth:web,admin']],
     )
     ->withMiddleware(function (Middleware $middleware): void {
         // Global security headers for production

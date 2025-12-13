@@ -86,7 +86,7 @@
                     </div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         @foreach($availableBranches as $branch)
-                            <a href="{{ route('user.messages.show', ['branchAddress' => urlencode($branch)]) }}" 
+                            <a href="{{ route('user.messages.show', ['branchAddress' => $branch]) }}" 
                                class="group flex items-center gap-3 p-4 bg-white hover:bg-wash border-2 border-gray-200 hover:border-wash rounded-xl transition-all">
                                 <div class="w-12 h-12 bg-gray-100 group-hover:bg-white rounded-xl flex items-center justify-center flex-shrink-0 transition-colors">
                                     <svg class="w-6 h-6 text-gray-600 group-hover:text-wash transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -103,7 +103,7 @@
             <!-- Conversations List - Redesigned -->
             <div class="space-y-3">
                 @forelse($conversations as $conversation)
-                    <a href="{{ route('user.messages.show', ['branchAddress' => urlencode($conversation->branch_address)]) }}" 
+                    <a href="{{ route('user.messages.show', ['branchAddress' => $conversation->branch_address]) }}" 
                        class="group block bg-white hover:bg-gray-50 rounded-2xl p-6 border-2 border-gray-200 hover:border-wash transition-all">
                         <div class="flex items-center gap-5">
                             <div class="relative">

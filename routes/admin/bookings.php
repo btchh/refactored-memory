@@ -19,6 +19,7 @@ Route::middleware(['auth:admin', 'prevent.back'])->group(function () {
     Route::put('bookings/{id}', [BookingController::class, 'update'])->name('bookings.update');
     Route::post('bookings/{id}/reschedule', [BookingController::class, 'reschedule'])->name('bookings.reschedule');
     Route::delete('bookings/{id}', [BookingController::class, 'cancel'])->name('bookings.cancel');
+    Route::post('bookings/{id}/cancel', [BookingController::class, 'cancelWithReason'])->name('bookings.cancel.reason');
     Route::patch('bookings/{id}/status', [BookingController::class, 'updateStatus'])->name('bookings.status');
     
     // Booking AJAX Endpoints

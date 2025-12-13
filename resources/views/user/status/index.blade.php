@@ -83,92 +83,116 @@
             </div>
         </div>
 
-        <!-- Order Details -->
-        <div class="space-y-4">
-            @forelse($bookings as $index => $booking)
-                <!-- Content Card for each order -->
-                <div class="bg-white rounded-2xl border-2 border-gray-200 p-6">
-                    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                        <!-- Order Number & Status -->
-                        <div class="flex items-center gap-4">
-                            <div class="bg-wash rounded-full w-16 h-16 flex items-center justify-center text-white font-black text-xl shadow-md">
-                                #{{ $index + 1 }}
-                            </div>
-                            <div>
-                                <h3 class="text-xl font-black text-gray-900 mb-2">Order #{{ $booking['id'] ?? $index + 1 }}</h3>
-                                <div class="flex flex-wrap gap-2">
-                                    @php
-                                        $statusClass = match($booking['status']) {
-                                            'pending' => 'badge-pending',
-                                            'in_progress' => 'badge-in-progress',
-                                            'completed' => 'badge-completed',
-                                            'cancelled' => 'badge-cancelled',
-                                            default => 'badge-pending'
-                                        };
-                                        $statusLabel = match($booking['status']) {
-                                            'pending' => 'Pending',
-                                            'in_progress' => 'In Progress',
-                                            'completed' => 'Completed',
-                                            'cancelled' => 'Cancelled',
-                                            default => ucfirst($booking['status'])
-                                        };
-                                    @endphp
-                                    <span class="badge {{ $statusClass }}">{{ $statusLabel }}</span>
-                                </div>
-                            </div>
-                        </div>
+        <!-- Order List -->
+        <div class="bg-white rounded-2xl border-2 border-gray-200 p-6">
+            <div class="flex items-center justify-between mb-5">
+                <h2 class="text-xl font-black text-gray-900">Active Orders</h2>
+            </div>
 
-                        <!-- Date & Time -->
-                        <div class="flex flex-wrap gap-6 text-sm">
-                            <div class="flex items-center gap-2">
-                                <svg class="w-5 h-5 text-wash" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                </svg>
-                                <div>
-                                    <p class="text-gray-500 text-xs font-bold uppercase">Date</p>
-                                    <p class="font-bold text-gray-900">{{ $booking['date'] }}</p>
+            <div class="space-y-4">
+                @forelse($bookings as $index => $booking)
+                    <div class="booking-card group bg-white rounded-xl border-2 border-gray-200 hover:border-wash hover:shadow-lg transition-all overflow-hidden">
+                        <div class="p-6">
+                            <div class="flex flex-col lg:flex-row lg:items-start gap-6">
+                                <!-- Order Info -->
+                                <div class="flex-1">
+                                    <div class="flex items-start gap-4">
+                                        <!-- Order Number Badge -->
+                                        <div class="w-14 h-14 bg-gradient-to-br from-wash to-wash-dark rounded-xl flex items-center justify-center text-white font-bold text-lg shadow-lg flex-shrink-0">
+                                            {{ $booking['id'] ?? $index + 1 }}
+                                        </div>
+                                        
+                                        <div class="flex-1 min-w-0">
+                                            <div class="flex items-center gap-3 mb-2">
+                                                <h3 class="text-lg font-bold text-gray-900">Order #{{ $booking['id'] ?? $index + 1 }}</h3>
+                                                @php
+                                                    $badgeClass = match($booking['status']) {
+                                                        'pending' => 'badge badge-pending',
+                                                        'in_progress' => 'badge badge-in-progress',
+                                                        'completed' => 'badge badge-completed',
+                                                        'cancelled' => 'badge badge-cancelled',
+                                                        default => 'badge badge-pending'
+                                                    };
+                                                @endphp
+                                                <span class="{{ $badgeClass }}">
+                                                    {{ str_replace('_', ' ', $booking['status']) }}
+                                                </span>
+                                            </div>
+                                        
+                                            <!-- Date & Time -->
+                                            <div class="flex flex-wrap items-center gap-4 text-sm text-gray-500">
+                                                <div class="flex items-center gap-2">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                    </svg>
+                                                    <span>{{ $booking['date'] }}</span>
+                                                </div>
+                                                <div class="flex items-center gap-2">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                    </svg>
+                                                    <span>{{ $booking['time'] }}</span>
+                                                </div>
+                                                @if(isset($booking['service_description']))
+                                                <div class="flex items-center gap-2">
+                                                    <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
+                                                    </svg>
+                                                    <span class="text-blue-600">{{ $booking['service_description'] }}</span>
+                                                </div>
+                                                @endif
+                                            </div>
+                                            
+                                            <!-- Branch Info -->
+                                            @if(isset($booking['branch_name']))
+                                            <div class="flex items-center gap-2 mt-2 text-sm">
+                                                <svg class="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                                                </svg>
+                                                <span class="text-purple-600 font-medium">{{ $booking['branch_name'] }}</span>
+                                                @if(isset($booking['branch_address']))
+                                                    <span class="text-gray-400">•</span>
+                                                    <span class="text-gray-500 truncate max-w-xs" title="{{ $booking['branch_address'] }}">{{ Str::limit($booking['branch_address'], 30) }}</span>
+                                                @endif
+                                            </div>
+                                            @endif
+                                                
+                                            <!-- Services Tags -->
+                                            <div class="flex flex-wrap gap-2 mt-4">
+                                                @foreach($booking['services'] as $service)
+                                                    <span class="inline-flex items-center px-3 py-1.5 bg-wash/5 text-wash rounded-lg text-sm font-bold border border-wash/20">
+                                                        {{ $service['name'] }}
+                                                        @if(isset($service['price']))
+                                                            <span class="ml-2 text-wash/70">₱{{ $service['price'] }}</span>
+                                                        @endif
+                                                    </span>
+                                                @endforeach
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Price & Actions -->
+                                <div class="flex lg:flex-col items-center lg:items-end justify-between lg:justify-start gap-4 pt-4 lg:pt-0 border-t lg:border-t-0 border-gray-100">
+                                    @if(isset($booking['total']))
+                                    <div class="text-right">
+                                        <p class="text-xs text-gray-600 font-bold uppercase tracking-wide mb-1">Total</p>
+                                        <p class="text-3xl font-black text-gray-900">₱{{ number_format($booking['total'], 2) }}</p>
+                                    </div>
+                                    @endif
+                                    
+                                    @if($booking['status'] === 'pending')
+                                        <button onclick="cancelUserBooking({{ $booking['id'] }})" class="btn btn-error">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                            </svg>
+                                            Cancel Order
+                                        </button>
+                                    @endif
                                 </div>
                             </div>
-                            <div class="flex items-center gap-2">
-                                <svg class="w-5 h-5 text-wash" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                                <div>
-                                    <p class="text-gray-500 text-xs font-bold uppercase">Time</p>
-                                    <p class="font-bold text-gray-900">{{ $booking['time'] }}</p>
-                                </div>
-                            </div>
-                            @if(isset($booking['branch_name']))
-                            <div class="flex items-center gap-2">
-                                <svg class="w-5 h-5 text-wash" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
-                                </svg>
-                                <div>
-                                    <p class="text-gray-500 text-xs font-bold uppercase">Branch</p>
-                                    <p class="font-bold text-wash">{{ $booking['branch_name'] }}</p>
-                                </div>
-                            </div>
-                            @endif
                         </div>
                     </div>
-
-                    <!-- Services -->
-                    <div class="mt-6 pt-6 border-t-2 border-gray-200">
-                        <p class="text-sm font-bold text-gray-600 mb-3 flex items-center gap-2 uppercase">
-                            <svg class="w-4 h-4 text-wash" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                            </svg>
-                            Services:
-                        </p>
-                        <div class="flex flex-wrap gap-2">
-                            @foreach($booking['services'] as $service)
-                                <span class="px-3 py-2 bg-gray-100 border-2 border-gray-200 text-gray-900 rounded-xl font-semibold text-sm">
-                                    {{ $service['name'] }}
-                                </span>
-                            @endforeach
-                        </div>
-                    </div>
-                </div>
             @empty
                 <!-- Empty State Content Card -->
                 <div class="bg-white rounded-2xl border-2 border-dashed border-gray-300 p-12 text-center">
@@ -189,4 +213,27 @@
             @endforelse
         </div>
     </div>
+
+    @push('scripts')
+    <script>
+        // Make cancel function available globally
+        window.cancelUserBooking = function(bookingId) {
+            if (typeof window.showCancelModal === 'function') {
+                window.showCancelModal(bookingId, {
+                    type: 'user',
+                    cancelUrl: '/user/api/bookings/__ID__/cancel',
+                    csrfToken: '{{ csrf_token() }}',
+                    onSuccess: () => {
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 1000);
+                    }
+                });
+            } else {
+                console.error('showCancelModal function not available');
+                alert('Cancel function not loaded. Please refresh the page.');
+            }
+        };
+    </script>
+    @endpush
 </x-layout>

@@ -12,7 +12,7 @@
         @endphp
 
         <!-- Hero Header -->
-        <div class="relative bg-gradient-to-br from-wash via-wash-dark to-gray-900 rounded-2xl p-12 overflow-hidden">
+        <div class="history-header relative bg-gradient-to-br from-wash via-wash-dark to-gray-900 rounded-2xl p-12 overflow-hidden">
             <!-- Decorative Background -->
             <div class="absolute inset-0 opacity-10">
                 <div class="absolute top-0 right-0 w-64 h-64 bg-white rounded-full -translate-y-1/2 translate-x-1/2"></div>
@@ -27,7 +27,7 @@
         </div>
 
         <!-- Stat Cards -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="grid grid-cols-2 gap-4">
             <!-- Total Orders -->
             <div class="group relative bg-white rounded-2xl p-6 border-2 border-gray-200 hover:border-wash transition-all overflow-hidden">
                 <div class="absolute top-0 right-0 w-24 h-24 bg-wash/5 rounded-full -translate-y-1/2 translate-x-1/2 group-hover:scale-150 transition-transform"></div>
@@ -55,34 +55,6 @@
                     <p class="text-3xl font-black text-gray-900">{{ $completedOrders }}</p>
                 </div>
             </div>
-
-            <!-- In Progress Orders -->
-            <div class="group relative bg-white rounded-2xl p-6 border-2 border-gray-200 hover:border-info transition-all overflow-hidden">
-                <div class="absolute top-0 right-0 w-24 h-24 bg-info/5 rounded-full -translate-y-1/2 translate-x-1/2 group-hover:scale-150 transition-transform"></div>
-                <div class="relative">
-                    <div class="w-12 h-12 bg-info/10 rounded-xl flex items-center justify-center mb-3">
-                        <svg class="w-6 h-6 text-info" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                        </svg>
-                    </div>
-                    <p class="text-xs text-gray-600 font-bold uppercase mb-1">In Progress</p>
-                    <p class="text-3xl font-black text-gray-900">{{ $inProgressOrders }}</p>
-                </div>
-            </div>
-
-            <!-- Total Spent -->
-            <div class="group relative bg-white rounded-2xl p-6 border-2 border-gray-200 hover:border-warning transition-all overflow-hidden">
-                <div class="absolute top-0 right-0 w-24 h-24 bg-warning/5 rounded-full -translate-y-1/2 translate-x-1/2 group-hover:scale-150 transition-transform"></div>
-                <div class="relative">
-                    <div class="w-12 h-12 bg-warning/10 rounded-xl flex items-center justify-center mb-3">
-                        <svg class="w-6 h-6 text-warning" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                    </div>
-                    <p class="text-xs text-gray-600 font-bold uppercase mb-1">Total Spent</p>
-                    <p class="text-3xl font-black text-gray-900">₱{{ number_format($totalSpent, 0) }}</p>
-                </div>
-            </div>
         </div>
 
         <!-- Search and Filter -->
@@ -91,6 +63,7 @@
             $currentPeriod = $isCustom ? 'custom' : (request('period') ?? 'all');
         @endphp
         <x-modules.filter-panel
+            class="history-filters"
             :action="route('user.history')"
             :status-filters="[
                 ['key' => 'all', 'label' => 'All Time', 'color' => 'primary', 'icon' => 'list'],
@@ -145,7 +118,7 @@
                 <h2 class="text-xl font-black text-gray-900">Recent Orders</h2>
             </div>
 
-            <div id="bookings-container" class="space-y-4">
+            <div id="bookings-container" class="booking-cards space-y-4">
                 @forelse($bookings as $index => $booking)
                     <div class="booking-card group bg-white rounded-xl border-2 border-gray-200 hover:border-wash hover:shadow-lg transition-all overflow-hidden" 
                          data-status="{{ $booking['status'] }}"
@@ -549,4 +522,11 @@
             }
         });
     </script>
+
+    <!-- Help Tour Button -->
+    <button class="help-tour-btn" onclick="if(window.tour) window.tour.startUserHistory()" title="Take a tour of this page">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+    </button>
 </x-layout>

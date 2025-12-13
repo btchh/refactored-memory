@@ -3,75 +3,56 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Traits\HasFilters;
 use App\Models\Transaction;
 use App\Services\AuditService;
+use App\Services\FilterService;
 use Illuminate\Http\Request;
 
 class BookingManagementController extends Controller
 {
+    use HasFilters;
+
     protected $auditService;
 
     public function __construct(AuditService $auditService)
     {
         $this->auditService = $auditService;
+        $this->initializeFilters();
     }
     public function index(Request $request)
     {
         $admin = auth()->guard('admin')->user();
-        $status = $request->get('status', 'all');
-        $search = $request->get('search');
-        $startDate = $request->get('start_date');
-        $endDate = $request->get('end_date');
-
+        
         // Get all admin IDs for this branch
         $branchAdminIds = \App\Models\Admin::where('branch_address', $admin->branch_address)->pluck('id');
 
-        // Only show bookings for this branch (all admins at this branch)
-        $query = Transaction::with(['user', 'services', 'products', 'admin'])
+        // Base query for this branch
+        $baseQuery = Transaction::with(['user', 'services', 'products', 'admin'])
             ->whereIn('admin_id', $branchAdminIds)
             ->orderBy('booking_date', 'desc')
             ->orderBy('booking_time', 'desc');
 
-        if ($status !== 'all') {
-            $query->where('status', $status);
-        }
+        // Apply filters using the centralized FilterService
+        $filteredQuery = $this->applyFilters(clone $baseQuery, $request, FilterService::adminManagementConfig());
+        
+        // Get paginated results
+        $bookings = $this->getPaginatedResults($filteredQuery, $request, 20);
 
-        if ($search) {
-            $query->whereHas('user', function ($q) use ($search) {
-                $q->where('fname', 'like', "%{$search}%")
-                  ->orWhere('lname', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%");
-            });
-        }
+        // Get filter statistics
+        $stats = $this->getFilterStats($baseQuery);
 
-        // Date range filtering
-        if ($startDate) {
-            $query->whereDate('booking_date', '>=', $startDate);
-        }
-        if ($endDate) {
-            $query->whereDate('booking_date', '<=', $endDate);
-        }
+        // Build response data
+        $responseData = $this->buildFilterResponse($request, $bookings, $stats);
 
-        $bookings = $query->paginate(20);
-
-        // Build stats query with same filters - for this branch's bookings
-        $statsQuery = Transaction::whereIn('admin_id', $branchAdminIds);
-        if ($startDate) {
-            $statsQuery->whereDate('booking_date', '>=', $startDate);
-        }
-        if ($endDate) {
-            $statsQuery->whereDate('booking_date', '<=', $endDate);
-        }
-
-        $stats = [
-            'all' => (clone $statsQuery)->count(),
-            'pending' => (clone $statsQuery)->where('status', 'pending')->count(),
-            'in_progress' => (clone $statsQuery)->where('status', 'in_progress')->count(),
-            'completed' => (clone $statsQuery)->where('status', 'completed')->count(),
-            'cancelled' => (clone $statsQuery)->where('status', 'cancelled')->count(),
-        ];
-
-        return view('admin.bookings.manage', compact('bookings', 'stats', 'status', 'search', 'startDate', 'endDate'));
+        return view('admin.bookings.manage', [
+            'bookings' => $responseData['results'],
+            'stats' => $responseData['stats'],
+            'status' => $request->get('status', 'all'),
+            'search' => $request->get('search', ''),
+            'startDate' => $responseData['filters']['start_date'],
+            'endDate' => $responseData['filters']['end_date']
+        ]);
     }
 
     public function updateStatus(Request $request, $id)

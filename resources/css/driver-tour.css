@@ -1,0 +1,224 @@
+/* Driver.js Demo-Style Styling */
+.driver-popover {
+    background: #ffffff !important;
+    border: none !important;
+    border-radius: 8px !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+    max-width: 360px !important;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+    padding: 20px !important;
+    position: relative !important;
+}
+
+.driver-popover-title {
+    font-size: 1.25rem !important;
+    font-weight: 600 !important;
+    color: #1a1a1a !important;
+    margin: 0 0 8px 0 !important;
+    line-height: 1.4 !important;
+}
+
+.driver-popover-description {
+    font-size: 0.875rem !important;
+    line-height: 1.5 !important;
+    color: #666666 !important;
+    margin: 0 0 20px 0 !important;
+}
+
+.driver-popover-footer {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    margin-top: 20px !important;
+    padding: 0 !important;
+}
+
+.driver-popover-navigation-btns {
+    display: flex !important;
+    gap: 8px !important;
+    margin-left: auto !important;
+}
+
+.driver-popover-btn {
+    padding: 8px 16px !important;
+    border-radius: 6px !important;
+    font-weight: 500 !important;
+    font-size: 0.875rem !important;
+    border: none !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    min-width: 70px !important;
+    height: 36px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+.driver-popover-next-btn {
+    background: #3b82f6 !important;
+    color: white !important;
+}
+
+.driver-popover-next-btn:hover {
+    background: #2563eb !important;
+}
+
+.driver-popover-prev-btn {
+    background: #374151 !important;
+    color: white !important;
+}
+
+.driver-popover-prev-btn:hover {
+    background: #1f2937 !important;
+}
+
+.driver-popover-close-btn {
+    background: #ef4444 !important;
+    color: white !important;
+    padding: 6px 8px !important;
+    border-radius: 4px !important;
+    font-size: 1rem !important;
+    font-weight: 600 !important;
+    line-height: 1 !important;
+    min-width: 32px !important;
+    height: 32px !important;
+    position: absolute !important;
+    top: 12px !important;
+    right: 12px !important;
+}
+
+.driver-popover-close-btn:hover {
+    background: #dc2626 !important;
+}
+
+.driver-popover-progress-text {
+    font-size: 0.75rem !important;
+    color: #9ca3af !important;
+    font-weight: 500 !important;
+}
+
+/* Driver.js Demo Highlight Styling */
+.driver-highlighted-element {
+    border-radius: 8px !important;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.5) !important;
+}
+
+/* Driver.js Demo Overlay */
+.driver-overlay {
+    background: rgba(0, 0, 0, 0.75) !important;
+}
+
+/* Driver.js Arrow Styling */
+.driver-popover-arrow {
+    border-color: #ffffff !important;
+}
+
+.driver-popover-arrow-side-top {
+    border-bottom-color: #ffffff !important;
+}
+
+.driver-popover-arrow-side-bottom {
+    border-top-color: #ffffff !important;
+}
+
+.driver-popover-arrow-side-left {
+    border-right-color: #ffffff !important;
+}
+
+.driver-popover-arrow-side-right {
+    border-left-color: #ffffff !important;
+}
+
+/* Simple help button styling */
+.help-tour-btn {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 56px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transition: all 0.2s ease;
+    z-index: 1000;
+}
+
+.help-tour-btn:hover {
+    background: #2563eb;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.help-tour-btn:active {
+    transform: translateY(0);
+}
+
+/* Simple responsive adjustments */
+@media (max-width: 640px) {
+    .driver-popover {
+        max-width: 320px !important;
+        margin: 16px !important;
+    }
+    
+    .help-tour-btn {
+        bottom: 16px;
+        right: 16px;
+        width: 48px;
+        height: 48px;
+        font-size: 1.125rem;
+    }
+}
+
+/* Subtle pulse animation - Like Driver.js demo */
+@keyframes tourPulse {
+    0%, 100% {
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.4);
+    }
+    50% {
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.6);
+    }
+}
+
+.driver-highlighted-element {
+    animation: tourPulse 2s ease-in-out infinite;
+}
+
+/* Simple completion badge */
+.tour-completed-badge {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    background: #10b981;
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+/* Simple skip button */
+.skip-tour-btn {
+    background: #f3f4f6;
+    color: #374151;
+    border: 1px solid #d1d5db;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.skip-tour-btn:hover {
+    background: #e5e7eb;
+}

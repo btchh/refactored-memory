@@ -4,6 +4,7 @@
  */
 
 import { api } from './api.js';
+// Cancel booking functionality is available globally via cancel-booking.js
 
 export class BookingManagement {
     constructor(options = {}) {
@@ -96,22 +97,22 @@ export class BookingManagement {
         return classes[status] || 'badge-neutral';
     }
 
-    async cancelBooking(id) {
-        if (!confirm('Are you sure you want to cancel this booking?')) return;
+    cancelBooking(id) {
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
         
-        const reason = prompt('Cancellation reason (optional):');
-        
-        try {
-            const data = await api.delete(`/admin/bookings/${id}`, { reason });
-            
-            if (data.success) {
-                window.Toast?.success('Booking cancelled successfully');
-                this.loadUserBookings(this.userId);
-                this.onBookingUpdate();
-            }
-        } catch (error) {
-            console.error('Error cancelling booking:', error);
-            window.Toast?.error('Failed to cancel booking');
+        if (typeof window.showCancelModal === 'function') {
+            window.showCancelModal(id, {
+                type: 'admin',
+                cancelUrl: '/admin/bookings/__ID__/cancel',
+                csrfToken: csrfToken,
+                onSuccess: () => {
+                    this.loadUserBookings(this.userId);
+                    this.onBookingUpdate();
+                }
+            });
+        } else {
+            console.error('showCancelModal function not available');
+            window.Toast?.error('Cancel function not loaded. Please refresh the page.');
         }
     }
 

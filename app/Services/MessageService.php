@@ -274,4 +274,28 @@ class MessageService
         $message = $this->replaceVariables($template, $data);
         return $this->smsService->sendBulkSms($phoneNumbers, $message);
     }
+
+    /**
+     * Notify admin when customer cancels booking
+     */
+    public function notifyAdminOfCancellation(string $adminPhoneNumber, array $data): array
+    {
+        $message = $this->replaceVariables(
+            config('messages.admin.booking_cancelled_by_customer'),
+            $data
+        );
+        return $this->smsService->sendSms($adminPhoneNumber, $message);
+    }
+
+    /**
+     * Notify admin of new booking
+     */
+    public function notifyAdminOfNewBooking(string $adminPhoneNumber, array $data): array
+    {
+        $message = $this->replaceVariables(
+            config('messages.admin.new_booking'),
+            $data
+        );
+        return $this->smsService->sendSms($adminPhoneNumber, $message);
+    }
 }

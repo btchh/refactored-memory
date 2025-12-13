@@ -3,7 +3,7 @@
 
     <div class="max-w-7xl mx-auto space-y-6">
         <!-- Hero Header -->
-        <div class="relative bg-gradient-to-br from-wash via-wash-dark to-gray-900 rounded-2xl p-12 overflow-hidden">
+        <div class="hero-header relative bg-gradient-to-br from-wash via-wash-dark to-gray-900 rounded-2xl p-12 overflow-hidden">
             <!-- Decorative Background -->
             <div class="absolute inset-0 opacity-10">
                 <div class="absolute top-0 right-0 w-64 h-64 bg-white rounded-full -translate-y-1/2 translate-x-1/2"></div>
@@ -18,7 +18,7 @@
         </div>
 
         <!-- Stat Cards Grid -->
-        <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+        <div class="stats-grid grid grid-cols-2 md:grid-cols-5 gap-4">
             <!-- All Bookings -->
             <a href="{{ route('admin.bookings.manage', ['status' => 'all']) }}" 
                class="group relative bg-white rounded-2xl p-6 border-2 {{ $status === 'all' ? 'border-wash' : 'border-gray-200' }} hover:border-wash transition-all overflow-hidden">
@@ -97,30 +97,22 @@
 
         <!-- Search & Filters -->
         @php
-            $hasDateFilter = $startDate || $endDate;
+            $period = request('period');
             $isCustomRequest = request('custom') == '1';
-            $isToday = $startDate == now()->format('Y-m-d') && $endDate == now()->format('Y-m-d');
-            $isTomorrow = $startDate == now()->addDay()->format('Y-m-d') && $endDate == now()->addDay()->format('Y-m-d');
-            $isWeek = $startDate == now()->startOfWeek()->format('Y-m-d') && $endDate == now()->endOfWeek()->format('Y-m-d');
-            $isMonth = $startDate == now()->startOfMonth()->format('Y-m-d') && $endDate == now()->endOfMonth()->format('Y-m-d');
+            $hasDateFilter = $startDate || $endDate;
             
             if ($isCustomRequest) {
                 $currentDateFilter = 'custom';
-            } elseif (!$hasDateFilter) {
-                $currentDateFilter = 'all';
-            } elseif ($isToday) {
-                $currentDateFilter = 'today';
-            } elseif ($isTomorrow) {
-                $currentDateFilter = 'tomorrow';
-            } elseif ($isWeek) {
-                $currentDateFilter = 'week';
-            } elseif ($isMonth) {
-                $currentDateFilter = 'month';
-            } else {
+            } elseif ($period && in_array($period, ['today', 'tomorrow', 'week', 'month'])) {
+                $currentDateFilter = $period;
+            } elseif ($hasDateFilter) {
                 $currentDateFilter = 'custom';
+            } else {
+                $currentDateFilter = 'all';
             }
         @endphp
         <x-modules.filter-panel
+            class="filter-panel"
             :action="route('admin.bookings.manage')"
             :status-filters="[
                 ['key' => 'all', 'label' => 'All Dates', 'color' => 'primary', 'icon' => 'list'],
@@ -155,29 +147,13 @@
                     const status = '{{ $status }}';
                     let url = '{{ route("admin.bookings.manage") }}?status=' + status;
                     
-                    const today = new Date();
-                    const formatDate = (d) => d.toISOString().split('T')[0];
-                    
                     if (filter === 'custom') {
                         url += '&custom=1';
-                    } else if (filter === 'today') {
-                        url += `&start_date=${formatDate(today)}&end_date=${formatDate(today)}`;
-                    } else if (filter === 'tomorrow') {
-                        const tomorrow = new Date(today);
-                        tomorrow.setDate(tomorrow.getDate() + 1);
-                        url += `&start_date=${formatDate(tomorrow)}&end_date=${formatDate(tomorrow)}`;
-                    } else if (filter === 'week') {
-                        const startOfWeek = new Date(today);
-                        startOfWeek.setDate(today.getDate() - today.getDay());
-                        const endOfWeek = new Date(startOfWeek);
-                        endOfWeek.setDate(startOfWeek.getDate() + 6);
-                        url += `&start_date=${formatDate(startOfWeek)}&end_date=${formatDate(endOfWeek)}`;
-                    } else if (filter === 'month') {
-                        const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-                        const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-                        url += `&start_date=${formatDate(startOfMonth)}&end_date=${formatDate(endOfMonth)}`;
+                    } else if (filter !== 'all') {
+                        // Use period parameter for predefined filters
+                        url += `&period=${filter}`;
                     }
-                    // 'all' goes without date params
+                    // 'all' goes without any date params
                     
                     window.location.href = url;
                 });
@@ -189,7 +165,7 @@
         <div id="alert-container"></div>
 
         <!-- Bookings Table -->
-        <div class="bg-white rounded-2xl border-2 border-gray-200 p-6">
+        <div class="bookings-table bg-white rounded-2xl border-2 border-gray-200 p-6">
             <div class="flex items-center justify-between mb-5">
                 <h2 class="text-xl font-black text-gray-900">Recent Bookings</h2>
             </div>
@@ -228,7 +204,7 @@
                                 </td>
                                 <td class="px-6 py-4">
                                     <select onchange="updateStatus({{ $booking->id }}, this.value)" 
-                                            class="form-select text-sm badge badge-{{ $booking->status === 'completed' ? 'success' : ($booking->status === 'in_progress' ? 'info' : ($booking->status === 'cancelled' ? 'error' : 'warning')) }}">
+                                            class="status-dropdown form-select text-sm badge badge-{{ $booking->status === 'completed' ? 'success' : ($booking->status === 'in_progress' ? 'info' : ($booking->status === 'cancelled' ? 'error' : 'warning')) }}">
                                         <option value="pending" {{ $booking->status === 'pending' ? 'selected' : '' }}>Pending</option>
                                         <option value="in_progress" {{ $booking->status === 'in_progress' ? 'selected' : '' }}>In Progress</option>
                                         <option value="completed" {{ $booking->status === 'completed' ? 'selected' : '' }}>Completed</option>
@@ -236,7 +212,7 @@
                                     </select>
                                 </td>
                                 <td class="px-6 py-4 text-right">
-                                    <div class="flex flex-wrap justify-end gap-2">
+                                    <div class="action-buttons flex flex-wrap justify-end gap-2">
                                         <button onclick="viewDetails({{ $booking->id }})" class="btn btn-sm btn-info" title="View Details">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -363,9 +339,26 @@
             updateWeight: '{{ route('admin.bookings.updateWeight', ['id' => '__ID__']) }}',
             details: '{{ route('admin.bookings.details', ['id' => '__ID__']) }}',
             reschedule: '{{ route('admin.bookings.reschedule', ['id' => '__ID__']) }}',
-            cancel: '{{ route('admin.bookings.cancel', ['id' => '__ID__']) }}',
+            cancel: '{{ route('admin.bookings.cancel.reason', ['id' => '__ID__']) }}',
             slots: '{{ route('admin.api.calendar.slots') }}',
             csrf: '{{ csrf_token() }}'
+        };
+        
+        // Make cancel function available globally
+        window.cancelBooking = function(bookingId) {
+            if (typeof window.showCancelModal === 'function') {
+                window.showCancelModal(bookingId, {
+                    type: 'admin',
+                    cancelUrl: window.bookingRoutes.cancel,
+                    csrfToken: window.bookingRoutes.csrf,
+                    onSuccess: () => {
+                        setTimeout(() => window.location.reload(), 1000);
+                    }
+                });
+            } else {
+                console.error('showCancelModal function not available');
+                alert('Cancel function not loaded. Please refresh the page.');
+            }
         };
 
         function editWeightFromView(bookingId, currentWeight) {
@@ -453,34 +446,7 @@
             }
         });
 
-        async function cancelBooking(bookingId) {
-            if (!confirm('Are you sure you want to cancel this booking?')) return;
 
-            const reason = prompt('Cancellation reason (optional):');
-
-            try {
-                const response = await fetch(window.bookingRoutes.cancel.replace('__ID__', bookingId), {
-                    method: 'DELETE',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': window.bookingRoutes.csrf
-                    },
-                    body: JSON.stringify({ reason: reason })
-                });
-
-                const result = await response.json();
-
-                if (result.success) {
-                    showAlert('success', result.message || 'Booking cancelled successfully');
-                    setTimeout(() => window.location.reload(), 1000);
-                } else {
-                    showAlert('error', result.message || 'Failed to cancel booking');
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                showAlert('error', 'Failed to cancel booking');
-            }
-        }
 
         document.getElementById('edit-weight-form').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -680,4 +646,30 @@
         }
     </script>
     @endpush
+
+    <!-- Help Tour Button -->
+    <button class="help-tour-btn" onclick="if(window.tour) window.tour.startBookingManagement()" title="Take a tour of this page">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+    </button>
+
+    <!-- Debug Tour Controls (Ctrl+Shift+T to show) -->
+    <div id="tour-debug" style="display:none; position:fixed; top:20px; right:20px; background:white; border:1px solid #ccc; padding:10px; border-radius:8px; z-index:9999; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+        <div style="font-size:12px; font-weight:bold; margin-bottom:8px;">Tour Debug</div>
+        <button onclick="if(window.tour) window.tour.startBookingManagement()" style="background:#3b82f6; color:white; border:none; padding:4px 8px; border-radius:4px; margin-right:4px; cursor:pointer;">Start Tour</button>
+        <button onclick="if(window.tour) { window.tour.reset(); alert('Tours reset!'); }" style="background:#ef4444; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer;">Reset</button>
+        <button onclick="console.log('Elements check:', { heroHeader: !!document.querySelector('.hero-header'), statsGrid: !!document.querySelector('.stats-grid'), bookingsTable: !!document.querySelector('.bookings-table') });" style="background:#10b981; color:white; border:none; padding:4px 8px; border-radius:4px; margin-top:4px; cursor:pointer; display:block;">Check Elements</button>
+    </div>
+
+    <script>
+        // Debug controls
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.shiftKey && e.key === 'T') {
+                e.preventDefault();
+                const debug = document.getElementById('tour-debug');
+                debug.style.display = debug.style.display === 'none' ? 'block' : 'none';
+            }
+        });
+    </script>
 </x-layout>

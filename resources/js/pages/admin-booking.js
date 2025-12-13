@@ -3,11 +3,12 @@
  * Main entry point for admin booking interface
  */
 
-import { Calendar } from '../modules/calendar.js';
+import { AdminCalendar } from '../modules/admin-calendar.js';
 import { BookingForm } from '../modules/booking-form.js';
 import { UserSearch } from '../modules/user-search.js';
 import { BookingManagement } from '../modules/booking-management.js';
 import { TimeSlots } from '../modules/time-slots.js';
+// Cancel booking functionality is available globally via cancel-booking.js
 
 // Auto-initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
@@ -37,24 +38,34 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     bookingManagement.init();
 
-    // Initialize Calendar
-    const calendar = new Calendar('calendar-container', {
+    // Initialize Admin Calendar (allows past date selection)
+    const calendar = new AdminCalendar('calendar-container', {
         countsUrl: routes.bookingCounts,
-        onDateSelect: async (date) => {
+        allowPastDates: true,
+        onDateSelect: async (date, isPast) => {
             const dateInput = document.getElementById('booking_date');
             if (dateInput) dateInput.value = date;
             
             // Load bookings for this date
-            await loadDateBookings(date);
+            await loadDateBookings(date, isPast);
             
-            // Load time slots
-            timeSlots.loadSlots(date);
+            // Load time slots (only for future dates)
+            if (!isPast) {
+                timeSlots.loadSlots(date);
+            } else {
+                // Clear time slots for past dates
+                const timeSelect = document.getElementById('booking_time');
+                if (timeSelect) {
+                    timeSelect.innerHTML = '<option value="">Past date - view only</option>';
+                    timeSelect.disabled = true;
+                }
+            }
         }
     });
     calendar.init();
 
     // Load bookings for a specific date
-    async function loadDateBookings(date) {
+    async function loadDateBookings(date, isPast = false) {
         const dateBookingsSection = document.getElementById('date-bookings-section');
         const dateBookingsList = document.getElementById('date-bookings-list');
         const selectedDateDisplay = document.getElementById('selected-date-display');
@@ -116,14 +127,16 @@ document.addEventListener('DOMContentLoaded', () => {
                         <svg class="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
                         </svg>
-                        <h4 class="text-lg font-semibold text-gray-900 mb-2">No Bookings Yet</h4>
-                        <p class="text-gray-600 mb-4">This date is available for new bookings</p>
+                        <h4 class="text-lg font-semibold text-gray-900 mb-2">No Bookings ${isPast ? 'Found' : 'Yet'}</h4>
+                        <p class="text-gray-600 mb-4">${isPast ? 'No bookings were made for this date' : 'This date is available for new bookings'}</p>
+                        ${!isPast ? `
                         <button onclick="showBookingForm()" class="btn btn-primary btn-sm">
                             <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                             </svg>
                             Create First Booking
                         </button>
+                        ` : ''}
                     </div>
                 `;
             } else {
@@ -178,7 +191,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                     </svg>
-                                    View Details
+                                    View
                                 </button>
                                 ${booking.is_upcoming ? `
                                     <button onclick="rescheduleBooking(${booking.id})" class="btn btn-sm btn-primary">
@@ -209,6 +222,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const classes = {
             'pending': 'bg-yellow-100 text-yellow-700',
             'in_progress': 'bg-blue-100 text-blue-700',
+            'out_for_delivery': 'bg-purple-100 text-purple-700',
             'completed': 'bg-green-100 text-green-700',
             'cancelled': 'bg-red-100 text-red-700'
         };
@@ -388,21 +402,13 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    window.cancelBooking = async (id) => {
-        if (confirm('Are you sure you want to cancel this booking?')) {
-            try {
-                const response = await fetch(`${routes.bookings}/${id}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'X-CSRF-TOKEN': csrf,
-                        'Content-Type': 'application/json'
-                    }
-                });
-                
-                const data = await response.json();
-                
-                if (data.success) {
-                    window.Toast?.success('Booking cancelled successfully');
+    window.cancelBooking = (id) => {
+        if (typeof window.showCancelModal === 'function') {
+            window.showCancelModal(id, {
+                type: 'admin',
+                cancelUrl: `${routes.bookings}/__ID__/cancel`,
+                csrfToken: csrf,
+                onSuccess: async () => {
                     // Reload the date bookings
                     const dateInput = document.getElementById('booking_date');
                     if (dateInput && dateInput.value) {
@@ -410,13 +416,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                     // Refresh calendar
                     calendar.render();
-                } else {
-                    window.Toast?.error('Failed to cancel booking: ' + data.message);
                 }
-            } catch (error) {
-                console.error('Failed to cancel booking:', error);
-                window.Toast?.error('Failed to cancel booking');
-            }
+            });
+        } else {
+            console.error('showCancelModal function not available');
+            window.Toast?.error('Cancel function not loaded. Please refresh the page.');
         }
     };
 

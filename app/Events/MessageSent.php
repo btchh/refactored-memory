@@ -37,6 +37,11 @@ class MessageSent implements ShouldBroadcastNow
             'sender_id' => $this->message->sender_id,
             'sender_name' => $this->message->sender_name,
             'message' => $this->message->message,
+            'has_attachment' => $this->message->has_attachment,
+            'attachment_url' => $this->message->attachment_url,
+            'attachment_type' => $this->message->attachment_type,
+            'attachment_name' => $this->message->attachment_name,
+            'is_read' => $this->message->is_read,
             'created_at' => $this->message->created_at->toISOString(),
             'formatted_time' => $this->message->created_at->format('g:i A'),
         ];

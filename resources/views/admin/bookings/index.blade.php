@@ -28,7 +28,7 @@
                         Select Date
                     </h2>
                     
-                    <div id="calendar-container" class="mb-4">
+                    <div id="calendar-container" class="calendar-picker mb-4">
                         <div class="flex justify-between items-center mb-4">
                             <button id="prev-month" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
                                 <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -102,7 +102,7 @@
                     @csrf
 
                     <!-- Service Type Selection -->
-                    <div class="bg-white rounded-2xl border-2 border-gray-200 p-6">
+                    <div class="service-selection bg-white rounded-2xl border-2 border-gray-200 p-6">
                         <h2 class="text-xl font-black text-gray-900 mb-2">Choose Service Type</h2>
                         <p class="text-sm text-gray-500 mb-4">Select how the customer's laundry will be picked up and delivered</p>
                         
@@ -152,7 +152,7 @@
                                         <div class="flex-1">
                                             <h3 class="font-bold text-gray-900 mb-1">Self Drop-off</h3>
                                             <p class="text-xs text-gray-500 mb-2">Customer drops off, we deliver</p>
-                                            <span class="inline-block px-2 py-1 bg-green-100 text-green-700 text-xs font-medium rounded">Save on Pickup</span>
+                                            <span class="inline-block px-2 py-1 bg-green-100 text-green-700 text-xs font-medium rounded">Drop Off at Branch</span>
                                         </div>
                                     </div>
                                 </div>
@@ -176,15 +176,15 @@
                                         <div class="flex-1">
                                             <h3 class="font-bold text-gray-900 mb-1">Self Pickup</h3>
                                             <p class="text-xs text-gray-500 mb-2">We pick up, customer collects</p>
-                                            <span class="inline-block px-2 py-1 bg-purple-100 text-purple-700 text-xs font-medium rounded">Save on Delivery</span>
+                                            <span class="inline-block px-2 py-1 bg-purple-100 text-purple-700 text-xs font-medium rounded">Collect at Branch</span>
                                         </div>
                                     </div>
                                 </div>
                             </label>
 
-                            <!-- Self Service -->
+                            <!-- Drop & Collect -->
                             <label class="admin-service-card cursor-pointer group" data-pickup="customer_dropoff" data-delivery="customer_pickup">
-                                <input type="radio" name="service_option" value="self_service" class="hidden">
+                                <input type="radio" name="service_option" value="drop_collect" class="hidden">
                                 <div class="relative border-2 border-gray-200 rounded-xl p-4 transition-all duration-200 hover:border-orange-300 hover:shadow-md group-has-[:checked]:border-orange-500 group-has-[:checked]:bg-orange-50 group-has-[:checked]:shadow-lg">
                                     <div class="absolute top-3 right-3 w-5 h-5 rounded-full border-2 border-gray-300 flex items-center justify-center group-has-[:checked]:border-orange-500 group-has-[:checked]:bg-orange-500">
                                         <svg class="w-3 h-3 text-white hidden group-has-[:checked]:block" fill="currentColor" viewBox="0 0 20 20">
@@ -194,13 +194,13 @@
                                     <div class="flex items-start gap-3">
                                         <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center flex-shrink-0 group-has-[:checked]:bg-orange-200">
                                             <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
                                             </svg>
                                         </div>
                                         <div class="flex-1">
-                                            <h3 class="font-bold text-gray-900 mb-1">Self Service</h3>
+                                            <h3 class="font-bold text-gray-900 mb-1">Drop & Collect</h3>
                                             <p class="text-xs text-gray-500 mb-2">Customer drops off & collects</p>
-                                            <span class="inline-block px-2 py-1 bg-orange-100 text-orange-700 text-xs font-medium rounded">Best Price</span>
+                                            <span class="inline-block px-2 py-1 bg-orange-100 text-orange-700 text-xs font-medium rounded">Visit Branch</span>
                                         </div>
                                     </div>
                                 </div>
@@ -299,7 +299,7 @@
                     </div>
 
                     <!-- Customer Selection -->
-                    <div class="bg-white rounded-2xl border-2 border-gray-200 p-6" id="customer-selection-section">
+                    <div class="user-search bg-white rounded-2xl border-2 border-gray-200 p-6" id="customer-selection-section">
                         <h2 class="text-xl font-black text-gray-900 mb-4 flex items-center gap-2">
                             <svg class="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -373,6 +373,13 @@
                                         guestIndicator.classList.remove('hidden');
                                         userInfo.classList.add('hidden');
                                     }
+                                    
+                                    // Auto-select "Drop & Collect" service option for walk-ins
+                                    const dropCollectCard = document.querySelector('.admin-service-card input[value="drop_collect"]');
+                                    if (dropCollectCard) {
+                                        dropCollectCard.checked = true;
+                                        dropCollectCard.closest('.admin-service-card').click();
+                                    }
                                 } else {
                                     // Online: Customer is required
                                     userSelect.required = true;
@@ -380,6 +387,13 @@
                                     onlineHelp.classList.remove('hidden');
                                     walkinHelp.classList.add('hidden');
                                     guestIndicator.classList.add('hidden');
+                                    
+                                    // Auto-select "Full Service" for online bookings
+                                    const fullServiceCard = document.querySelector('.admin-service-card input[value="full_service"]');
+                                    if (fullServiceCard) {
+                                        fullServiceCard.checked = true;
+                                        fullServiceCard.closest('.admin-service-card').click();
+                                    }
                                 }
                             });
                         });
@@ -492,7 +506,7 @@
                                     </label>
                                 </div>
                             </div>
-                            <div class="md:col-span-2">
+                            <div class="service-pricing md:col-span-2">
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Services</label>
                                 <div id="services-container" class="grid grid-cols-2 gap-2">
                                     <p class="text-gray-500 col-span-2 text-sm">Select an item type first</p>
@@ -615,4 +629,11 @@
     </script>
     @vite(['resources/js/pages/admin-booking.js'])
     @endpush
+
+    <!-- Help Tour Button -->
+    <button class="help-tour-btn" onclick="if(window.tour) window.tour.startAdminBookingForm()" title="Take a tour of this page">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+    </button>
 </x-layout>

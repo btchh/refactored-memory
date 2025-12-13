@@ -123,6 +123,9 @@ class BookingService
             // Send reminder if booking is tomorrow
             $this->sendReminderIfTomorrow($transaction);
 
+            // Notify admin of new booking
+            $this->sendNewBookingNotification($transaction->fresh()->load('user', 'admin'));
+
             return [
                 'success' => true,
                 'booking' => $transaction->load('user', 'services', 'products'),
@@ -495,18 +498,22 @@ class BookingService
      */
     private function sendCancelledSms($transaction, $reason, $byAdmin)
     {
-        if (!$transaction->user || !$transaction->user->phone) {
-            return;
-        }
-
         try {
             $data = $this->getSmsData($transaction);
             $data['reason'] = $reason ?: 'No reason provided';
 
-            if ($byAdmin) {
-                $this->messageService->sendBookingCancelledByAdmin($transaction->user->phone, $data);
-            } else {
-                $this->messageService->sendBookingCancelled($transaction->user->phone, $data);
+            // Notify customer
+            if ($transaction->user && $transaction->user->phone) {
+                if ($byAdmin) {
+                    $this->messageService->sendBookingCancelledByAdmin($transaction->user->phone, $data);
+                } else {
+                    $this->messageService->sendBookingCancelled($transaction->user->phone, $data);
+                }
+            }
+
+            // Notify admin when customer cancels
+            if (!$byAdmin && $transaction->admin && $transaction->admin->phone) {
+                $this->messageService->notifyAdminOfCancellation($transaction->admin->phone, $data);
             }
         } catch (\Exception $e) {
             Log::error('Failed to send cancellation SMS', [
@@ -595,12 +602,32 @@ class BookingService
     }
 
     /**
+     * Send new booking notification to admin
+     */
+    private function sendNewBookingNotification($transaction)
+    {
+        if (!$transaction->admin || !$transaction->admin->phone) {
+            return;
+        }
+
+        try {
+            $data = $this->getSmsData($transaction);
+            $this->messageService->notifyAdminOfNewBooking($transaction->admin->phone, $data);
+        } catch (\Exception $e) {
+            Log::error('Failed to send new booking notification to admin', [
+                'booking_id' => $transaction->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    /**
      * Get common SMS data from transaction
      */
     private function getSmsData($transaction): array
     {
         return [
-            'customer_name' => $transaction->user->fname,
+            'customer_name' => $transaction->user->fname ?? 'Walk-in Customer',
             'booking_id' => $transaction->id,
             'schedule' => date('M j, Y', strtotime($transaction->booking_date)) . ' at ' . date('g:i A', strtotime($transaction->booking_time)),
             'service_description' => $transaction->service_description,

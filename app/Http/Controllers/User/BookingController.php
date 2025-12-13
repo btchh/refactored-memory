@@ -3,14 +3,26 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
+use App\Http\Traits\HasFilters;
 use App\Models\Transaction;
 use App\Services\BookingService;
 use App\Services\CalApiService;
+use App\Services\FilterService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class BookingController extends Controller
 {
+    use HasFilters;
+
+    protected $bookingService;
+
+    public function __construct(BookingService $bookingService)
+    {
+        $this->bookingService = $bookingService;
+        $this->initializeFilters();
+    }
+
     /**
      * Show the booking form
      */
@@ -219,5 +231,46 @@ class BookingController extends Controller
             'success' => true,
             'total' => $total,
         ]);
+    }
+
+    /**
+     * Cancel a booking (AJAX)
+     */
+    public function cancelBooking(Request $request, $id)
+    {
+        $transaction = Transaction::where('id', $id)
+            ->where('user_id', auth()->id())
+            ->first();
+
+        if (!$transaction) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Booking not found'
+            ], 404);
+        }
+
+        // Only allow cancellation of pending bookings
+        if (!in_array($transaction->status, ['pending'])) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Only pending bookings can be cancelled'
+            ], 400);
+        }
+
+        // Check if booking is in the future
+        $bookingDateTime = \Carbon\Carbon::parse($transaction->booking_date->format('Y-m-d') . ' ' . $transaction->booking_time);
+        if ($bookingDateTime->isPast()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Cannot cancel bookings that have already passed'
+            ], 400);
+        }
+
+        $reason = $request->input('reason', 'Cancelled by customer');
+
+        // Use booking service to handle cancellation with notifications
+        $result = $this->bookingService->cancelBooking($id, $reason, false); // byAdmin = false
+
+        return response()->json($result);
     }
 }

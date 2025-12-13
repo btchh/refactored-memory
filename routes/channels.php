@@ -25,9 +25,11 @@ Broadcast::channel('conversation.{conversationId}', function ($user, $conversati
     // $user could be either a User or Admin model
     if (method_exists($user, 'getTable')) {
         if ($user->getTable() === 'users') {
+            // User must own the conversation
             return $conversation->user_id === $user->id;
         } elseif ($user->getTable() === 'admins') {
-            return $conversation->admin_id === $user->id;
+            // Admin must be from the same branch
+            return $conversation->branch_address === $user->branch_address;
         }
     }
     

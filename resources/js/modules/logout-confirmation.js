@@ -60,7 +60,8 @@ function showLogoutModal(form) {
             window.formProtection.hasUnsavedChanges = false;
         }
         modal.remove();
-        form.submit();
+        // Use HTMLFormElement.prototype.submit to bypass event listeners
+        HTMLFormElement.prototype.submit.call(form);
     });
     
     // Close on backdrop click

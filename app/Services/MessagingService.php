@@ -3,10 +3,14 @@
 namespace App\Services;
 
 use App\Events\MessageSent;
+use App\Events\MessagesRead;
+use App\Events\UserTyping;
 use App\Models\Admin;
 use App\Models\Conversation;
 use App\Models\Message;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Storage;
 
 class MessagingService
 {
@@ -21,13 +25,25 @@ class MessagingService
     /**
      * Send a message
      */
-    public function sendMessage(int $conversationId, string $senderType, int $senderId, string $messageText): Message
-    {
+    public function sendMessage(
+        int $conversationId,
+        string $senderType,
+        int $senderId,
+        string $messageText,
+        ?UploadedFile $attachment = null
+    ): Message {
+        $attachmentData = [];
+        
+        if ($attachment) {
+            $attachmentData = $this->handleAttachment($attachment, $conversationId);
+        }
+        
         $message = Message::create([
             'conversation_id' => $conversationId,
             'sender_type' => $senderType,
             'sender_id' => $senderId,
             'message' => $messageText,
+            ...$attachmentData,
         ]);
 
         // Update conversation's last message timestamp
@@ -39,6 +55,23 @@ class MessagingService
         broadcast(new MessageSent($message))->toOthers();
 
         return $message;
+    }
+
+    /**
+     * Handle file attachment upload
+     */
+    protected function handleAttachment(UploadedFile $file, int $conversationId): array
+    {
+        $extension = $file->getClientOriginalExtension();
+        $isImage = in_array(strtolower($extension), ['jpg', 'jpeg', 'png', 'gif', 'webp']);
+        
+        $path = $file->store("chat-attachments/{$conversationId}", 'public');
+        
+        return [
+            'attachment_path' => $path,
+            'attachment_type' => $isImage ? 'image' : 'file',
+            'attachment_name' => $file->getClientOriginalName(),
+        ];
     }
 
     /**
@@ -55,19 +88,38 @@ class MessagingService
     }
 
     /**
-     * Mark messages as read
+     * Mark messages as read and broadcast
      */
     public function markAsRead(int $conversationId, string $readerType): void
     {
         $senderType = $readerType === 'user' ? 'admin' : 'user';
         
-        Message::where('conversation_id', $conversationId)
+        // Get IDs of messages being marked as read
+        $messageIds = Message::where('conversation_id', $conversationId)
             ->where('sender_type', $senderType)
             ->where('is_read', false)
-            ->update([
-                'is_read' => true,
-                'read_at' => now(),
-            ]);
+            ->pluck('id')
+            ->toArray();
+        
+        if (empty($messageIds)) {
+            return;
+        }
+        
+        Message::whereIn('id', $messageIds)->update([
+            'is_read' => true,
+            'read_at' => now(),
+        ]);
+        
+        // Broadcast read receipt
+        broadcast(new MessagesRead($conversationId, $readerType, $messageIds))->toOthers();
+    }
+
+    /**
+     * Broadcast typing indicator
+     */
+    public function broadcastTyping(int $conversationId, string $senderType, string $senderName, bool $isTyping = true): void
+    {
+        broadcast(new UserTyping($conversationId, $senderType, $senderName, $isTyping))->toOthers();
     }
 
     /**
@@ -142,12 +194,13 @@ class MessagingService
         return Admin::whereIn('id', function ($query) use ($userId) {
             $query->select('admin_id')
                 ->from('transactions')
-                ->where('user_id', $userId)
-                ->distinct();
+                ->where('user_id', $userId);
         })
-            ->select('branch_address')
-            ->distinct()
-            ->pluck('branch_address');
+            ->whereNotNull('branch_address')
+            ->where('branch_address', '!=', '')
+            ->pluck('branch_address')
+            ->unique()
+            ->values();
     }
 
     /**

@@ -49,8 +49,14 @@ class MessageController extends Controller
     public function send(Request $request, $userId)
     {
         $request->validate([
-            'message' => 'required|string|max:1000',
+            'message' => 'nullable|string|max:1000',
+            'attachment' => 'nullable|file|max:5120|mimes:jpg,jpeg,png,gif,webp,pdf,doc,docx',
         ]);
+
+        // Require either message or attachment
+        if (!$request->message && !$request->hasFile('attachment')) {
+            return response()->json(['success' => false, 'message' => 'Message or attachment required'], 422);
+        }
 
         $admin = Auth::guard('admin')->user();
         $conversation = $this->messagingService->getOrCreateConversation($userId, $admin->branch_address);
@@ -59,7 +65,8 @@ class MessageController extends Controller
             $conversation->id,
             'admin',
             $admin->id,
-            $request->message
+            $request->message ?? '',
+            $request->file('attachment')
         );
 
         return response()->json([
@@ -69,10 +76,39 @@ class MessageController extends Controller
                 'message' => $message->message,
                 'sender_type' => $message->sender_type,
                 'sender_name' => $message->sender_name,
+                'has_attachment' => $message->has_attachment,
+                'attachment_url' => $message->attachment_url,
+                'attachment_type' => $message->attachment_type,
+                'attachment_name' => $message->attachment_name,
+                'is_read' => false,
                 'created_at' => $message->created_at->toISOString(),
                 'formatted_time' => $message->created_at->format('g:i A'),
             ],
         ]);
+    }
+
+    /**
+     * Broadcast typing indicator
+     */
+    public function typing(Request $request, $userId)
+    {
+        $admin = Auth::guard('admin')->user();
+        $conversation = Conversation::where('user_id', $userId)
+            ->where('branch_address', $admin->branch_address)
+            ->first();
+
+        if (!$conversation) {
+            return response()->json(['success' => false], 404);
+        }
+
+        $this->messagingService->broadcastTyping(
+            $conversation->id,
+            'admin',
+            $admin->fname . ' ' . $admin->lname,
+            $request->boolean('is_typing', true)
+        );
+
+        return response()->json(['success' => true]);
     }
 
     /**
@@ -98,6 +134,11 @@ class MessageController extends Controller
                 'message' => $m->message,
                 'sender_type' => $m->sender_type,
                 'sender_name' => $m->sender_name,
+                'has_attachment' => $m->has_attachment,
+                'attachment_url' => $m->attachment_url,
+                'attachment_type' => $m->attachment_type,
+                'attachment_name' => $m->attachment_name,
+                'is_read' => $m->is_read,
                 'created_at' => $m->created_at->toISOString(),
                 'formatted_time' => $m->created_at->format('g:i A'),
             ]),
